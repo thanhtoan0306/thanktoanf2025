@@ -1,0 +1,224 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+
+const title = 'Login';
+---
+
+<PageLayout title={title}>
+	<section class="page-header">
+		<div>
+			<p class="eyebrow">Welcome back</p>
+			<h1>Đăng nhập</h1>
+			<p class="lead">Đăng nhập với tài khoản admin để quản lý blog.</p>
+		</div>
+	</section>
+
+	<section>
+		<form id="admin-login-form" class="card">
+			<div class="field-group">
+				<label for="username">Tài khoản</label>
+				<input
+					id="username"
+					name="username"
+					type="text"
+					required
+					placeholder="Ví dụ: admin"
+					autocomplete="username"
+				/>
+			</div>
+			<div class="field-group">
+				<label for="password">Mật khẩu</label>
+				<input
+					id="password"
+					name="password"
+					type="password"
+					required
+					placeholder="Nhập mật khẩu"
+					autocomplete="current-password"
+				/>
+			</div>
+			<div class="actions">
+				<button type="submit" class="primary-btn">Đăng nhập</button>
+				<button type="button" id="logout-button" class="secondary-btn" hidden>
+					Đăng xuất
+				</button>
+			</div>
+			<p id="login-message" class="message" aria-live="polite"></p>
+			<p class="hint">
+				<b>Tài khoản demo</b>: <code>admin</code> / <code>1</code>
+			</p>
+		</form>
+	</section>
+
+	<script>
+		const FORM_ID = 'admin-login-form';
+		const USERNAME_INPUT_ID = 'username';
+		const PASSWORD_INPUT_ID = 'password';
+		const MESSAGE_ID = 'login-message';
+		const LOGOUT_BUTTON_ID = 'logout-button';
+		const STORAGE_KEY = 'adminLoggedIn';
+
+		const form = document.getElementById(FORM_ID) as HTMLFormElement | null;
+		const usernameInput = document.getElementById(
+			USERNAME_INPUT_ID,
+		) as HTMLInputElement | null;
+		const passwordInput = document.getElementById(
+			PASSWORD_INPUT_ID,
+		) as HTMLInputElement | null;
+		const messageEl = document.getElementById(MESSAGE_ID) as HTMLParagraphElement | null;
+		const logoutBtn = document.getElementById(
+			LOGOUT_BUTTON_ID,
+		) as HTMLButtonElement | null;
+
+		// Nếu đã login trước đó thì cập nhật UI
+		if (window.localStorage.getItem(STORAGE_KEY) === 'true') {
+			if (messageEl) {
+				messageEl.textContent = 'Bạn đang đăng nhập với quyền admin.';
+				messageEl.classList.remove('error');
+				messageEl.classList.add('success');
+			}
+			if (logoutBtn) {
+				logoutBtn.hidden = false;
+			}
+		}
+
+		form?.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			const username = usernameInput?.value.trim() ?? '';
+			const password = passwordInput?.value ?? '';
+
+			// Demo: tài khoản tĩnh ở client
+			const VALID_USERNAME = 'admin';
+			const VALID_PASSWORD = '1';
+
+			if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+				window.localStorage.setItem(STORAGE_KEY, 'true');
+				if (messageEl) {
+					messageEl.textContent = 'Đăng nhập thành công. Bạn đang là admin.';
+					messageEl.classList.remove('error');
+					messageEl.classList.add('success');
+				}
+				if (logoutBtn) {
+					logoutBtn.hidden = false;
+				}
+			} else {
+				if (messageEl) {
+					messageEl.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
+					messageEl.classList.remove('success');
+					messageEl.classList.add('error');
+				}
+			}
+		});
+
+		logoutBtn?.addEventListener('click', () => {
+			window.localStorage.removeItem(STORAGE_KEY);
+			if (messageEl) {
+				messageEl.textContent = 'Bạn đã đăng xuất.';
+				messageEl.classList.remove('success');
+				messageEl.classList.remove('error');
+			}
+			if (logoutBtn) {
+				logoutBtn.hidden = true;
+			}
+			if (usernameInput) usernameInput.value = '';
+			if (passwordInput) passwordInput.value = '';
+		});
+	</script>
+
+	<style>
+		.page-header {
+			display: grid;
+			gap: 0.5rem;
+			margin-bottom: 1.5rem;
+		}
+		.eyebrow {
+			margin: 0;
+			text-transform: uppercase;
+			font-size: 0.9rem;
+			letter-spacing: 0.15em;
+			color: rgb(var(--gray));
+		}
+		.lead {
+			margin: 0;
+			color: rgb(var(--gray));
+			max-width: 640px;
+		}
+		.card {
+			display: grid;
+			gap: 0.75rem;
+			max-width: 380px;
+			padding: 1.5rem 1.75rem;
+			border-radius: 1rem;
+			border: 1px solid rgba(var(--black), 0.06);
+			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
+			background: white;
+		}
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+		.field-group {
+			display: grid;
+			gap: 0.25rem;
+		}
+		label {
+			font-weight: 500;
+			font-size: 0.95rem;
+		}
+		input {
+			padding: 0.6rem 0.75rem;
+			border-radius: 0.6rem;
+			border: 1px solid rgba(var(--black), 0.12);
+			font-size: 1rem;
+		}
+		input:focus-visible {
+			outline: 2px solid rgb(var(--accent));
+			outline-offset: 1px;
+		}
+		.primary-btn {
+			margin-top: 0.25rem;
+			padding: 0.6rem 0.9rem;
+			border-radius: 999px;
+			border: none;
+			background: rgb(var(--accent));
+			color: white;
+			font-weight: 600;
+			cursor: pointer;
+		}
+		.primary-btn:hover {
+			filter: brightness(0.95);
+		}
+		.secondary-btn {
+			margin-top: 0.25rem;
+			padding: 0.6rem 0.9rem;
+			border-radius: 999px;
+			border: 1px solid rgba(var(--black), 0.15);
+			background: white;
+			color: rgb(var(--black));
+			font-weight: 500;
+			cursor: pointer;
+		}
+		.secondary-btn:hover {
+			background: rgba(var(--black), 0.02);
+		}
+		.message {
+			min-height: 1.4rem;
+			font-size: 0.9rem;
+		}
+		.message.error {
+			color: #dc2626;
+		}
+		.message.success {
+			color: #16a34a;
+		}
+		.hint {
+			margin-top: 0.5rem;
+			font-size: 0.85rem;
+			color: rgb(var(--gray));
+			max-width: 480px;
+		}
+	</style>
+</PageLayout>
+
