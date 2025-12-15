@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import PageLayout from '../layouts/PageLayout.astro';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const featured = posts.slice(0, 3);
+---
+
+<PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<Hero
+		eyebrow="Developer journal"
+		title={`Xin chào, mình là ${SITE_AUTHOR}`}
+		subtitle="Frontend engineer, builder và người ghi chép lại những điều mình học được khi làm sản phẩm thực tế."
+		primaryCta={{ href: '/blog', label: 'Đọc blog' }}
+		secondaryCta={{ href: '/about', label: 'Giới thiệu' }}
+	/>
+
+	<section class="section">
+		<div class="section__header">
+			<div>
+				<p class="eyebrow">Nhật ký dev</p>
+				<h2>Bài viết mới nhất</h2>
+			</div>
+			<a class="section__link" href="/blog">Xem tất cả</a>
+		</div>
+		<div class="post-grid">
+			{featured.map((post) => (
+				<PostCard post={post} />
+			))}
+		</div>
+	</section>
+
+	<section class="section highlights">
+		<div>
+			<p class="eyebrow">Bạn sẽ tìm thấy</p>
+			<h2>Tư duy & kỹ thuật</h2>
+			<p class="lead">
+				Ghi chú ngắn gọn, dễ áp dụng về cách mình tiếp cận front-end, DX và làm việc với team sản phẩm.
+			</p>
+		</div>
+		<ul class="pill-list">
+			<li>Thực hành Astro, React và web fundamentals</li>
+			<li>Quy trình shipping: từ idea đến production</li>
+			<li>Hệ thống thiết kế UI và component hóa</li>
+			<li>Tooling dev: testing, linting, CI/CD</li>
+			<li>Kỹ năng mềm: viết, review, mentoring</li>
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.section {
+		margin-top: 2.5rem;
+		display: grid;
+		gap: 1.25rem;
+	}
+	.section__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.section__link {
+		text-decoration: none;
+		color: var(--accent);
+		font-weight: 700;
+	}
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		font-size: 0.9rem;
+		color: rgb(var(--gray));
+	}
+	.lead {
+		margin: 0.3rem 0 0;
+		color: rgb(var(--gray));
+		max-width: 720px;
+	}
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.4rem;
+	}
+	.highlights {
+		background: white;
+		border-radius: 14px;
+		padding: 1.5rem;
+		box-shadow: 0 14px 36px rgba(var(--gray), 10%);
+	}
+	.pill-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.pill-list li {
+		background: rgba(var(--accent-rgb, 35, 55, 255), 0.08);
+		color: rgb(var(--black));
+		border: 1px solid rgba(var(--accent-rgb, 35, 55, 255), 0.2);
+		border-radius: 999px;
+		padding: 0.55rem 0.9rem;
+		font-size: 0.95rem;
+	}
+
+	@media (max-width: 720px) {
+		.section__header {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.section__link {
+			align-self: flex-start;
+		}
+	}
+</style>

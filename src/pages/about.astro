@@ -1,0 +1,130 @@
+---
+import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
+import PageLayout from '../layouts/PageLayout.astro';
+import { SITE_AUTHOR, SITE_DESCRIPTION } from '../consts';
+---
+
+<PageLayout title={`Về tôi | ${SITE_AUTHOR}`} description={SITE_DESCRIPTION} image={AboutHeroImage}>
+	<section class="about">
+		<div class="about__intro">
+			<p class="eyebrow">About</p>
+			<h1>Xin chào, mình là {SITE_AUTHOR}</h1>
+			<p class="lead">
+				Mình là frontend engineer, tập trung vào DX, hiệu năng và trải nghiệm người dùng. Blog này là nơi
+				mình ghi chép quá trình học, thử nghiệm và những bài học khi làm sản phẩm thực tế.
+			</p>
+			<div class="pill-group">
+				<span class="pill">Astro / React</span>
+				<span class="pill">Thiết kế hệ thống UI</span>
+				<span class="pill">DX & Automation</span>
+				<span class="pill">Kiến thức nền tảng Web</span>
+			</div>
+		</div>
+		<div class="about__card">
+			<img src={AboutHeroImage.src} alt="Ảnh minh hoạ" loading="lazy" />
+			<ul>
+				<li><strong>Vai trò:</strong> Frontend engineer</li>
+				<li><strong>Hiện tại:</strong> Xây dựng sản phẩm, mentor team dev</li>
+				<li><strong>Sở thích:</strong> Viết blog, đọc sách và tối ưu workflow</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="section">
+		<h2>Triết lý làm việc</h2>
+		<p>
+			Mình tin rằng sản phẩm tốt cần nền tảng kỹ thuật chắc chắn và quy trình rõ ràng. Mọi bài viết đều hướng
+			đến việc đơn giản hóa kiến thức, có ví dụ thực tế và có thể áp dụng ngay trong dự án.
+		</p>
+		<ul class="list">
+			<li>Ưu tiên clarity hơn cleverness.</li>
+			<li>Xây dựng hệ thống component để scale nhanh nhưng vẫn kiểm soát.</li>
+			<li>Tự động hóa những việc lặp lại để đội dev tập trung vào giá trị chính.</li>
+		</ul>
+	</section>
+
+	<section class="section">
+		<h2>Mình đang làm gì?</h2>
+		<ul class="list">
+			<li>Hoàn thiện bộ starter Astro cho blog cá nhân.</li>
+			<li>Viết series ngắn về tối ưu bundler và DX cho frontend.</li>
+			<li>Mentor về viết code rõ ràng, code review và thiết kế API UI.</li>
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.about {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 1.5rem;
+		align-items: start;
+	}
+	.about__intro {
+		display: grid;
+		gap: 0.75rem;
+	}
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.15em;
+		font-size: 0.9rem;
+		color: rgb(var(--gray));
+	}
+	.lead {
+		margin: 0;
+		color: rgb(var(--gray));
+	}
+	.pill-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+	.pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.5rem 0.85rem;
+		border-radius: 999px;
+		background: rgba(var(--gray-light), 0.8);
+		color: rgb(var(--black));
+		font-size: 0.95rem;
+	}
+	.about__card {
+		background: white;
+		border-radius: 14px;
+		padding: 1rem;
+		box-shadow: 0 14px 36px rgba(var(--gray), 10%);
+		display: grid;
+		gap: 0.8rem;
+	}
+	.about__card img {
+		width: 100%;
+		border-radius: 10px;
+	}
+	.about__card ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.5rem;
+		color: rgb(var(--gray));
+	}
+	.section {
+		margin-top: 2rem;
+	}
+	.list {
+		padding-left: 1.1rem;
+		color: rgb(var(--gray));
+		display: grid;
+		gap: 0.35rem;
+	}
+	@media (max-width: 900px) {
+		.about {
+			grid-template-columns: 1fr;
+		}
+		.about__card {
+			order: -1;
+		}
+	}
+</style>
