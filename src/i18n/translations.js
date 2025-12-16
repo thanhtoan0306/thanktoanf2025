@@ -6,6 +6,7 @@ export const translations = {
 			blog: 'Blog',
 			about: 'About',
 			login: 'Login',
+			cv: 'CV',
 		},
 		// Home page
 		home: {
@@ -44,6 +45,8 @@ export const translations = {
 			eyebrow: 'About',
 			title: 'Hello, I\'m',
 			description: 'I am a frontend engineer, focused on DX, performance and user experience. This blog is where I document my learning process, experiments and lessons when building real products.',
+			viewCv: 'View CV',
+			previewCv: 'Preview CV',
 			pills: {
 				tech: 'Astro / React',
 				design: 'UI system design',
@@ -112,6 +115,7 @@ export const translations = {
 			blog: '博客',
 			about: '关于',
 			login: '登录',
+			cv: '简历',
 		},
 		// Home page
 		home: {
@@ -150,6 +154,8 @@ export const translations = {
 			eyebrow: '关于',
 			title: '你好，我是',
 			description: '我是一名前端工程师，专注于 DX、性能和用户体验。这个博客是我记录学习过程、实验和在构建真实产品时的经验教训的地方。',
+			viewCv: '查看简历',
+			previewCv: '预览简历',
 			pills: {
 				tech: 'Astro / React',
 				design: 'UI 系统设计',
@@ -218,6 +224,7 @@ export const translations = {
 			blog: 'Blog',
 			about: 'Giới thiệu',
 			login: 'Đăng nhập',
+			cv: 'CV',
 		},
 		// Home page
 		home: {
@@ -256,6 +263,8 @@ export const translations = {
 			eyebrow: 'About',
 			title: 'Xin chào, mình là',
 			description: 'Mình là frontend engineer, tập trung vào DX, hiệu năng và trải nghiệm người dùng. Blog này là nơi mình ghi chép quá trình học, thử nghiệm và những bài học khi làm sản phẩm thực tế.',
+			viewCv: 'Xem CV',
+			previewCv: 'Xem trước CV',
 			pills: {
 				tech: 'Astro / React',
 				design: 'Thiết kế hệ thống UI',
