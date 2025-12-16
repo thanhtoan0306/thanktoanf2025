@@ -1,0 +1,92 @@
+---
+export const prerender = false; // Disable prerendering to support i18n cookies
+
+import { getCollection } from 'astro:content';
+import PostCard from '../../components/PostCard.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getCurrentLanguage, t } from '../../i18n/utils';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const lang = getCurrentLanguage(Astro);
+---
+
+<PageLayout title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<section class="page-header">
+		<div>
+			<p class="eyebrow">{t('blog.eyebrow', lang)}</p>
+			<h1>{t('blog.title', lang)}</h1>
+			<p class="lead">
+				{t('blog.description', lang)}
+			</p>
+		</div>
+		<button id="add-blog-button" class="add-blog-button" hidden>
+			{t('blog.addBlog', lang)}
+		</button>
+	</section>
+
+	<section>
+		<div class="post-grid">
+			{posts.map((post) => (
+				<PostCard post={post} />
+			))}
+		</div>
+	</section>
+
+	<script>
+		const STORAGE_KEY = 'adminLoggedIn';
+		const addBtn = document.getElementById('add-blog-button');
+
+		if (window.localStorage.getItem(STORAGE_KEY) === 'true') {
+			addBtn?.removeAttribute('hidden');
+		}
+
+		addBtn?.addEventListener('click', () => {
+			// Tạm thời chỉ alert, sau này có thể chuyển sang trang tạo bài mới
+			alert('TODO: Trang tạo blog mới (chưa implement).');
+		});
+	</script>
+</PageLayout>
+
+<style>
+	.page-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		font-size: 0.9rem;
+		letter-spacing: 0.15em;
+		color: rgb(var(--gray));
+	}
+	.lead {
+		margin: 0;
+		color: rgb(var(--gray));
+		max-width: 640px;
+	}
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.4rem;
+	}
+	.add-blog-button {
+		align-self: flex-start;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		border: none;
+		background: #f97316; /* cam */
+		color: white;
+		font-weight: 600;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.add-blog-button:hover {
+		filter: brightness(0.95);
+	}
+</style>

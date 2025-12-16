@@ -1,0 +1,129 @@
+---
+export const prerender = false; // Disable prerendering to support i18n cookies
+
+import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getCurrentLanguage, t } from '../i18n/utils';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const featured = posts.slice(0, 3);
+const lang = getCurrentLanguage(Astro);
+console.log('[Home Page] Server-side - Language:', lang);
+console.log('[Home Page] Server-side - Translation test - title:', t('home.title', lang));
+const highlightItems = t('home.highlights.items', lang);
+console.log('[Home Page] Server-side - Highlight items:', highlightItems);
+---
+
+<PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<Hero
+		eyebrow={t('home.eyebrow', lang)}
+		title={`${t('home.title', lang)} ${SITE_AUTHOR}`}
+		subtitle={t('home.subtitle', lang)}
+		primaryCta={{ href: '/blog', label: t('home.primaryCta', lang) }}
+		secondaryCta={{ href: '/about', label: t('home.secondaryCta', lang) }}
+	/>
+
+	<section class="section">
+		<div class="section__header">
+			<div>
+				<p class="eyebrow">{t('home.latestPosts.eyebrow', lang)}</p>
+				<h2>{t('home.latestPosts.title', lang)}</h2>
+			</div>
+			<a class="section__link" href="/blog">{t('home.latestPosts.viewAll', lang)}</a>
+		</div>
+		<div class="post-grid">
+			{featured.map((post) => (
+				<PostCard post={post} />
+			))}
+		</div>
+	</section>
+
+	<section class="section highlights">
+		<div>
+			<p class="eyebrow">{t('home.highlights.eyebrow', lang)}</p>
+			<h2>{t('home.highlights.title', lang)}</h2>
+			<p class="lead">
+				{t('home.highlights.description', lang)}
+			</p>
+		</div>
+		<ul class="pill-list">
+			{highlightItems.map((item) => (
+				<li>{item}</li>
+			))}
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.section {
+		margin-top: 2.5rem;
+		display: grid;
+		gap: 1.25rem;
+	}
+	.section__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.section__link {
+		text-decoration: none;
+		color: var(--accent);
+		font-weight: 700;
+	}
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		font-size: 0.9rem;
+		color: rgb(var(--gray));
+	}
+	.lead {
+		margin: 0.3rem 0 0;
+		color: rgb(var(--gray));
+		max-width: 720px;
+	}
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.4rem;
+	}
+	.highlights {
+		background: var(--bg-primary);
+		border-radius: 14px;
+		padding: 1.5rem;
+		box-shadow: 0 14px 36px rgba(var(--gray), 10%);
+		transition: background-color 0.3s ease;
+	}
+	.pill-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.pill-list li {
+		background: rgba(var(--accent-rgb, 35, 55, 255), 0.08);
+		color: rgb(var(--black));
+		border: 1px solid rgba(var(--accent-rgb, 35, 55, 255), 0.2);
+		border-radius: 999px;
+		padding: 0.55rem 0.9rem;
+		font-size: 0.95rem;
+	}
+
+	@media (max-width: 720px) {
+		.section__header {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.section__link {
+			align-self: flex-start;
+		}
+	}
+</style>
