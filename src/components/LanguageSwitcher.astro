@@ -1,0 +1,287 @@
+---
+---
+
+<div class="language-switcher">
+	<button class="language-button" id="language-button" aria-label="Select language" aria-expanded="false">
+		<svg viewBox="0 0 24 24" aria-hidden="true" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+			<circle cx="12" cy="12" r="10"></circle>
+			<line x1="2" y1="12" x2="22" y2="12"></line>
+			<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+		</svg>
+		<span class="language-code" id="language-code">EN</span>
+		<svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="dropdown-arrow">
+			<polyline points="6 9 12 15 18 9"></polyline>
+		</svg>
+	</button>
+	<div class="language-dropdown" id="language-dropdown" role="menu" aria-hidden="true">
+		<button class="language-option" data-lang="en" role="menuitem">
+			<span class="language-name">English</span>
+			<span class="language-native">English</span>
+		</button>
+		<button class="language-option" data-lang="zh" role="menuitem">
+			<span class="language-name">中文</span>
+			<span class="language-native">中文</span>
+		</button>
+		<button class="language-option" data-lang="vi" role="menuitem">
+			<span class="language-name">Tiếng Việt</span>
+			<span class="language-native">Tiếng Việt</span>
+		</button>
+	</div>
+</div>
+
+<script>
+	const STORAGE_KEY = 'selectedLanguage';
+	const DEFAULT_LANG = 'en';
+	
+	const languages = {
+		en: { code: 'EN', name: 'English', native: 'English' },
+		zh: { code: 'ZH', name: '中文', native: '中文' },
+		vi: { code: 'VI', name: 'Tiếng Việt', native: 'Tiếng Việt' }
+	};
+
+	const button = document.getElementById('language-button');
+	const dropdown = document.getElementById('language-dropdown');
+	const languageCode = document.getElementById('language-code');
+	const options = document.querySelectorAll('.language-option');
+
+	// Lấy ngôn ngữ từ localStorage hoặc mặc định là 'en'
+	function getCurrentLanguage(): keyof typeof languages {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		return (stored && stored in languages) ? stored as keyof typeof languages : DEFAULT_LANG as keyof typeof languages;
+	}
+
+	// Cập nhật UI với ngôn ngữ hiện tại
+	function updateLanguageDisplay(lang: keyof typeof languages) {
+		const langData = languages[lang];
+		if (langData && languageCode) {
+			languageCode.textContent = langData.code;
+		}
+		
+		// Cập nhật trạng thái active cho các option
+		options.forEach(option => {
+			if ((option as HTMLElement).dataset.lang === lang) {
+				option.classList.add('active');
+			} else {
+				option.classList.remove('active');
+			}
+		});
+	}
+
+	// Mở/đóng dropdown
+	function toggleDropdown() {
+		if (!button || !dropdown) return;
+		
+		const isExpanded = button.getAttribute('aria-expanded') === 'true';
+		button.setAttribute('aria-expanded', (!isExpanded).toString());
+		dropdown.setAttribute('aria-hidden', isExpanded.toString());
+		dropdown.classList.toggle('open');
+	}
+
+	// Đóng dropdown khi click bên ngoài
+	document.addEventListener('click', (e) => {
+		if (!button || !dropdown) return;
+		
+		const switcher = button.closest('.language-switcher');
+		const target = e.target as Node;
+		if (switcher && target && !switcher.contains(target)) {
+			button.setAttribute('aria-expanded', 'false');
+			dropdown.setAttribute('aria-hidden', 'true');
+			dropdown.classList.remove('open');
+		}
+	});
+
+	// Xử lý click vào button
+	button?.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleDropdown();
+	});
+
+	// Xử lý chọn ngôn ngữ
+	options.forEach(option => {
+		option.addEventListener('click', () => {
+			const lang = (option as HTMLElement).dataset.lang;
+			console.log('[LanguageSwitcher] ===== LANGUAGE CHANGE =====');
+			console.log('[LanguageSwitcher] Language selected:', lang);
+			if (lang && languages[lang as keyof typeof languages]) {
+				console.log('[LanguageSwitcher] Setting localStorage to:', lang);
+				localStorage.setItem(STORAGE_KEY, lang);
+				
+				// Set cookie để server-side có thể đọc được
+				const cookieString = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+				console.log('[LanguageSwitcher] Setting cookie:', cookieString);
+				document.cookie = cookieString;
+				
+				// Verify cookie was set
+				const cookieValue = document.cookie
+					.split('; ')
+					.find(row => row.startsWith('lang='))
+					?.split('=')[1];
+				console.log('[LanguageSwitcher] Cookie verification - Current cookie value:', cookieValue);
+				
+				updateLanguageDisplay(lang as keyof typeof languages);
+				toggleDropdown();
+				
+				console.log('[LanguageSwitcher] Reloading page to apply new language...');
+				// Reload trang để áp dụng ngôn ngữ mới
+				window.location.reload();
+			} else {
+				console.warn('[LanguageSwitcher] Invalid language selected:', lang);
+			}
+		});
+	});
+
+	// Khởi tạo với ngôn ngữ hiện tại
+	// Đồng bộ cookie với localStorage
+	console.log('[LanguageSwitcher] ===== INITIALIZATION =====');
+	const currentLang = getCurrentLanguage();
+	console.log('[LanguageSwitcher] Current lang from localStorage:', currentLang);
+	
+	const cookieLang = document.cookie
+		.split('; ')
+		.find(row => row.startsWith('lang='))
+		?.split('=')[1];
+	console.log('[LanguageSwitcher] Cookie lang:', cookieLang);
+	console.log('[LanguageSwitcher] All cookies:', document.cookie);
+	console.log('[LanguageSwitcher] HTML lang attribute:', document.documentElement.lang);
+	
+	// Nếu có cookie nhưng localStorage khác, cập nhật localStorage
+	if (cookieLang && cookieLang !== currentLang && cookieLang in languages) {
+		console.log('[LanguageSwitcher] Syncing - Cookie differs from localStorage, updating localStorage to:', cookieLang);
+		localStorage.setItem(STORAGE_KEY, cookieLang);
+		updateLanguageDisplay(cookieLang as keyof typeof languages);
+	} else {
+		// Nếu có localStorage nhưng chưa có cookie, set cookie
+		if (currentLang && !cookieLang) {
+			console.log('[LanguageSwitcher] Syncing - Setting cookie from localStorage:', currentLang);
+			document.cookie = `lang=${currentLang}; path=/; max-age=31536000; SameSite=Lax`;
+		}
+		console.log('[LanguageSwitcher] Initialization - Displaying lang:', currentLang);
+		updateLanguageDisplay(getCurrentLanguage());
+	}
+</script>
+
+<style>
+	.language-switcher {
+		position: relative;
+		margin-left: 0.5em;
+	}
+
+	.language-button {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.5em 0.75em;
+		background: transparent;
+		border: 1px solid rgba(var(--gray), 0.3);
+		border-radius: 6px;
+		cursor: pointer;
+		color: rgb(var(--gray-dark));
+		font-size: 0.9em;
+		transition: all 0.2s ease;
+	}
+
+	.language-button:hover {
+		background: rgb(var(--gray-light));
+		border-color: var(--accent);
+	}
+
+	.language-button svg:first-child {
+		color: var(--accent);
+	}
+
+	.language-code {
+		font-weight: 600;
+		min-width: 2em;
+	}
+
+	.dropdown-arrow {
+		transition: transform 0.2s ease;
+	}
+
+	.language-button[aria-expanded="true"] .dropdown-arrow {
+		transform: rotate(180deg);
+	}
+
+	.language-dropdown {
+		position: absolute;
+		top: calc(100% + 0.5em);
+		right: 0;
+		background: white;
+		border: 1px solid rgba(var(--gray), 0.3);
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(var(--gray), 0.15);
+		min-width: 180px;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-10px);
+		transition: all 0.2s ease;
+		z-index: 1000;
+		overflow: hidden;
+	}
+
+	.language-dropdown.open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.language-option {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		padding: 0.75em 1em;
+		background: transparent;
+		border: none;
+		text-align: left;
+		cursor: pointer;
+		color: rgb(var(--gray-dark));
+		transition: background 0.2s ease;
+	}
+
+	.language-option:hover {
+		background: rgb(var(--gray-light));
+	}
+
+	.language-option.active {
+		background: rgba(var(--accent-rgb), 0.1);
+		color: var(--accent);
+		font-weight: 600;
+	}
+
+	.language-option:not(:last-child) {
+		border-bottom: 1px solid rgba(var(--gray), 0.1);
+	}
+
+	.language-name {
+		font-weight: 500;
+	}
+
+	.language-native {
+		color: rgb(var(--gray));
+		font-size: 0.9em;
+	}
+
+	.language-option.active .language-native {
+		color: var(--accent);
+	}
+
+	@media (max-width: 720px) {
+		.language-switcher {
+			margin-left: 0.25em;
+		}
+
+		.language-button {
+			padding: 0.4em 0.6em;
+			font-size: 0.85em;
+		}
+
+		.language-code {
+			display: none;
+		}
+
+		.language-dropdown {
+			right: 0;
+		}
+	}
+</style>

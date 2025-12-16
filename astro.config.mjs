@@ -8,4 +8,5 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'http://thanktoanf.online',
 	integrations: [mdx(), sitemap()],
+	output: 'hybrid', // Enable server-side rendering for i18n support
 });

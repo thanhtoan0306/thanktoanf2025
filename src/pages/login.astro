@@ -1,51 +1,55 @@
 ---
-import PageLayout from '../layouts/PageLayout.astro';
+export const prerender = false; // Disable prerendering to support i18n cookies
 
-const title = 'Login';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getCurrentLanguage, t } from '../i18n/utils';
+
+const lang = getCurrentLanguage(Astro);
+const title = t('login.title', lang);
 ---
 
 <PageLayout title={title}>
 	<section class="page-header">
 		<div>
-			<p class="eyebrow">Welcome back</p>
-			<h1>Đăng nhập</h1>
-			<p class="lead">Đăng nhập với tài khoản admin để quản lý blog.</p>
+			<p class="eyebrow">{t('login.eyebrow', lang)}</p>
+			<h1>{t('login.title', lang)}</h1>
+			<p class="lead">{t('login.description', lang)}</p>
 		</div>
 	</section>
 
 	<section>
 		<form id="admin-login-form" class="card">
 			<div class="field-group">
-				<label for="username">Tài khoản</label>
+				<label for="username">{t('login.username', lang)}</label>
 				<input
 					id="username"
 					name="username"
 					type="text"
 					required
-					placeholder="Ví dụ: admin"
+					placeholder={t('login.usernamePlaceholder', lang)}
 					autocomplete="username"
 				/>
 			</div>
 			<div class="field-group">
-				<label for="password">Mật khẩu</label>
+				<label for="password">{t('login.password', lang)}</label>
 				<input
 					id="password"
 					name="password"
 					type="password"
 					required
-					placeholder="Nhập mật khẩu"
+					placeholder={t('login.passwordPlaceholder', lang)}
 					autocomplete="current-password"
 				/>
 			</div>
 			<div class="actions">
-				<button type="submit" class="primary-btn">Đăng nhập</button>
+				<button type="submit" class="primary-btn">{t('login.submit', lang)}</button>
 				<button type="button" id="logout-button" class="secondary-btn" hidden>
-					Đăng xuất
+					{t('login.logout', lang)}
 				</button>
 			</div>
 			<p id="login-message" class="message" aria-live="polite"></p>
 			<p class="hint">
-				<b>Tài khoản demo</b>: <code>admin</code> / <code>1</code>
+				<b>{t('login.demoAccount', lang)}</b>: <code>admin</code> / <code>1</code>
 			</p>
 		</form>
 	</section>
@@ -57,6 +61,39 @@ const title = 'Login';
 		const MESSAGE_ID = 'login-message';
 		const LOGOUT_BUTTON_ID = 'logout-button';
 		const STORAGE_KEY = 'adminLoggedIn';
+		const LANG_STORAGE_KEY = 'selectedLanguage';
+		
+		// Get current language
+		function getLang() {
+			return localStorage.getItem(LANG_STORAGE_KEY) || 'en';
+		}
+		
+		// Translations for messages
+		const messages = {
+			en: {
+				loggedIn: 'You are logged in as admin.',
+				success: 'Login successful. You are now admin.',
+				error: 'Incorrect username or password. Please try again.',
+				loggedOut: 'You have logged out.',
+			},
+			zh: {
+				loggedIn: '您已以管理员身份登录。',
+				success: '登录成功。您现在是一名管理员。',
+				error: '用户名或密码错误。请重试。',
+				loggedOut: '您已登出。',
+			},
+			vi: {
+				loggedIn: 'Bạn đang đăng nhập với quyền admin.',
+				success: 'Đăng nhập thành công. Bạn đang là admin.',
+				error: 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.',
+				loggedOut: 'Bạn đã đăng xuất.',
+			},
+		};
+		
+		function getMessage(key) {
+			const lang = getLang();
+			return messages[lang]?.[key] || messages.en[key];
+		}
 
 		const form = document.getElementById(FORM_ID) as HTMLFormElement | null;
 		const usernameInput = document.getElementById(
@@ -73,7 +110,7 @@ const title = 'Login';
 		// Nếu đã login trước đó thì cập nhật UI
 		if (window.localStorage.getItem(STORAGE_KEY) === 'true') {
 			if (messageEl) {
-				messageEl.textContent = 'Bạn đang đăng nhập với quyền admin.';
+				messageEl.textContent = getMessage('loggedIn');
 				messageEl.classList.remove('error');
 				messageEl.classList.add('success');
 			}
@@ -95,7 +132,7 @@ const title = 'Login';
 			if (username === VALID_USERNAME && password === VALID_PASSWORD) {
 				window.localStorage.setItem(STORAGE_KEY, 'true');
 				if (messageEl) {
-					messageEl.textContent = 'Đăng nhập thành công. Bạn đang là admin.';
+					messageEl.textContent = getMessage('success');
 					messageEl.classList.remove('error');
 					messageEl.classList.add('success');
 				}
@@ -104,7 +141,7 @@ const title = 'Login';
 				}
 			} else {
 				if (messageEl) {
-					messageEl.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
+					messageEl.textContent = getMessage('error');
 					messageEl.classList.remove('success');
 					messageEl.classList.add('error');
 				}
@@ -114,7 +151,7 @@ const title = 'Login';
 		logoutBtn?.addEventListener('click', () => {
 			window.localStorage.removeItem(STORAGE_KEY);
 			if (messageEl) {
-				messageEl.textContent = 'Bạn đã đăng xuất.';
+				messageEl.textContent = getMessage('loggedOut');
 				messageEl.classList.remove('success');
 				messageEl.classList.remove('error');
 			}

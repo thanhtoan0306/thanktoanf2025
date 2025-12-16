@@ -1,32 +1,40 @@
 ---
+export const prerender = false; // Disable prerendering to support i18n cookies
+
 import { getCollection } from 'astro:content';
 import Hero from '../components/Hero.astro';
 import PostCard from '../components/PostCard.astro';
 import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import PageLayout from '../layouts/PageLayout.astro';
+import { getCurrentLanguage, t } from '../i18n/utils';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 const featured = posts.slice(0, 3);
+const lang = getCurrentLanguage(Astro);
+console.log('[Home Page] Server-side - Language:', lang);
+console.log('[Home Page] Server-side - Translation test - title:', t('home.title', lang));
+const highlightItems = t('home.highlights.items', lang);
+console.log('[Home Page] Server-side - Highlight items:', highlightItems);
 ---
 
 <PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<Hero
-		eyebrow="Developer journal"
-		title={`Xin chào, mình là ${SITE_AUTHOR}`}
-		subtitle="Frontend engineer, builder và người ghi chép lại những điều mình học được khi làm sản phẩm thực tế."
-		primaryCta={{ href: '/blog', label: 'Đọc blog' }}
-		secondaryCta={{ href: '/about', label: 'Giới thiệu' }}
+		eyebrow={t('home.eyebrow', lang)}
+		title={`${t('home.title', lang)} ${SITE_AUTHOR}`}
+		subtitle={t('home.subtitle', lang)}
+		primaryCta={{ href: '/blog', label: t('home.primaryCta', lang) }}
+		secondaryCta={{ href: '/about', label: t('home.secondaryCta', lang) }}
 	/>
 
 	<section class="section">
 		<div class="section__header">
 			<div>
-				<p class="eyebrow">Nhật ký dev</p>
-				<h2>Bài viết mới nhất</h2>
+				<p class="eyebrow">{t('home.latestPosts.eyebrow', lang)}</p>
+				<h2>{t('home.latestPosts.title', lang)}</h2>
 			</div>
-			<a class="section__link" href="/blog">Xem tất cả</a>
+			<a class="section__link" href="/blog">{t('home.latestPosts.viewAll', lang)}</a>
 		</div>
 		<div class="post-grid">
 			{featured.map((post) => (
@@ -37,18 +45,16 @@ const featured = posts.slice(0, 3);
 
 	<section class="section highlights">
 		<div>
-			<p class="eyebrow">Bạn sẽ tìm thấy</p>
-			<h2>Tư duy & kỹ thuật</h2>
+			<p class="eyebrow">{t('home.highlights.eyebrow', lang)}</p>
+			<h2>{t('home.highlights.title', lang)}</h2>
 			<p class="lead">
-				Ghi chú ngắn gọn, dễ áp dụng về cách mình tiếp cận front-end, DX và làm việc với team sản phẩm.
+				{t('home.highlights.description', lang)}
 			</p>
 		</div>
 		<ul class="pill-list">
-			<li>Thực hành Astro, React và web fundamentals</li>
-			<li>Quy trình shipping: từ idea đến production</li>
-			<li>Hệ thống thiết kế UI và component hóa</li>
-			<li>Tooling dev: testing, linting, CI/CD</li>
-			<li>Kỹ năng mềm: viết, review, mentoring</li>
+			{highlightItems.map((item) => (
+				<li>{item}</li>
+			))}
 		</ul>
 	</section>
 </PageLayout>

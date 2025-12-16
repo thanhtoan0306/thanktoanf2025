@@ -1,0 +1,23 @@
+---
+// Component để debug language ở client-side
+---
+
+<script>
+	// Debug language state on client-side
+	console.log('[ClientDebug] ===== CLIENT-SIDE LANGUAGE DEBUG =====');
+	console.log('[ClientDebug] LocalStorage lang:', localStorage.getItem('selectedLanguage'));
+	console.log('[ClientDebug] Cookie lang:', document.cookie
+		.split('; ')
+		.find(row => row.startsWith('lang='))
+		?.split('=')[1]);
+	console.log('[ClientDebug] HTML lang attribute:', document.documentElement.lang);
+	console.log('[ClientDebug] All cookies:', document.cookie);
+	
+	// Check if translations are working
+	const testElements = {
+		navHome: document.querySelector('nav a[href="/"]')?.textContent,
+		navBlog: document.querySelector('nav a[href="/blog"]')?.textContent,
+		navAbout: document.querySelector('nav a[href="/about"]')?.textContent,
+	};
+	console.log('[ClientDebug] Current translations in DOM:', testElements);
+</script>
