@@ -1,0 +1,245 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import PlaygroundSidebar from '../components/playground/PlaygroundSidebar.astro';
+import AppSection from '../components/playground/AppSection.astro';
+
+const currentCategory = Astro.url.searchParams.get('category') || 'Apps';
+
+const allApps = [
+	{
+		id: 'app-1',
+		name: 'Task Manager Pro',
+		description: 'A powerful task management application with drag-and-drop interface.',
+		icon: '✅',
+		category: 'Productivity',
+		url: '#',
+		github: '#',
+		rank: 1,
+	},
+	{
+		id: 'app-2',
+		name: 'Weather Dashboard',
+		description: 'Beautiful weather app with detailed forecasts and interactive maps.',
+		icon: '🌤️',
+		category: 'Weather',
+		url: '#',
+		github: '#',
+		rank: 2,
+	},
+	{
+		id: 'app-3',
+		name: 'Music Player',
+		description: 'Modern music player with playlist management and equalizer.',
+		icon: '🎵',
+		category: 'Music',
+		url: '#',
+		github: '#',
+		rank: 3,
+	},
+	{
+		id: 'app-4',
+		name: 'Expense Tracker',
+		description: 'Track your expenses with categories, charts, and monthly reports.',
+		icon: '💰',
+		category: 'Finance',
+		url: '#',
+		github: '#',
+		rank: 4,
+	},
+	{
+		id: 'app-5',
+		name: 'Recipe Finder',
+		description: 'Discover recipes based on ingredients you have.',
+		icon: '🍳',
+		category: 'Food',
+		url: '#',
+		github: '#',
+		rank: 5,
+	},
+	{
+		id: 'app-6',
+		name: 'Fitness Tracker',
+		description: 'Monitor your workouts, track progress, and set fitness goals.',
+		icon: '💪',
+		category: 'Health',
+		url: '#',
+		github: '#',
+		rank: 6,
+	},
+	{
+		id: 'app-7',
+		name: 'Code Snippet Manager',
+		description: 'Organize and share code snippets with syntax highlighting.',
+		icon: '💻',
+		category: 'Developer',
+		url: '#',
+		github: '#',
+		rank: 7,
+	},
+	{
+		id: 'app-8',
+		name: 'Note Taking App',
+		description: 'Rich text editor with markdown support and cross-device sync.',
+		icon: '📝',
+		category: 'Productivity',
+		url: '#',
+		github: '#',
+		rank: 8,
+	},
+	{
+		id: 'app-9',
+		name: 'Password Generator',
+		description: 'Generate secure passwords with customizable length and strength.',
+		icon: '🔐',
+		category: 'Security',
+		url: '#',
+		github: '#',
+		rank: 9,
+	},
+	{
+		id: 'app-10',
+		name: 'Pomodoro Timer',
+		description: 'Focus timer based on Pomodoro technique with customizable intervals.',
+		icon: '⏱️',
+		category: 'Productivity',
+		url: '#',
+		github: '#',
+		rank: 10,
+	},
+	{
+		id: 'app-11',
+		name: 'Color Palette Generator',
+		description: 'Generate beautiful color palettes with hex codes and export options.',
+		icon: '🎨',
+		category: 'Design',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-12',
+		name: 'QR Code Generator',
+		description: 'Create QR codes for URLs, text, WiFi credentials, and more.',
+		icon: '📱',
+		category: 'Tools',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-13',
+		name: 'Unit Converter',
+		description: 'Convert between different units: length, weight, temperature, currency.',
+		icon: '📐',
+		category: 'Tools',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-14',
+		name: 'Image Compressor',
+		description: 'Compress images while maintaining quality with batch processing.',
+		icon: '🖼️',
+		category: 'Tools',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-15',
+		name: 'Markdown Editor',
+		description: 'Live preview markdown editor with syntax highlighting and themes.',
+		icon: '📄',
+		category: 'Developer',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-16',
+		name: 'Random Quote Generator',
+		description: 'Get inspired with random quotes from famous authors.',
+		icon: '💬',
+		category: 'Entertainment',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-17',
+		name: 'BMI Calculator',
+		description: 'Calculate Body Mass Index with detailed health recommendations.',
+		icon: '⚖️',
+		category: 'Health',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-18',
+		name: 'Todo List',
+		description: 'Simple and clean todo list with priorities and due dates.',
+		icon: '📋',
+		category: 'Productivity',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-19',
+		name: 'Age Calculator',
+		description: 'Calculate age in years, months, days with visualizations.',
+		icon: '🎂',
+		category: 'Tools',
+		url: '#',
+		github: '#',
+	},
+	{
+		id: 'app-20',
+		name: 'Text Analyzer',
+		description: 'Analyze text for word count, reading time, and readability scores.',
+		icon: '📊',
+		category: 'Tools',
+		url: '#',
+		github: '#',
+	},
+];
+
+// Filter apps by category if needed
+const filteredApps = currentCategory === 'Apps' 
+	? allApps 
+	: allApps.filter(app => app.category.toLowerCase() === currentCategory.toLowerCase());
+
+// Sections data
+const relaxingApps = filteredApps.slice(0, 6);
+const topFreeApps = filteredApps.slice(0, 10).map((app, index) => ({ ...app, rank: index + 1 }));
+const streamingApps = filteredApps.slice(6, 12);
+---
+
+<PageLayout title={`Playground | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<div class="playground-container">
+		<PlaygroundSidebar currentCategory={currentCategory} />
+		
+		<main class="playground-main">
+			<AppSection title="Cho Phút Giây Thư Giãn" apps={relaxingApps} variant="compact" />
+			<AppSection title="Top Ứng Dụng Miễn Phí" apps={topFreeApps} variant="grid" />
+			<AppSection title="Cùng Nhau Stream Phát Video" apps={streamingApps} variant="compact" />
+		</main>
+	</div>
+</PageLayout>
+
+<style>
+	.playground-container {
+		display: flex;
+		gap: 0;
+		min-height: calc(100vh - 200px);
+	}
+	.playground-main {
+		flex: 1;
+		padding: 2rem;
+		overflow-x: hidden;
+	}
+
+	@media (max-width: 768px) {
+		.playground-container {
+			flex-direction: column;
+		}
+		.playground-main {
+			padding: 1.5rem 1rem;
+		}
+	}
+</style>

@@ -1,0 +1,232 @@
+---
+interface Props {
+	currentCategory?: string;
+}
+
+const { currentCategory = 'Apps' } = Astro.props;
+
+const categories = [
+	{ id: 'photo', name: 'Ảnh & Video', icon: '📷' },
+	{ id: 'health', name: 'Sức Khỏe & Thể Dục', icon: '💪' },
+	{ id: 'productivity', name: 'Hiệu Suất', icon: '⚡' },
+	{ id: 'entertainment', name: 'Giải Trí', icon: '🎬' },
+	{ id: 'developer', name: 'Developer', icon: '💻' },
+	{ id: 'tools', name: 'Tools', icon: '🔧' },
+	{ id: 'education', name: 'Education', icon: '📚' },
+	{ id: 'design', name: 'Design', icon: '🎨' },
+];
+---
+
+<aside class="playground-sidebar">
+	<div class="sidebar-header">
+		<h2 class="sidebar-title">Playground</h2>
+	</div>
+	
+	<div class="search-container">
+		<div class="search-box">
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<circle cx="11" cy="11" r="8"/>
+				<path d="m21 21-4.35-4.35"/>
+			</svg>
+			<input type="search" placeholder="Tìm kiếm" class="search-input" id="playground-search" />
+		</div>
+	</div>
+
+	<nav class="sidebar-nav">
+		<a href="/playground" class="nav-item" class:active={currentCategory === 'Today'}>
+			<span>Hôm nay</span>
+		</a>
+		<a href="/playground?category=games" class="nav-item" class:active={currentCategory === 'Games'}>
+			<span>Trò chơi</span>
+		</a>
+		<a href="/playground?category=apps" class="nav-item" class:active={currentCategory === 'Apps'}>
+			<span>Ứng dụng</span>
+		</a>
+		<a href="/playground?category=arcade" class="nav-item" class:active={currentCategory === 'Arcade'}>
+			<span>Arcade</span>
+		</a>
+	</nav>
+
+	<div class="categories-section">
+		<h3 class="categories-title">Danh mục</h3>
+		<ul class="categories-list">
+			{categories.map((category) => (
+				<li>
+					<a href={`/playground?category=${category.id}`} class="category-item" class:active={currentCategory === category.id}>
+						<span class="category-icon">{category.icon}</span>
+						<span class="category-name">{category.name}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</aside>
+
+<style>
+	.playground-sidebar {
+		width: 240px;
+		min-width: 240px;
+		background: var(--bg-secondary);
+		border-right: 1px solid var(--border-color);
+		padding: 1.5rem 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		height: 100%;
+		position: sticky;
+		top: 0;
+		align-self: flex-start;
+	}
+	.sidebar-header {
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--border-color);
+	}
+	.sidebar-title {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	.search-container {
+		width: 100%;
+	}
+	.search-box {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		background: var(--bg-primary);
+		border: 1px solid var(--border-color);
+		border-radius: 0.75rem;
+		transition: border-color 0.2s ease;
+	}
+	.search-box:focus-within {
+		border-color: rgb(var(--accent));
+	}
+	.search-box svg {
+		flex-shrink: 0;
+		color: rgb(var(--gray));
+	}
+	.search-input {
+		flex: 1;
+		border: none;
+		background: transparent;
+		color: var(--text-primary);
+		font-size: 0.95rem;
+		outline: none;
+	}
+	.search-input::placeholder {
+		color: rgb(var(--gray));
+	}
+	.sidebar-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.nav-item {
+		display: flex;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		border-radius: 0.5rem;
+		text-decoration: none;
+		color: var(--text-primary);
+		font-weight: 500;
+		transition: all 0.2s ease;
+	}
+	.nav-item:hover {
+		background: var(--bg-primary);
+	}
+	.nav-item.active {
+		background: var(--bg-primary);
+		color: rgb(var(--accent));
+		font-weight: 600;
+	}
+	.categories-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.categories-title {
+		margin: 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: rgb(var(--gray));
+		padding: 0 1rem;
+	}
+	.categories-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.category-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.5rem;
+		text-decoration: none;
+		color: var(--text-primary);
+		font-size: 0.95rem;
+		transition: all 0.2s ease;
+	}
+	.category-item:hover {
+		background: var(--bg-primary);
+	}
+	.category-item.active {
+		background: var(--bg-primary);
+		color: rgb(var(--accent));
+		font-weight: 600;
+	}
+	.category-icon {
+		font-size: 1.25rem;
+		width: 24px;
+		text-align: center;
+		flex-shrink: 0;
+	}
+	.category-name {
+		flex: 1;
+	}
+
+	@media (max-width: 1024px) {
+		.playground-sidebar {
+			width: 200px;
+			min-width: 200px;
+			padding: 1rem 0.75rem;
+		}
+		.category-name {
+			font-size: 0.85rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.playground-sidebar {
+			width: 100%;
+			min-width: 100%;
+			position: relative;
+			border-right: none;
+			border-bottom: 1px solid var(--border-color);
+		}
+		.sidebar-nav {
+			flex-direction: row;
+			overflow-x: auto;
+			padding-bottom: 0.5rem;
+		}
+		.nav-item {
+			white-space: nowrap;
+		}
+		.categories-list {
+			flex-direction: row;
+			flex-wrap: wrap;
+			overflow-x: auto;
+			padding-bottom: 0.5rem;
+		}
+		.category-item {
+			white-space: nowrap;
+		}
+	}
+</style>

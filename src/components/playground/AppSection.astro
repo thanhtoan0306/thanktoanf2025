@@ -1,0 +1,119 @@
+---
+import AppCard from './AppCard.astro';
+
+interface Props {
+	title: string;
+	apps: Array<{
+		id: string;
+		name: string;
+		description: string;
+		icon: string;
+		category: string;
+		url: string;
+		github?: string;
+		rank?: number;
+	}>;
+	variant?: 'compact' | 'grid';
+}
+
+const { title, apps, variant = 'compact' } = Astro.props;
+---
+
+<section class="app-section">
+	<div class="section-header">
+		<h2 class="section-title">{title}</h2>
+		<a href="#" class="section-link">
+			<span>Tất cả</span>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<polyline points="9 18 15 12 9 6"/>
+			</svg>
+		</a>
+	</div>
+	
+	{variant === 'compact' ? (
+		<div class="app-list-compact">
+			{apps.map((app) => (
+				<AppCard app={app} variant="compact" />
+			))}
+		</div>
+	) : (
+		<div class="app-list-grid">
+			{apps.map((app) => (
+				<AppCard app={app} variant="grid" />
+			))}
+		</div>
+	)}
+</section>
+
+<style>
+	.app-section {
+		margin-bottom: 3rem;
+	}
+	.section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1.25rem;
+	}
+	.section-title {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	.section-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: rgb(var(--accent));
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 0.95rem;
+		transition: color 0.2s ease;
+	}
+	.section-link:hover {
+		color: var(--accent-dark);
+	}
+	.section-link svg {
+		transition: transform 0.2s ease;
+	}
+	.section-link:hover svg {
+		transform: translateX(2px);
+	}
+	.app-list-compact {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.75rem;
+	}
+	.app-list-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 1rem;
+		overflow-x: auto;
+		padding-bottom: 0.5rem;
+		scrollbar-width: thin;
+	}
+	.app-list-grid::-webkit-scrollbar {
+		height: 6px;
+	}
+	.app-list-grid::-webkit-scrollbar-track {
+		background: var(--bg-secondary);
+		border-radius: 3px;
+	}
+	.app-list-grid::-webkit-scrollbar-thumb {
+		background: rgb(var(--gray));
+		border-radius: 3px;
+	}
+	.app-list-grid::-webkit-scrollbar-thumb:hover {
+		background: rgb(var(--accent));
+	}
+
+	@media (max-width: 768px) {
+		.app-list-compact {
+			grid-template-columns: 1fr;
+		}
+		.app-list-grid {
+			grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+		}
+	}
+</style>
