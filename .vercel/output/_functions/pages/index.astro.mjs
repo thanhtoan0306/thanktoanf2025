@@ -1,6 +1,6 @@
 import { b as createAstro, c as createComponent, m as maybeRenderHead, e as addAttribute, a as renderTemplate, d as renderComponent } from '../chunks/astro/server_iqrwoL2g.mjs';
 import 'piccolore';
-import { g as getCollection } from '../chunks/_astro_content_BXbhZXpm.mjs';
+import { g as getCollection } from '../chunks/_astro_content_L9UfzTxb.mjs';
 import 'clsx';
 /* empty css                                 */
 import { $ as $$PostCard } from '../chunks/PostCard_YaudqFZ8.mjs';

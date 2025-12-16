@@ -1,6 +1,6 @@
 import { b as createAstro, c as createComponent, d as renderComponent, a as renderTemplate, m as maybeRenderHead, r as renderScript } from '../chunks/astro/server_iqrwoL2g.mjs';
 import 'piccolore';
-import { g as getCollection } from '../chunks/_astro_content_BXbhZXpm.mjs';
+import { g as getCollection } from '../chunks/_astro_content_L9UfzTxb.mjs';
 import { $ as $$PostCard } from '../chunks/PostCard_YaudqFZ8.mjs';
 import { a as SITE_DESCRIPTION, b as SITE_TITLE } from '../chunks/consts_Y9_NTkRK.mjs';
 import { g as getCurrentLanguage, $ as $$PageLayout, t } from '../chunks/PageLayout_DDKjE1Xs.mjs';

@@ -8,9 +8,9 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'http://thanktoanf.online',
-	output: 'static',
+	output: 'server',
 	adapter: vercel({}),
 	integrations: [mdx(), sitemap()],
-	// In Astro 5, output: "hybrid" is removed. Use output: "static" (default) 
-	// and set prerender = false on pages that need SSR (already done for i18n pages)
+	// Using output: "server" to enable SSR for pages with prerender = false
+	// Pages without prerender = false will still be statically generated during build
 });

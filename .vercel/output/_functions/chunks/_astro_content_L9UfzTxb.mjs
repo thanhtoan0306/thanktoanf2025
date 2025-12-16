@@ -66,7 +66,7 @@ class ImmutableDataStore {
    */
   static async fromModule() {
     try {
-      const data = await import('./_astro_data-layer-content_tix0H1oR.mjs');
+      const data = await import('./_astro_data-layer-content_DNHhhxNc.mjs');
       if (data.default instanceof Map) {
         return ImmutableDataStore.fromMap(data.default);
       }
@@ -140,7 +140,7 @@ function createGetCollection({
     } else if (collection in dataCollectionToEntryMap) {
       type = "data";
     } else if (store.hasCollection(collection)) {
-      const { default: imageAssetMap } = await import('./content-assets_PTv_WDrp.mjs');
+      const { default: imageAssetMap } = await import('./content-assets_BQmG1HQ9.mjs');
       const result = [];
       for (const rawEntry of store.values(collection)) {
         const data = updateImageReferencesInData(rawEntry.data, rawEntry.filePath, imageAssetMap);
@@ -222,7 +222,7 @@ function emulateLegacyEntry({ legacyId, ...entry }) {
 }
 const CONTENT_LAYER_IMAGE_REGEX = /__ASTRO_IMAGE_="([^"]+)"/g;
 async function updateImageReferencesInBody(html, fileName) {
-  const { default: imageAssetMap } = await import('./content-assets_PTv_WDrp.mjs');
+  const { default: imageAssetMap } = await import('./content-assets_BQmG1HQ9.mjs');
   const imageObjects = /* @__PURE__ */ new Map();
   const { getImage } = await import('./_astro_assets_BmtHjVoY.mjs').then(n => n._);
   for (const [_full, imagePath] of html.matchAll(CONTENT_LAYER_IMAGE_REGEX)) {
