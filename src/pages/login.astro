@@ -41,6 +41,10 @@ import PageLayout from '../layouts/PageLayout.astro';
 					Logout
 				</button>
 			</div>
+			<div class="divider">
+				<span>or</span>
+			</div>
+			<div id="google-signin-button"></div>
 			<p id="login-message" class="message" aria-live="polite"></p>
 			<p class="hint">
 				<b>Demo account</b>: <code>admin</code> / <code>1</code>
@@ -49,12 +53,35 @@ import PageLayout from '../layouts/PageLayout.astro';
 	</section>
 
 	<script>
+		// Type definitions for Google Identity Services
+		interface GoogleAccounts {
+			accounts: {
+				id: {
+					initialize: (config: { client_id: string; callback: (response: any) => void }) => void;
+					renderButton: (element: HTMLElement | null, config: any) => void;
+					disableAutoSelect: () => void;
+				};
+			};
+		}
+		
+		declare global {
+			interface Window {
+				google?: GoogleAccounts;
+			}
+		}
+
+		// Google OAuth Configuration
+		// TODO: Replace with your Google Client ID from Google Cloud Console
+		// https://console.cloud.google.com/apis/credentials
+		const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || '117700101080-9471bgmhfqskapsr1ttmej2u8abt6i0v.apps.googleusercontent.com';
+		
 		const FORM_ID = 'admin-login-form';
 		const USERNAME_INPUT_ID = 'username';
 		const PASSWORD_INPUT_ID = 'password';
 		const MESSAGE_ID = 'login-message';
 		const LOGOUT_BUTTON_ID = 'logout-button';
 		const STORAGE_KEY = 'adminLoggedIn';
+		const GOOGLE_USER_KEY = 'googleUser';
 
 		const form = document.getElementById(FORM_ID) as HTMLFormElement | null;
 		const usernameInput = document.getElementById(
@@ -68,18 +95,105 @@ import PageLayout from '../layouts/PageLayout.astro';
 			LOGOUT_BUTTON_ID,
 		) as HTMLButtonElement | null;
 
-		// Nếu đã login trước đó thì cập nhật UI
-		if (window.localStorage.getItem(STORAGE_KEY) === 'true') {
-			if (messageEl) {
-				messageEl.textContent = 'You are logged in as admin.';
-				messageEl.classList.remove('error');
-				messageEl.classList.add('success');
-			}
-			if (logoutBtn) {
-				logoutBtn.hidden = false;
+		// Check if already logged in
+		function checkLoginStatus() {
+			const isLoggedIn = window.localStorage.getItem(STORAGE_KEY) === 'true';
+			const googleUser = window.localStorage.getItem(GOOGLE_USER_KEY);
+			
+			if (isLoggedIn || googleUser) {
+				if (messageEl) {
+					const loginMethod = googleUser ? 'Google' : 'admin';
+					messageEl.textContent = `You are logged in via ${loginMethod}.`;
+					messageEl.classList.remove('error');
+					messageEl.classList.add('success');
+				}
+				if (logoutBtn) {
+					logoutBtn.hidden = false;
+				}
 			}
 		}
 
+		// Initialize on page load
+		checkLoginStatus();
+
+		// Google Sign-In initialization
+		function initializeGoogleSignIn() {
+			if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+				console.warn('Google Client ID not configured. Please set PUBLIC_GOOGLE_CLIENT_ID in .env');
+				return;
+			}
+
+			// Load Google Identity Services script
+			const script = document.createElement('script');
+			script.src = 'https://accounts.google.com/gsi/client';
+			script.async = true;
+			script.defer = true;
+			script.onload = () => {
+				if (window.google?.accounts?.id) {
+					window.google.accounts.id.initialize({
+						client_id: GOOGLE_CLIENT_ID,
+						callback: handleGoogleSignIn,
+					});
+
+					window.google.accounts.id.renderButton(
+						document.getElementById('google-signin-button'),
+						{
+							theme: 'outline',
+							size: 'large',
+							width: '100%',
+							text: 'signin_with',
+							locale: 'en',
+						}
+					);
+				}
+			};
+			document.head.appendChild(script);
+		}
+
+		// Handle Google Sign-In callback
+		function handleGoogleSignIn(response: any) {
+			try {
+				// Decode JWT token (basic decode, in production verify with backend)
+				const payload = JSON.parse(atob(response.credential.split('.')[1]));
+				
+				// Store user info
+				const userInfo = {
+					email: payload.email,
+					name: payload.name,
+					picture: payload.picture,
+					sub: payload.sub,
+				};
+				
+				window.localStorage.setItem(GOOGLE_USER_KEY, JSON.stringify(userInfo));
+				window.localStorage.setItem(STORAGE_KEY, 'true');
+				
+				if (messageEl) {
+					messageEl.textContent = `Login successful! Welcome, ${userInfo.name || userInfo.email}.`;
+					messageEl.classList.remove('error');
+					messageEl.classList.add('success');
+				}
+				
+				if (logoutBtn) {
+					logoutBtn.hidden = false;
+				}
+			} catch (error) {
+				console.error('Error processing Google sign-in:', error);
+				if (messageEl) {
+					messageEl.textContent = 'Error signing in with Google. Please try again.';
+					messageEl.classList.remove('success');
+					messageEl.classList.add('error');
+				}
+			}
+		}
+
+		// Initialize Google Sign-In when DOM is ready
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initializeGoogleSignIn);
+		} else {
+			initializeGoogleSignIn();
+		}
+
+		// Traditional form login
 		form?.addEventListener('submit', (event) => {
 			event.preventDefault();
 
@@ -92,6 +206,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 
 			if (username === VALID_USERNAME && password === VALID_PASSWORD) {
 				window.localStorage.setItem(STORAGE_KEY, 'true');
+				window.localStorage.removeItem(GOOGLE_USER_KEY); // Clear Google user if exists
 				if (messageEl) {
 					messageEl.textContent = 'Login successful. You are now admin.';
 					messageEl.classList.remove('error');
@@ -109,8 +224,16 @@ import PageLayout from '../layouts/PageLayout.astro';
 			}
 		});
 
+		// Logout handler
 		logoutBtn?.addEventListener('click', () => {
 			window.localStorage.removeItem(STORAGE_KEY);
+			window.localStorage.removeItem(GOOGLE_USER_KEY);
+			
+			// Sign out from Google if logged in via Google
+			if (window.google?.accounts?.id) {
+				window.google.accounts.id.disableAutoSelect();
+			}
+			
 			if (messageEl) {
 				messageEl.textContent = 'You have logged out.';
 				messageEl.classList.remove('success');
@@ -221,6 +344,28 @@ import PageLayout from '../layouts/PageLayout.astro';
 			font-size: 0.85rem;
 			color: rgb(var(--gray));
 			max-width: 480px;
+		}
+		.divider {
+			display: flex;
+			align-items: center;
+			text-align: center;
+			margin: 1rem 0;
+		}
+		.divider::before,
+		.divider::after {
+			content: '';
+			flex: 1;
+			border-bottom: 1px solid var(--border-color);
+		}
+		.divider span {
+			padding: 0 1rem;
+			color: rgb(var(--gray));
+			font-size: 0.9rem;
+		}
+		#google-signin-button {
+			display: flex;
+			justify-content: center;
+			margin-top: 0.5rem;
 		}
 	</style>
 </PageLayout>
