@@ -1,4 +1,4 @@
-# Dev Notebook
+# thanktoanf
 
 Blog cá nhân cho developer được dựng bằng [Astro 5], sử dụng JavaScript thuần và CSS. Dự án tập trung vào cách tách component rõ ràng (layout, header/footer, hero, card bài viết) để bạn có thể mở rộng nhanh.
 
