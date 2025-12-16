@@ -96,12 +96,13 @@ const currentWorkItems = t('about.currentWork.items', lang as string | null);
 		font-size: 0.95rem;
 	}
 	.about__card {
-		background: white;
+		background: var(--bg-primary);
 		border-radius: 14px;
 		padding: 1rem;
 		box-shadow: 0 14px 36px rgba(var(--gray), 10%);
 		display: grid;
 		gap: 0.8rem;
+		transition: background-color 0.3s ease;
 	}
 	.about__card img {
 		width: 100%;

@@ -187,9 +187,10 @@ const title = t('login.title', lang);
 			max-width: 380px;
 			padding: 1.5rem 1.75rem;
 			border-radius: 1rem;
-			border: 1px solid rgba(var(--black), 0.06);
+			border: 1px solid var(--border-color);
 			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
-			background: white;
+			background: var(--bg-primary);
+			transition: background-color 0.3s ease, border-color 0.3s ease;
 		}
 		.actions {
 			display: flex;
@@ -207,8 +208,11 @@ const title = t('login.title', lang);
 		input {
 			padding: 0.6rem 0.75rem;
 			border-radius: 0.6rem;
-			border: 1px solid rgba(var(--black), 0.12);
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
 			font-size: 1rem;
+			transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 		}
 		input:focus-visible {
 			outline: 2px solid rgb(var(--accent));
@@ -231,14 +235,15 @@ const title = t('login.title', lang);
 			margin-top: 0.25rem;
 			padding: 0.6rem 0.9rem;
 			border-radius: 999px;
-			border: 1px solid rgba(var(--black), 0.15);
-			background: white;
-			color: rgb(var(--black));
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
 			font-weight: 500;
 			cursor: pointer;
+			transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 		}
 		.secondary-btn:hover {
-			background: rgba(var(--black), 0.02);
+			background: var(--bg-secondary);
 		}
 		.message {
 			min-height: 1.4rem;

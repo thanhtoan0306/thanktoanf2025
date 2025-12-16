@@ -24,6 +24,22 @@ console.log('[PageLayout] Server-side - HTML lang attribute:', htmlLang);
 <html lang={htmlLang}>
 	<head>
 		<BaseHead title={title} description={description} image={image} />
+		<script>
+			// Apply theme immediately to prevent flash
+			(function() {
+				const theme = localStorage.getItem('theme') || 'light';
+				const root = document.documentElement;
+				
+				if (theme === 'auto') {
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					root.classList.add(prefersDark ? 'dark' : 'light');
+					root.setAttribute('data-theme', 'auto');
+				} else {
+					root.classList.add(theme);
+					root.setAttribute('data-theme', theme);
+				}
+			})();
+		</script>
 	</head>
 	<body>
 		<Header />

@@ -1,0 +1,276 @@
+---
+---
+
+<div class="theme-switcher">
+	<button class="theme-button" id="theme-button" aria-label="Select theme" aria-expanded="false">
+		<svg viewBox="0 0 24 24" aria-hidden="true" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="theme-icon" id="theme-icon">
+			<!-- Sun icon (light mode) -->
+			<circle cx="12" cy="12" r="5" class="sun-icon"></circle>
+			<line x1="12" y1="1" x2="12" y2="3"></line>
+			<line x1="12" y1="21" x2="12" y2="23"></line>
+			<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+			<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+			<line x1="1" y1="12" x2="3" y2="12"></line>
+			<line x1="21" y1="12" x2="23" y2="12"></line>
+			<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+			<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+			<!-- Moon icon (dark mode) -->
+			<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" class="moon-icon"></path>
+		</svg>
+	</button>
+	<div class="theme-dropdown" id="theme-dropdown" role="menu" aria-hidden="true">
+		<button class="theme-option" data-theme="light" role="menuitem">
+			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+				<circle cx="12" cy="12" r="5"></circle>
+				<line x1="12" y1="1" x2="12" y2="3"></line>
+				<line x1="12" y1="21" x2="12" y2="23"></line>
+				<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+				<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+				<line x1="1" y1="12" x2="3" y2="12"></line>
+				<line x1="21" y1="12" x2="23" y2="12"></line>
+				<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+				<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+			</svg>
+			<span>Light</span>
+		</button>
+		<button class="theme-option" data-theme="dark" role="menuitem">
+			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+			</svg>
+			<span>Dark</span>
+		</button>
+		<button class="theme-option" data-theme="auto" role="menuitem">
+			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+				<rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+				<line x1="8" y1="21" x2="16" y2="21"></line>
+				<line x1="12" y1="17" x2="12" y2="21"></line>
+			</svg>
+			<span>Device</span>
+		</button>
+	</div>
+</div>
+
+<script>
+	const STORAGE_KEY = 'theme';
+	const themes = {
+		light: { icon: 'sun', label: 'Light' },
+		dark: { icon: 'moon', label: 'Dark' },
+		auto: { icon: 'auto', label: 'Device' }
+	};
+
+	const button = document.getElementById('theme-button');
+	const dropdown = document.getElementById('theme-dropdown');
+	const themeIcon = document.getElementById('theme-icon');
+	const options = document.querySelectorAll('.theme-option');
+
+	// Get current theme
+	function getCurrentTheme() {
+		return localStorage.getItem(STORAGE_KEY) || 'light';
+	}
+
+	// Apply theme
+	function applyTheme(theme) {
+		const root = document.documentElement;
+		
+		if (theme === 'auto') {
+			// Use device preference
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			root.classList.remove('light', 'dark');
+			root.classList.add(prefersDark ? 'dark' : 'light');
+			root.setAttribute('data-theme', 'auto');
+		} else {
+			root.classList.remove('light', 'dark', 'auto');
+			root.classList.add(theme);
+			root.setAttribute('data-theme', theme);
+		}
+		
+		// Update icon
+		updateIcon(theme);
+	}
+
+	// Update icon based on current effective theme
+	function updateIcon(theme) {
+		if (!themeIcon) return;
+		
+		const sunIcon = themeIcon.querySelector('.sun-icon') as HTMLElement | null;
+		const moonIcon = themeIcon.querySelector('.moon-icon') as HTMLElement | null;
+		
+		if (theme === 'auto') {
+			// Show icon based on current effective theme
+			const isDark = document.documentElement.classList.contains('dark');
+			if (sunIcon) sunIcon.style.display = isDark ? 'none' : 'block';
+			if (moonIcon) moonIcon.style.display = isDark ? 'block' : 'none';
+		} else {
+			if (sunIcon) sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+			if (moonIcon) moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+		}
+	}
+
+	// Update active state
+	function updateActiveState(theme) {
+		options.forEach(option => {
+			if ((option as HTMLElement).dataset.theme === theme) {
+				option.classList.add('active');
+			} else {
+				option.classList.remove('active');
+			}
+		});
+	}
+
+	// Toggle dropdown
+	function toggleDropdown() {
+		if (!button || !dropdown) return;
+		
+		const isExpanded = button.getAttribute('aria-expanded') === 'true';
+		button.setAttribute('aria-expanded', (!isExpanded).toString());
+		dropdown.setAttribute('aria-hidden', isExpanded.toString());
+		dropdown.classList.toggle('open');
+	}
+
+	// Close dropdown when clicking outside
+	document.addEventListener('click', (e) => {
+		if (!button || !dropdown) return;
+		
+		const switcher = button.closest('.theme-switcher');
+		const target = e.target as Node;
+		if (switcher && target && !switcher.contains(target)) {
+			button.setAttribute('aria-expanded', 'false');
+			dropdown.setAttribute('aria-hidden', 'true');
+			dropdown.classList.remove('open');
+		}
+	});
+
+	// Button click
+	button?.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleDropdown();
+	});
+
+	// Option click
+	options.forEach(option => {
+		option.addEventListener('click', () => {
+			const theme = (option as HTMLElement).dataset.theme;
+			if (theme && (theme === 'light' || theme === 'dark' || theme === 'auto')) {
+				localStorage.setItem(STORAGE_KEY, theme);
+				applyTheme(theme);
+				updateActiveState(theme);
+				toggleDropdown();
+			}
+		});
+	});
+
+	// Listen to system theme changes (for auto mode)
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+		if (getCurrentTheme() === 'auto') {
+			applyTheme('auto');
+		}
+	});
+
+	// Initialize
+	const currentTheme = getCurrentTheme();
+	applyTheme(currentTheme);
+	updateActiveState(currentTheme);
+</script>
+
+<style>
+	.theme-switcher {
+		position: relative;
+		margin-left: 0.5em;
+	}
+
+	.theme-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		background: transparent;
+		border: 1px solid rgba(var(--gray), 0.3);
+		border-radius: 6px;
+		cursor: pointer;
+		color: rgb(var(--gray-dark));
+		transition: all 0.2s ease;
+	}
+
+	.theme-button:hover {
+		background: rgb(var(--gray-light));
+		border-color: var(--accent);
+	}
+
+	.theme-icon {
+		color: var(--accent);
+	}
+
+	.theme-icon .sun-icon,
+	.theme-icon .moon-icon {
+		transition: opacity 0.2s ease;
+	}
+
+	.theme-dropdown {
+		position: absolute;
+		top: calc(100% + 0.5em);
+		right: 0;
+		background: var(--bg-primary);
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(var(--gray), 0.15);
+		min-width: 140px;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-10px);
+		transition: all 0.2s ease;
+		z-index: 1000;
+		overflow: hidden;
+	}
+
+	.theme-dropdown.open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.theme-option {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		width: 100%;
+		padding: 0.75em 1em;
+		background: transparent;
+		border: none;
+		text-align: left;
+		cursor: pointer;
+		color: var(--text-primary);
+		transition: background 0.2s ease, color 0.2s ease;
+		font-size: 0.95rem;
+	}
+
+	.theme-option:hover {
+		background: rgb(var(--gray-light));
+	}
+
+	.theme-option.active {
+		background: rgba(var(--accent-rgb), 0.1);
+		color: var(--accent);
+		font-weight: 600;
+	}
+
+	.theme-option:not(:last-child) {
+		border-bottom: 1px solid var(--border-color);
+	}
+
+	.theme-option svg {
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 720px) {
+		.theme-switcher {
+			margin-left: 0.25em;
+		}
+
+		.theme-button {
+			width: 36px;
+			height: 36px;
+		}
+	}
+</style>
