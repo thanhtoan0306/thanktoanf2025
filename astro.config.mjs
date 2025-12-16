@@ -9,7 +9,9 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'http://thanktoanf.online',
 	output: 'server',
-	adapter: vercel({}),
+	adapter: vercel({
+		imageService: true,
+	}),
 	integrations: [mdx(), sitemap()],
 	// Using output: "server" to enable SSR for pages with prerender = false
 	// Pages without prerender = false will still be statically generated during build

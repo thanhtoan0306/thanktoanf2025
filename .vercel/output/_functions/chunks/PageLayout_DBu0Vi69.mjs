@@ -1,10 +1,10 @@
-import { b as createAstro, c as createComponent, e as addAttribute, a as renderTemplate, m as maybeRenderHead, r as renderScript, d as renderComponent, g as renderHead, f as renderSlot } from './astro/server_iqrwoL2g.mjs';
+import { b as createAstro, c as createComponent, e as addAttribute, a as renderTemplate, m as maybeRenderHead, r as renderScript, d as renderComponent, g as renderHead, f as renderSlot } from './astro/server_IeWSpHbH.mjs';
 import 'piccolore';
 import 'clsx';
 /* empty css                          */
 import { _ as __ASTRO_IMAGE_IMPORT_Z1F4X4R } from './blog-placeholder-1_DuymYoyI.mjs';
 import { b as SITE_TITLE, a as SITE_DESCRIPTION } from './consts_Y9_NTkRK.mjs';
-import { $ as $$HeaderLink } from './HeaderLink_CMunVTy2.mjs';
+import { $ as $$HeaderLink } from './HeaderLink_Bho5tOMd.mjs';
 
 const $$Astro$3 = createAstro("http://thanktoanf.online");
 const $$BaseHead = createComponent(($$result, $$props, $$slots) => {

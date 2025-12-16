@@ -1,7 +1,7 @@
-import { c as createComponent, m as maybeRenderHead, u as unescapeHTML, r as renderScript, a as renderTemplate, b as createAstro, d as renderComponent, e as addAttribute } from '../chunks/astro/server_iqrwoL2g.mjs';
+import { c as createComponent, m as maybeRenderHead, u as unescapeHTML, r as renderScript, a as renderTemplate, b as createAstro, d as renderComponent, e as addAttribute } from '../chunks/astro/server_IeWSpHbH.mjs';
 import 'piccolore';
 import { _ as __ASTRO_IMAGE_IMPORT_Z1Yq4sn } from '../chunks/blog-placeholder-about_CkQeGsZP.mjs';
-import { g as getCurrentLanguage, t, $ as $$PageLayout } from '../chunks/PageLayout_DDKjE1Xs.mjs';
+import { g as getCurrentLanguage, t, $ as $$PageLayout } from '../chunks/PageLayout_DBu0Vi69.mjs';
 import { S as SITE_AUTHOR, a as SITE_DESCRIPTION } from '../chunks/consts_Y9_NTkRK.mjs';
 import 'clsx';
 import { readFileSync } from 'fs';

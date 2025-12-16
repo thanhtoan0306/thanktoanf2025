@@ -1,8 +1,8 @@
-import { b as createAstro, c as createComponent, m as maybeRenderHead, e as addAttribute, d as renderComponent, a as renderTemplate } from './astro/server_iqrwoL2g.mjs';
+import { b as createAstro, c as createComponent, m as maybeRenderHead, e as addAttribute, d as renderComponent, a as renderTemplate } from './astro/server_IeWSpHbH.mjs';
 import 'piccolore';
-import { $ as $$Image } from './_astro_assets_BmtHjVoY.mjs';
-import { $ as $$FormattedDate } from './FormattedDate_BRgYJJUP.mjs';
-import { g as getCurrentLanguage, t } from './PageLayout_DDKjE1Xs.mjs';
+import { $ as $$Image } from './_astro_assets_CIsyz8T2.mjs';
+import { $ as $$FormattedDate } from './FormattedDate_1-OJjuuC.mjs';
+import { g as getCurrentLanguage, t } from './PageLayout_DBu0Vi69.mjs';
 /* empty css                         */
 
 const $$Astro = createAstro("http://thanktoanf.online");
