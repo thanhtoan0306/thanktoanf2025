@@ -8,5 +8,6 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'http://thanktoanf.online',
 	integrations: [mdx(), sitemap()],
-	output: 'hybrid', // Enable server-side rendering for i18n support
+	// In Astro 5, output: "hybrid" is removed. Use output: "static" (default) 
+	// and set prerender = false on pages that need SSR (already done for i18n pages)
 });
