@@ -1,27 +1,20 @@
 ---
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
-import LanguageSwitcher from './LanguageSwitcher.astro';
 import ThemeSwitcher from './ThemeSwitcher.astro';
-import { getCurrentLanguage, t } from '../i18n/utils';
-
-const lang = getCurrentLanguage(Astro);
-console.log('[Header] Server-side - Language:', lang);
-console.log('[Header] Server-side - Nav home translation:', t('nav.home', lang));
 ---
 
 <header>
 	<nav>
 		<h2><a href="/">{SITE_TITLE}</a></h2>
 		<div class="internal-links">
-			<HeaderLink href="/">{t('nav.home', lang)}</HeaderLink>
-			<HeaderLink href="/blog">{t('nav.blog', lang)}</HeaderLink>
-			<HeaderLink href="/about">{t('nav.about', lang)}</HeaderLink>
-			<HeaderLink href="/login">{t('nav.login', lang)}</HeaderLink>
+			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+			<HeaderLink href="/login">Login</HeaderLink>
 		</div>
 		<div class="header-right">
 			<ThemeSwitcher />
-			<LanguageSwitcher />
 			<div class="social-links">
 				<a href="https://www.facebook.com/thanhtoan0306" target="_blank" rel="noreferrer">
 				<span class="sr-only">Facebook</span>

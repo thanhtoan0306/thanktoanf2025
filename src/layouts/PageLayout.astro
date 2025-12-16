@@ -3,25 +3,12 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { getCurrentLanguage } from '../i18n/utils';
 
 const { title = SITE_TITLE, description = SITE_DESCRIPTION, image } = Astro.props;
-const lang = getCurrentLanguage(Astro);
-console.log('[PageLayout] Server-side - Detected language:', lang);
-// Try to log cookies safely
-try {
-	const langCookie = Astro.cookies.get('lang')?.value;
-	console.log('[PageLayout] Server-side - Lang cookie value:', langCookie);
-} catch (e) {
-	console.log('[PageLayout] Server-side - Could not read cookies (may be prerendered)');
-}
-const langMap = { en: 'en', zh: 'zh', vi: 'vi' };
-const htmlLang = langMap[lang] || 'en';
-console.log('[PageLayout] Server-side - HTML lang attribute:', htmlLang);
 ---
 
 <!doctype html>
-<html lang={htmlLang}>
+<html lang="en">
 	<head>
 		<BaseHead title={title} description={description} image={image} />
 		<script>
@@ -47,34 +34,6 @@ console.log('[PageLayout] Server-side - HTML lang attribute:', htmlLang);
 			<slot />
 		</main>
 		<Footer />
-		<script>
-			// Client-side language hydration
-			console.log('[PageLayout] ===== CLIENT-SIDE RENDER =====');
-			const storedLang = localStorage.getItem('selectedLanguage') || 'en';
-			const cookieLang = document.cookie
-				.split('; ')
-				.find(row => row.startsWith('lang='))
-				?.split('=')[1];
-			
-			console.log('[PageLayout] LocalStorage lang:', storedLang);
-			console.log('[PageLayout] Cookie lang:', cookieLang);
-			console.log('[PageLayout] HTML lang before:', document.documentElement.lang);
-			
-			// Use cookie if available, otherwise localStorage, otherwise default
-			const currentLang = cookieLang || storedLang;
-			
-			// Update HTML lang attribute
-			if (currentLang && ['en', 'zh', 'vi'].includes(currentLang)) {
-				document.documentElement.lang = currentLang;
-				console.log('[PageLayout] Updated HTML lang to:', currentLang);
-				
-				// Sync localStorage with cookie
-				if (cookieLang && cookieLang !== storedLang) {
-					localStorage.setItem('selectedLanguage', cookieLang);
-					console.log('[PageLayout] Synced localStorage with cookie');
-				}
-			}
-		</script>
 	</body>
 </html>
 

@@ -1,12 +1,9 @@
 ---
-import { getCurrentLanguage, t } from '../i18n/utils';
-
 const today = new Date();
-const lang = getCurrentLanguage(Astro);
 ---
 
 <footer>
-	{t('footer.copyright', lang)} {today.getFullYear()} {t('footer.author', lang)} — {t('footer.description', lang)}
+	© {today.getFullYear()} FE Tony — Sharing for the dev community.
 	<div class="social-links">
 		<a href="https://www.facebook.com/thanhtoan0306" target="_blank" rel="noreferrer">
 			<span class="sr-only">Facebook</span>

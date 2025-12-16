@@ -1,16 +1,14 @@
 ---
 import { Image } from 'astro:assets';
 import FormattedDate from './FormattedDate.astro';
-import { getCurrentLanguage, t } from '../i18n/utils';
 
 const { post } = Astro.props;
 const { data } = post;
 const link = `/blog/${post.id}/`;
-const lang = getCurrentLanguage(Astro);
 ---
 
 <article class="card">
-	<a href={link} class="card__link" aria-label={`${t('common.readMore', lang)}: ${data.title}`}>
+	<a href={link} class="card__link" aria-label={`Read more: ${data.title}`}>
 		{data.heroImage && (
 			<Image class="card__image" width={720} height={360} src={data.heroImage} alt="" />
 		)}

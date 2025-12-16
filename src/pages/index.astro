@@ -1,40 +1,32 @@
 ---
-export const prerender = false; // Disable prerendering to support i18n cookies
-
 import { getCollection } from 'astro:content';
 import Hero from '../components/Hero.astro';
 import PostCard from '../components/PostCard.astro';
 import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import PageLayout from '../layouts/PageLayout.astro';
-import { getCurrentLanguage, t } from '../i18n/utils';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 const featured = posts.slice(0, 3);
-const lang = getCurrentLanguage(Astro);
-console.log('[Home Page] Server-side - Language:', lang);
-console.log('[Home Page] Server-side - Translation test - title:', t('home.title', lang));
-const highlightItems = t('home.highlights.items', lang);
-console.log('[Home Page] Server-side - Highlight items:', highlightItems);
 ---
 
 <PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<Hero
-		eyebrow={t('home.eyebrow', lang)}
-		title={`${t('home.title', lang)} ${SITE_AUTHOR}`}
-		subtitle={t('home.subtitle', lang)}
-		primaryCta={{ href: '/blog', label: t('home.primaryCta', lang) }}
-		secondaryCta={{ href: '/about', label: t('home.secondaryCta', lang) }}
+		eyebrow="Developer journal"
+		title={`Hello, I'm ${SITE_AUTHOR}`}
+		subtitle="Frontend engineer, builder and someone who documents what I learn when building real products."
+		primaryCta={{ href: '/blog', label: 'Read blog' }}
+		secondaryCta={{ href: '/about', label: 'About me' }}
 	/>
 
 	<section class="section">
 		<div class="section__header">
 			<div>
-				<p class="eyebrow">{t('home.latestPosts.eyebrow', lang)}</p>
-				<h2>{t('home.latestPosts.title', lang)}</h2>
+				<p class="eyebrow">Dev journal</p>
+				<h2>Latest posts</h2>
 			</div>
-			<a class="section__link" href="/blog">{t('home.latestPosts.viewAll', lang)}</a>
+			<a class="section__link" href="/blog">View all</a>
 		</div>
 		<div class="post-grid">
 			{featured.map((post) => (
@@ -45,16 +37,18 @@ console.log('[Home Page] Server-side - Highlight items:', highlightItems);
 
 	<section class="section highlights">
 		<div>
-			<p class="eyebrow">{t('home.highlights.eyebrow', lang)}</p>
-			<h2>{t('home.highlights.title', lang)}</h2>
+			<p class="eyebrow">You will find</p>
+			<h2>Thinking & techniques</h2>
 			<p class="lead">
-				{t('home.highlights.description', lang)}
+				Concise, applicable notes on how I approach front-end, DX and working with product teams.
 			</p>
 		</div>
 		<ul class="pill-list">
-			{highlightItems.map((item) => (
-				<li>{item}</li>
-			))}
+			<li>Practicing Astro, React and web fundamentals</li>
+			<li>Shipping process: from idea to production</li>
+			<li>UI design systems and componentization</li>
+			<li>Dev tooling: testing, linting, CI/CD</li>
+			<li>Soft skills: writing, review, mentoring</li>
 		</ul>
 	</section>
 </PageLayout>
