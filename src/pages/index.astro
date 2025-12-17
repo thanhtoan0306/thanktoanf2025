@@ -20,21 +20,6 @@ const featured = posts.slice(0, 3);
 		secondaryCta={{ href: '/about', label: 'About me' }}
 	/>
 
-	<section class="section">
-		<div class="section__header">
-			<div>
-				<p class="eyebrow">Dev journal</p>
-				<h2>Latest posts</h2>
-			</div>
-			<a class="section__link" href="/blog">View all</a>
-		</div>
-		<div class="post-grid">
-			{featured.map((post) => (
-				<PostCard post={post} />
-			))}
-		</div>
-	</section>
-
 	<section class="section highlights">
 		<div>
 			<p class="eyebrow">You will find</p>
