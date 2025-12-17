@@ -1,0 +1,28 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout title="Dashboard">
+	<section class="dashboard">
+		<h1>Dashboard</h1>
+		<p class="lead">Private admin area. Only visible after login.</p>
+	</section>
+
+	<style>
+		.dashboard {
+			max-width: 720px;
+			margin: 0 auto;
+			padding-top: 2rem;
+		}
+		.dashboard h1 {
+			margin: 0 0 0.75rem 0;
+			font-size: 2rem;
+			font-weight: 700;
+		}
+		.lead {
+			margin: 0;
+			color: rgb(var(--gray));
+		}
+	</style>
+</PageLayout>
+

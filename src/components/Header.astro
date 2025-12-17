@@ -12,6 +12,7 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/playground">Playground</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
+			<HeaderLink href="/admin" class="dashboard-link">Dashboard</HeaderLink>
 			<HeaderLink href="/login">Login</HeaderLink>
 		</div>
 		<div class="header-right">
@@ -65,6 +66,29 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 		</div>
 		</div>
 	</nav>
+	<script>
+		const DASHBOARD_ACCESS_KEY = 'dashboardAccess';
+
+		function syncDashboardVisibility() {
+			const hasAccess = typeof window !== 'undefined'
+				&& window.localStorage.getItem(DASHBOARD_ACCESS_KEY) === 'true';
+			const el = document.querySelector('.dashboard-link') as HTMLElement | null;
+			if (!el) return;
+			el.style.display = hasAccess ? 'inline-block' : 'none';
+		}
+
+		if (typeof window !== 'undefined') {
+			// Initial sync
+			syncDashboardVisibility();
+
+			// React to storage changes (e.g. login/logout in other tabs)
+			window.addEventListener('storage', (event) => {
+				if (event.key === DASHBOARD_ACCESS_KEY) {
+					syncDashboardVisibility();
+				}
+			});
+		}
+	</script>
 </header>
 <style>
 header {
@@ -107,6 +131,9 @@ header {
 	.social-links,
 	.social-links a {
 		display: flex;
+	}
+	.dashboard-link {
+		display: none;
 	}
 	@media (max-width: 720px) {
 		.social-links {

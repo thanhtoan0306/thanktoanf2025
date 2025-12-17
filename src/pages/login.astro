@@ -104,6 +104,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 		// TODO: Replace with your Google Client ID from Google Cloud Console
 		// https://console.cloud.google.com/apis/credentials
 		const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || '117700101080-9471bgmhfqskapsr1ttmej2u8abt6i0v.apps.googleusercontent.com';
+		const ADMIN_EMAIL = 'thanhtoan0306@gmail.com';
 		
 		const FORM_ID = 'admin-login-form';
 		const USERNAME_INPUT_ID = 'username';
@@ -112,6 +113,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 		const LOGOUT_BUTTON_ID = 'logout-button';
 		const STORAGE_KEY = 'adminLoggedIn';
 		const GOOGLE_USER_KEY = 'googleUser';
+		const DASHBOARD_ACCESS_KEY = 'dashboardAccess';
 
 		const form = document.getElementById(FORM_ID) as HTMLFormElement | null;
 		const userProfile = document.getElementById('user-profile') as HTMLDivElement | null;
@@ -177,7 +179,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 					console.error('Error parsing Google user:', e);
 				}
 			} else {
-				// Admin login
+				// Admin login (username/password)
 				if (userNameEl) userNameEl.textContent = 'Admin';
 				if (userEmailEl) userEmailEl.textContent = 'Administrator Account';
 				if (loginMethodEl) {
@@ -278,6 +280,13 @@ import PageLayout from '../layouts/PageLayout.astro';
 				
 				window.localStorage.setItem(GOOGLE_USER_KEY, JSON.stringify(userInfo));
 				window.localStorage.setItem(STORAGE_KEY, 'true');
+
+				// Grant dashboard access only for admin email
+				if (userInfo.email === ADMIN_EMAIL) {
+					window.localStorage.setItem(DASHBOARD_ACCESS_KEY, 'true');
+				} else {
+					window.localStorage.removeItem(DASHBOARD_ACCESS_KEY);
+				}
 				
 				showUserProfile();
 			} catch (error) {
@@ -314,6 +323,8 @@ import PageLayout from '../layouts/PageLayout.astro';
 			if (username === VALID_USERNAME && password === VALID_PASSWORD) {
 				window.localStorage.setItem(STORAGE_KEY, 'true');
 				window.localStorage.removeItem(GOOGLE_USER_KEY); // Clear Google user if exists
+				// Admin account via form login also has dashboard access
+				window.localStorage.setItem(DASHBOARD_ACCESS_KEY, 'true');
 				showUserProfile();
 			} else {
 				if (messageEl) {
@@ -329,6 +340,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 		logoutBtn?.addEventListener('click', () => {
 			window.localStorage.removeItem(STORAGE_KEY);
 			window.localStorage.removeItem(GOOGLE_USER_KEY);
+			window.localStorage.removeItem(DASHBOARD_ACCESS_KEY);
 			
 			// Sign out from Google if logged in via Google
 			if (window.google?.accounts?.id) {
