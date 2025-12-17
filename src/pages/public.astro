@@ -3,7 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 ---
 
-<PageLayout title={`Todos | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+<PageLayout title={`Public | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
 	<div class="todo-container">
 		<form id="todo-form" class="todo-form">
 			<input id="todo-input" type="text" placeholder="Add a todo..." autocomplete="off" />
@@ -35,10 +35,14 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 					headers: { 'accept': 'application/json' },
 				});
 				if (!response.ok) throw new Error('Failed to load todos');
-				todos = await response.json();
+				const data = await response.json();
+				// Handle different response formats
+				todos = Array.isArray(data) ? data : (data.items || data.data || []);
 				renderTodos();
 			} catch (error) {
 				console.error('Error loading todos:', error);
+				todos = [];
+				renderTodos();
 			}
 		}
 
@@ -46,7 +50,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			if (!listEl) return;
 			listEl.innerHTML = '';
 
-			if (todos.length === 0) {
+			if (!Array.isArray(todos) || todos.length === 0) {
 				const li = document.createElement('li');
 				li.className = 'todo-item empty';
 				li.textContent = 'No todos yet';
