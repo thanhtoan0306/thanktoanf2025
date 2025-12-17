@@ -1,0 +1,225 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<PageLayout title={`Todos | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<div class="todo-container">
+		<form id="todo-form" class="todo-form">
+			<input id="todo-input" type="text" placeholder="Add a todo..." autocomplete="off" />
+			<button type="submit">Add</button>
+		</form>
+
+		<ul class="todo-list" id="todo-list"></ul>
+	</div>
+
+	<script>
+		const API_BASE = 'https://apigo1-production.up.railway.app/api/todos';
+
+		interface TodoItem {
+			id: number;
+			title: string;
+			description: string;
+			completed: boolean;
+		}
+
+		const listEl = document.getElementById('todo-list') as HTMLUListElement | null;
+		const formEl = document.getElementById('todo-form') as HTMLFormElement | null;
+		const inputEl = document.getElementById('todo-input') as HTMLInputElement | null;
+
+		let todos: TodoItem[] = [];
+
+		async function loadTodos() {
+			try {
+				const response = await fetch(API_BASE, {
+					headers: { 'accept': 'application/json' },
+				});
+				if (!response.ok) throw new Error('Failed to load todos');
+				todos = await response.json();
+				renderTodos();
+			} catch (error) {
+				console.error('Error loading todos:', error);
+			}
+		}
+
+		function renderTodos() {
+			if (!listEl) return;
+			listEl.innerHTML = '';
+
+			if (todos.length === 0) {
+				const li = document.createElement('li');
+				li.className = 'todo-item empty';
+				li.textContent = 'No todos yet';
+				listEl.appendChild(li);
+				return;
+			}
+
+			todos.forEach((todo) => {
+				const li = document.createElement('li');
+				li.className = 'todo-item';
+				if (todo.completed) {
+					li.classList.add('completed');
+				}
+
+				li.innerHTML = `
+					<button type="button">×</button>
+					<input type="checkbox" ${todo.completed ? 'checked' : ''} />
+					<span>${todo.title}</span>
+				`;
+
+				const checkbox = li.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+				const deleteBtn = li.querySelector('button') as HTMLButtonElement | null;
+
+				checkbox?.addEventListener('change', () => toggleTodo(todo.id, todo));
+				deleteBtn?.addEventListener('click', () => removeTodo(todo.id));
+
+				listEl.appendChild(li);
+			});
+		}
+
+		async function addTodo(title: string) {
+			const trimmed = title.trim();
+			if (!trimmed) return;
+
+			try {
+				const response = await fetch(API_BASE, {
+					method: 'POST',
+					headers: {
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						title: trimmed,
+						description: '',
+					}),
+				});
+
+				if (!response.ok) throw new Error('Failed to add todo');
+				await loadTodos();
+			} catch (error) {
+				console.error('Error adding todo:', error);
+			}
+		}
+
+		async function toggleTodo(id: number, todo: TodoItem) {
+			try {
+				const response = await fetch(`${API_BASE}/${id}`, {
+					method: 'PUT',
+					headers: {
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						title: todo.title,
+						description: todo.description,
+						completed: !todo.completed,
+					}),
+				});
+
+				if (!response.ok) throw new Error('Failed to update todo');
+				await loadTodos();
+			} catch (error) {
+				console.error('Error updating todo:', error);
+			}
+		}
+
+		async function removeTodo(id: number) {
+			try {
+				const response = await fetch(`${API_BASE}/${id}`, {
+					method: 'DELETE',
+					headers: { 'accept': 'application/json' },
+				});
+
+				if (!response.ok) throw new Error('Failed to delete todo');
+				await loadTodos();
+			} catch (error) {
+				console.error('Error deleting todo:', error);
+			}
+		}
+
+		formEl?.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (!inputEl) return;
+			await addTodo(inputEl.value);
+			inputEl.value = '';
+			inputEl.focus();
+		});
+
+		// Load todos on page load
+		loadTodos();
+	</script>
+
+	<style>
+		.todo-container {
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 0;
+		}
+
+		.todo-form {
+			display: flex;
+			gap: 0.5rem;
+			margin: 0;
+			justify-content: center;
+		}
+
+		.todo-form input {
+			flex: 1;
+			padding: 0.75rem;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			font-size: 1rem;
+		}
+
+		.todo-form button {
+			padding: 0.75rem 1.5rem;
+			border: none;
+			border-radius: 4px;
+			background: #007bff;
+			color: white;
+			cursor: pointer;
+			font-size: 1rem;
+		}
+
+		.todo-form button:hover {
+			background: #0056b3;
+		}
+
+		.todo-list {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.todo-item {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			padding: 0.75rem;
+			border-bottom: 1px solid #eee;
+		}
+
+		.todo-item.completed span {
+			text-decoration: line-through;
+			color: #999;
+		}
+
+		.todo-item button {
+			border: none;
+			background: transparent;
+			color: #999;
+			cursor: pointer;
+			font-size: 1.5rem;
+			padding: 0;
+		}
+
+		.todo-item button:hover {
+			color: #d32f2f;
+		}
+
+		.todo-item.empty {
+			justify-content: center;
+			color: #999;
+		}
+	</style>
+</PageLayout>
