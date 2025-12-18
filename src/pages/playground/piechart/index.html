@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Biểu đồ tròn - Pie Chart</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 2rem;
+			color: #333;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 20px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+			padding: 2rem;
+		}
+
+		header {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+
+		h1 {
+			font-size: 2.5rem;
+			color: #667eea;
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle {
+			color: #666;
+			font-size: 1.1rem;
+		}
+
+		.chart-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 2rem;
+			margin: 2rem 0;
+		}
+
+		.chart-wrapper {
+			position: relative;
+			width: 400px;
+			height: 400px;
+		}
+
+		#pieChart {
+			width: 100%;
+			height: 100%;
+			transform: rotate(-90deg);
+		}
+
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+			justify-content: center;
+			margin-top: 1rem;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem 1rem;
+			background: #f5f5f5;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.legend-item:hover {
+			background: #e0e0e0;
+			transform: translateY(-2px);
+		}
+
+		.legend-color {
+			width: 20px;
+			height: 20px;
+			border-radius: 4px;
+		}
+
+		.legend-item.hidden .legend-color {
+			opacity: 0.3;
+		}
+
+		.legend-item.hidden {
+			opacity: 0.5;
+		}
+
+		.data-input {
+			width: 100%;
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.input-group {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1rem;
+			align-items: center;
+		}
+
+		.input-group input {
+			flex: 1;
+			padding: 0.75rem;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: border-color 0.2s;
+		}
+
+		.input-group input:focus {
+			outline: none;
+			border-color: #667eea;
+		}
+
+		.input-group input[type="color"] {
+			width: 60px;
+			height: 45px;
+			border: none;
+			cursor: pointer;
+		}
+
+		.btn {
+			padding: 0.75rem 1.5rem;
+			background: #667eea;
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-weight: 600;
+		}
+
+		.btn:hover {
+			background: #5568d3;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+		}
+
+		.btn:active {
+			transform: translateY(0);
+		}
+
+		.btn-danger {
+			background: #e74c3c;
+		}
+
+		.btn-danger:hover {
+			background: #c0392b;
+		}
+
+		.controls {
+			display: flex;
+			gap: 1rem;
+			justify-content: center;
+			margin-top: 1rem;
+		}
+
+		.stats {
+			text-align: center;
+			margin-top: 1rem;
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 8px;
+		}
+
+		.stats p {
+			margin: 0.5rem 0;
+			font-size: 0.95rem;
+			color: #666;
+		}
+
+		.stats strong {
+			color: #667eea;
+		}
+
+		@media (max-width: 768px) {
+			.chart-wrapper {
+				width: 300px;
+				height: 300px;
+			}
+
+			h1 {
+				font-size: 2rem;
+			}
+
+			.input-group {
+				flex-direction: column;
+			}
+
+			.input-group input[type="color"] {
+				width: 100%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>🥧 Biểu đồ tròn</h1>
+			<p class="subtitle">Tạo và tùy chỉnh biểu đồ tròn tương tác</p>
+		</header>
+
+		<div class="chart-container">
+			<div class="chart-wrapper">
+				<svg id="pieChart" viewBox="0 0 200 200">
+					<!-- Pie chart sẽ được vẽ bằng JavaScript -->
+				</svg>
+			</div>
+
+			<div class="legend" id="legend"></div>
+
+			<div class="stats" id="stats">
+				<p>Tổng: <strong id="total">0</strong></p>
+				<p>Số mục: <strong id="count">0</strong></p>
+			</div>
+		</div>
+
+		<div class="data-input">
+			<h2 style="text-align: center; margin-bottom: 1rem; color: #667eea;">Thêm dữ liệu</h2>
+			<div class="input-group">
+				<input type="text" id="labelInput" placeholder="Nhãn (ví dụ: Apple)">
+				<input type="number" id="valueInput" placeholder="Giá trị (ví dụ: 30)" min="0" step="0.1">
+				<input type="color" id="colorInput" value="#667eea">
+				<button class="btn" onclick="addData()">Thêm</button>
+			</div>
+			<div class="controls">
+				<button class="btn" onclick="loadSampleData()">Dữ liệu mẫu</button>
+				<button class="btn btn-danger" onclick="clearData()">Xóa tất cả</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		let data = [];
+		const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe', '#43e97b', '#fa709a', '#fee140', '#30cfd0', '#a8edea'];
+
+		function addData() {
+			const label = document.getElementById('labelInput').value.trim();
+			const value = parseFloat(document.getElementById('valueInput').value);
+			const color = document.getElementById('colorInput').value;
+
+			if (!label || isNaN(value) || value <= 0) {
+				alert('Vui lòng nhập nhãn và giá trị hợp lệ!');
+				return;
+			}
+
+			data.push({ label, value, color });
+			document.getElementById('labelInput').value = '';
+			document.getElementById('valueInput').value = '';
+			updateChart();
+		}
+
+		function clearData() {
+			if (confirm('Bạn có chắc muốn xóa tất cả dữ liệu?')) {
+				data = [];
+				updateChart();
+			}
+		}
+
+		function loadSampleData() {
+			data = [
+				{ label: 'Apple', value: 30, color: '#667eea' },
+				{ label: 'Banana', value: 25, color: '#764ba2' },
+				{ label: 'Orange', value: 20, color: '#f093fb' },
+				{ label: 'Grape', value: 15, color: '#4facfe' },
+				{ label: 'Mango', value: 10, color: '#00f2fe' }
+			];
+			updateChart();
+		}
+
+		function updateChart() {
+			const svg = document.getElementById('pieChart');
+			const legend = document.getElementById('legend');
+			const stats = document.getElementById('stats');
+
+			// Clear previous content
+			svg.innerHTML = '';
+			legend.innerHTML = '';
+
+			if (data.length === 0) {
+				document.getElementById('total').textContent = '0';
+				document.getElementById('count').textContent = '0';
+				return;
+			}
+
+			const total = data.reduce((sum, item) => sum + item.value, 0);
+			const centerX = 100;
+			const centerY = 100;
+			const radius = 80;
+
+			let currentAngle = 0;
+
+			data.forEach((item, index) => {
+				const percentage = (item.value / total) * 100;
+				const angle = (item.value / total) * 360;
+				const largeArcFlag = angle > 180 ? 1 : 0;
+
+				const startAngle = currentAngle;
+				const endAngle = currentAngle + angle;
+
+				const x1 = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+				const y1 = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+				const x2 = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
+				const y2 = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
+
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+				path.setAttribute('d', `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`);
+				path.setAttribute('fill', item.color);
+				path.setAttribute('stroke', 'white');
+				path.setAttribute('stroke-width', '2');
+				path.setAttribute('data-index', index);
+				path.style.cursor = 'pointer';
+				path.style.transition = 'opacity 0.3s';
+
+				path.addEventListener('mouseenter', () => {
+					path.style.opacity = '0.8';
+				});
+				path.addEventListener('mouseleave', () => {
+					path.style.opacity = '1';
+				});
+
+				path.addEventListener('click', () => {
+					toggleItem(index);
+				});
+
+				svg.appendChild(path);
+
+				// Add label in the middle of the slice
+				if (percentage > 5) {
+					const labelAngle = (startAngle + endAngle) / 2;
+					const labelX = centerX + (radius * 0.6) * Math.cos((labelAngle * Math.PI) / 180);
+					const labelY = centerY + (radius * 0.6) * Math.sin((labelAngle * Math.PI) / 180);
+
+					const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+					text.setAttribute('x', labelX);
+					text.setAttribute('y', labelY);
+					text.setAttribute('text-anchor', 'middle');
+					text.setAttribute('dominant-baseline', 'middle');
+					text.setAttribute('fill', 'white');
+					text.setAttribute('font-size', '12');
+					text.setAttribute('font-weight', 'bold');
+					text.setAttribute('transform', `rotate(${labelAngle + 90} ${labelX} ${labelY})`);
+					text.textContent = `${percentage.toFixed(1)}%`;
+					svg.appendChild(text);
+				}
+
+				currentAngle += angle;
+
+				// Add legend item
+				const legendItem = document.createElement('div');
+				legendItem.className = 'legend-item';
+				legendItem.setAttribute('data-index', index);
+				legendItem.innerHTML = `
+					<div class="legend-color" style="background: ${item.color}"></div>
+					<span>${item.label}</span>
+					<span style="margin-left: auto; font-weight: bold;">${item.value} (${percentage.toFixed(1)}%)</span>
+				`;
+				legendItem.addEventListener('click', () => {
+					toggleItem(index);
+				});
+				legend.appendChild(legendItem);
+			});
+
+			// Update stats
+			document.getElementById('total').textContent = total.toFixed(2);
+			document.getElementById('count').textContent = data.length;
+		}
+
+		function toggleItem(index) {
+			const item = data[index];
+			if (!item) return;
+
+			item.hidden = !item.hidden;
+			const path = document.querySelector(`#pieChart path[data-index="${index}"]`);
+			const legendItem = document.querySelector(`.legend-item[data-index="${index}"]`);
+
+			if (item.hidden) {
+				if (path) path.style.opacity = '0.3';
+				if (legendItem) legendItem.classList.add('hidden');
+			} else {
+				if (path) path.style.opacity = '1';
+				if (legendItem) legendItem.classList.remove('hidden');
+			}
+
+			// Recalculate and redraw if needed
+			updateChart();
+		}
+
+		// Allow Enter key to add data
+		document.getElementById('valueInput').addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				addData();
+			}
+		});
+
+		// Load sample data on page load
+		window.addEventListener('load', () => {
+			loadSampleData();
+		});
+	</script>
+</body>
+</html>
