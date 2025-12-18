@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Snake Game - Phaser</title>
+	<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 1rem;
+			color: #333;
+			overflow-x: hidden;
+		}
+
+		.container {
+			background: white;
+			border-radius: 20px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+			padding: 1.5rem;
+			max-width: 800px;
+			width: 100%;
+		}
+
+		header {
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+
+		h1 {
+			font-size: 2rem;
+			color: #1e3c72;
+			margin-bottom: 0.5rem;
+		}
+
+		.subtitle {
+			color: #666;
+			font-size: 0.9rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.controls {
+			text-align: center;
+			margin-top: 1rem;
+			padding: 0.75rem;
+			background: #f8f9fa;
+			border-radius: 10px;
+		}
+
+		.controls p {
+			margin: 0.25rem 0;
+			color: #666;
+			font-size: 0.85rem;
+		}
+
+		#game-container {
+			display: flex;
+			justify-content: center;
+			margin: 0 auto;
+			width: 100%;
+			max-width: 100%;
+		}
+
+		.touch-controls {
+			display: none;
+			margin-top: 1rem;
+			justify-content: center;
+			gap: 0.5rem;
+		}
+
+		.touch-controls.show {
+			display: flex;
+		}
+
+		.touch-btn {
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			background: rgba(30, 60, 114, 0.8);
+			border: 2px solid #1e3c72;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+			color: white;
+			cursor: pointer;
+			user-select: none;
+			touch-action: none;
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		.touch-btn:active {
+			background: rgba(42, 82, 152, 0.9);
+			transform: scale(0.95);
+		}
+
+		.touch-controls-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 60px);
+			grid-template-rows: repeat(3, 60px);
+			gap: 0.5rem;
+		}
+
+		.touch-btn-up {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		.touch-btn-left {
+			grid-column: 1;
+			grid-row: 2;
+		}
+
+		.touch-btn-down {
+			grid-column: 2;
+			grid-row: 3;
+		}
+
+		.touch-btn-right {
+			grid-column: 3;
+			grid-row: 2;
+		}
+
+		@media (max-width: 768px) {
+			body {
+				padding: 0.5rem;
+			}
+
+			.container {
+				padding: 1rem;
+				border-radius: 15px;
+			}
+
+			header {
+				margin-bottom: 0.75rem;
+			}
+
+			h1 {
+				font-size: 1.5rem;
+			}
+
+			.subtitle {
+				font-size: 0.8rem;
+			}
+
+			.controls {
+				padding: 0.5rem;
+				margin-top: 0.75rem;
+			}
+
+			.controls p {
+				font-size: 0.75rem;
+				margin: 0.2rem 0;
+			}
+
+			.touch-controls {
+				margin-top: 0.75rem;
+			}
+
+			.touch-btn {
+				width: 50px;
+				height: 50px;
+				font-size: 20px;
+			}
+
+			.touch-controls-grid {
+				grid-template-columns: repeat(3, 50px);
+				grid-template-rows: repeat(3, 50px);
+				gap: 0.4rem;
+			}
+		}
+
+		@media (max-width: 480px) {
+			h1 {
+				font-size: 1.25rem;
+			}
+
+			.subtitle {
+				font-size: 0.75rem;
+			}
+
+			.touch-btn {
+				width: 45px;
+				height: 45px;
+				font-size: 18px;
+			}
+
+			.touch-controls-grid {
+				grid-template-columns: repeat(3, 45px);
+				grid-template-rows: repeat(3, 45px);
+				gap: 0.3rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>🐍 Snake Game</h1>
+			<p class="subtitle">Classic Snake game built with Phaser</p>
+		</header>
+
+		<div id="game-container"></div>
+
+		<div class="touch-controls" id="touch-controls">
+			<div class="touch-controls-grid">
+				<button class="touch-btn touch-btn-up" id="btn-up">↑</button>
+				<button class="touch-btn touch-btn-left" id="btn-left">←</button>
+				<button class="touch-btn touch-btn-down" id="btn-down">↓</button>
+				<button class="touch-btn touch-btn-right" id="btn-right">→</button>
+			</div>
+		</div>
+
+		<div class="controls">
+			<p><strong>Controls:</strong></p>
+			<p id="controls-text">Use Arrow Keys or WASD to move</p>
+			<p>Eat the food to grow and increase your score!</p>
+		</div>
+	</div>
+
+	<script>
+		let game;
+		let snake;
+		let food;
+		let cursors;
+		let score = 0;
+		let highScore = localStorage.getItem('snakeHighScore') || 0;
+		let gameOverText;
+		let startText;
+		let gameStarted = false;
+		let gameTimer;
+		let scoreText;
+		let highScoreText;
+		let playButton;
+		let playButtonBg;
+		let replayButton;
+		let replayButtonBg;
+		let finalScoreText;
+		let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		let touchStartX = 0;
+		let touchStartY = 0;
+
+		// Calculate game size based on screen
+		function getGameSize() {
+			const container = document.querySelector('.container');
+			const containerWidth = container ? container.offsetWidth - 40 : window.innerWidth - 40;
+			const containerHeight = window.innerHeight - 350; // Account for header, controls, etc
+			const maxWidth = Math.min(containerWidth, 600);
+			const maxHeight = Math.min(containerHeight, 600);
+			const size = Math.min(maxWidth, maxHeight);
+			const gridSize = 20;
+			return Math.max(gridSize * 15, Math.floor(size / gridSize) * gridSize); // Min 15x15 grid
+		}
+
+		const gameSize = getGameSize();
+
+		const config = {
+			type: Phaser.AUTO,
+			width: gameSize,
+			height: gameSize,
+			parent: 'game-container',
+			backgroundColor: '#000000',
+			scene: {
+				create: create,
+				update: update
+			},
+			physics: {
+				default: 'arcade',
+				arcade: {
+					debug: false
+				}
+			},
+			scale: {
+				mode: Phaser.Scale.FIT,
+				autoCenter: Phaser.Scale.CENTER_BOTH
+			}
+		};
+
+		// Update controls text based on device
+		if (isMobile) {
+			document.getElementById('controls-text').textContent = 'Use touch buttons or swipe to move';
+		}
+
+		function create() {
+			// Grid size
+			const gridSize = 20;
+			const gridWidth = config.width / gridSize;
+			const gridHeight = config.height / gridSize;
+
+			// Calculate responsive font sizes
+			const scoreFontSize = isMobile ? Math.max(16, config.width / 25) : 24;
+			const highScoreFontSize = isMobile ? Math.max(14, config.width / 30) : 20;
+
+			// Score display (top left)
+			scoreText = this.add.text(
+				10,
+				10,
+				'Score: 0',
+				{
+					fontSize: scoreFontSize + 'px',
+					fill: '#ffffff',
+					fontStyle: 'bold'
+				}
+			).setOrigin(0, 0);
+
+			// High score display (top right)
+			highScoreText = this.add.text(
+				config.width - 10,
+				10,
+				`High: ${highScore}`,
+				{
+					fontSize: highScoreFontSize + 'px',
+					fill: '#ffff00',
+					fontStyle: 'bold'
+				}
+			).setOrigin(1, 0);
+
+			// Create snake (array of rectangles) - hidden initially
+			snake = [];
+			const startX = Math.floor(gridWidth / 2);
+			const startY = Math.floor(gridHeight / 2);
+
+			for (let i = 0; i < 3; i++) {
+				const segment = this.add.rectangle(
+					(startX - i) * gridSize + gridSize / 2,
+					startY * gridSize + gridSize / 2,
+					gridSize - 2,
+					gridSize - 2,
+					0x4ade80
+				);
+				segment.setVisible(false);
+				snake.push({ x: startX - i, y: startY, graphics: segment });
+			}
+
+			// Direction
+			this.direction = { x: 1, y: 0 };
+			this.nextDirection = { x: 1, y: 0 };
+
+			// Calculate responsive sizes
+			const titleFontSize = isMobile ? Math.max(28, config.width / 12) : 48;
+			const buttonWidth = isMobile ? Math.max(120, config.width / 4) : 150;
+			const buttonHeight = isMobile ? Math.max(40, config.width / 15) : 50;
+			const buttonFontSize = isMobile ? Math.max(20, config.width / 20) : 28;
+
+			// Start screen text
+			startText = this.add.text(
+				config.width / 2,
+				config.height / 2 - (isMobile ? 40 : 60),
+				'SNAKE GAME',
+				{
+					fontSize: titleFontSize + 'px',
+					fill: '#ffffff',
+					fontStyle: 'bold'
+				}
+			).setOrigin(0.5);
+
+			// Play button
+			playButtonBg = this.add.rectangle(
+				config.width / 2,
+				config.height / 2 + (isMobile ? 15 : 20),
+				buttonWidth,
+				buttonHeight,
+				0x1e3c72
+			).setInteractive({ useHandCursor: true })
+			 .on('pointerdown', startGame)
+			 .on('pointerover', () => playButtonBg.setFillStyle(0x2a5298))
+			 .on('pointerout', () => playButtonBg.setFillStyle(0x1e3c72));
+
+			playButton = this.add.text(
+				config.width / 2,
+				config.height / 2 + (isMobile ? 15 : 20),
+				'PLAY',
+				{
+					fontSize: buttonFontSize + 'px',
+					fill: '#ffffff',
+					fontStyle: 'bold'
+				}
+			).setOrigin(0.5).setInteractive({ useHandCursor: true })
+			 .on('pointerdown', startGame);
+
+			const gameOverFontSize = isMobile ? Math.max(28, config.width / 12) : 48;
+			const finalScoreFontSize = isMobile ? Math.max(20, config.width / 18) : 32;
+
+			// Game over text (hidden initially)
+			gameOverText = this.add.text(
+				config.width / 2,
+				config.height / 2 - (isMobile ? 50 : 80),
+				'GAME OVER',
+				{
+					fontSize: gameOverFontSize + 'px',
+					fill: '#ff0000',
+					fontStyle: 'bold'
+			}).setOrigin(0.5).setVisible(false);
+
+			// Final score text (hidden initially)
+			finalScoreText = this.add.text(
+				config.width / 2,
+				config.height / 2 - (isMobile ? 20 : 30),
+				'Score: 0',
+				{
+					fontSize: finalScoreFontSize + 'px',
+					fill: '#ffffff',
+					fontStyle: 'bold'
+			}).setOrigin(0.5).setVisible(false);
+
+			// Replay button (hidden initially)
+			replayButtonBg = this.add.rectangle(
+				config.width / 2,
+				config.height / 2 + (isMobile ? 20 : 30),
+				buttonWidth,
+				buttonHeight,
+				0x1e3c72
+			).setInteractive({ useHandCursor: true })
+			 .setVisible(false)
+			 .on('pointerdown', replayGame)
+			 .on('pointerover', () => replayButtonBg.setFillStyle(0x2a5298))
+			 .on('pointerout', () => replayButtonBg.setFillStyle(0x1e3c72));
+
+			replayButton = this.add.text(
+				config.width / 2,
+				config.height / 2 + (isMobile ? 20 : 30),
+				'REPLAY',
+				{
+					fontSize: buttonFontSize + 'px',
+					fill: '#ffffff',
+					fontStyle: 'bold'
+			}).setOrigin(0.5).setInteractive({ useHandCursor: true })
+			 .setVisible(false)
+			 .on('pointerdown', replayGame);
+
+			// Keyboard controls
+			cursors = this.input.keyboard.createCursorKeys();
+			const wasd = this.input.keyboard.addKeys('W,S,A,D');
+
+			// Arrow keys
+			cursors.left.on('down', () => {
+				if (gameStarted && this.direction.x === 0) {
+					this.nextDirection = { x: -1, y: 0 };
+				}
+			});
+			cursors.right.on('down', () => {
+				if (gameStarted && this.direction.x === 0) {
+					this.nextDirection = { x: 1, y: 0 };
+				}
+			});
+			cursors.up.on('down', () => {
+				if (gameStarted && this.direction.y === 0) {
+					this.nextDirection = { x: 0, y: -1 };
+				}
+			});
+			cursors.down.on('down', () => {
+				if (gameStarted && this.direction.y === 0) {
+					this.nextDirection = { x: 0, y: 1 };
+				}
+			});
+
+			// WASD keys
+			wasd.A.on('down', () => {
+				if (gameStarted && this.direction.x === 0) {
+					this.nextDirection = { x: -1, y: 0 };
+				}
+			});
+			wasd.D.on('down', () => {
+				if (gameStarted && this.direction.x === 0) {
+					this.nextDirection = { x: 1, y: 0 };
+				}
+			});
+			wasd.W.on('down', () => {
+				if (gameStarted && this.direction.y === 0) {
+					this.nextDirection = { x: 0, y: -1 };
+				}
+			});
+			wasd.S.on('down', () => {
+				if (gameStarted && this.direction.y === 0) {
+					this.nextDirection = { x: 0, y: 1 };
+				}
+			});
+
+			// Touch controls for mobile
+			if (isMobile) {
+				// Swipe detection
+				this.input.on('pointerdown', (pointer) => {
+					if (gameStarted) {
+						touchStartX = pointer.x;
+						touchStartY = pointer.y;
+					}
+				});
+
+				this.input.on('pointerup', (pointer) => {
+					if (!gameStarted) return;
+					
+					const deltaX = pointer.x - touchStartX;
+					const deltaY = pointer.y - touchStartY;
+					const minSwipeDistance = 30;
+
+					if (Math.abs(deltaX) > Math.abs(deltaY)) {
+						// Horizontal swipe
+						if (Math.abs(deltaX) > minSwipeDistance) {
+							if (deltaX > 0 && this.direction.x === 0) {
+								// Swipe right
+								this.nextDirection = { x: 1, y: 0 };
+							} else if (deltaX < 0 && this.direction.x === 0) {
+								// Swipe left
+								this.nextDirection = { x: -1, y: 0 };
+							}
+						}
+					} else {
+						// Vertical swipe
+						if (Math.abs(deltaY) > minSwipeDistance) {
+							if (deltaY > 0 && this.direction.y === 0) {
+								// Swipe down
+								this.nextDirection = { x: 0, y: 1 };
+							} else if (deltaY < 0 && this.direction.y === 0) {
+								// Swipe up
+								this.nextDirection = { x: 0, y: -1 };
+							}
+						}
+					}
+				});
+			}
+		}
+
+		// Touch button handlers
+		function setupTouchControls() {
+			if (!isMobile) return;
+
+			const btnUp = document.getElementById('btn-up');
+			const btnDown = document.getElementById('btn-down');
+			const btnLeft = document.getElementById('btn-left');
+			const btnRight = document.getElementById('btn-right');
+
+			function handleDirection(x, y) {
+				if (!gameStarted) return;
+				const scene = game.scene.scenes[0];
+				if (x === -1 && scene.direction.x === 0) {
+					scene.nextDirection = { x: -1, y: 0 };
+				} else if (x === 1 && scene.direction.x === 0) {
+					scene.nextDirection = { x: 1, y: 0 };
+				} else if (y === -1 && scene.direction.y === 0) {
+					scene.nextDirection = { x: 0, y: -1 };
+				} else if (y === 1 && scene.direction.y === 0) {
+					scene.nextDirection = { x: 0, y: 1 };
+				}
+			}
+
+			btnUp.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				handleDirection(0, -1);
+			});
+
+			btnDown.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				handleDirection(0, 1);
+			});
+
+			btnLeft.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				handleDirection(-1, 0);
+			});
+
+			btnRight.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				handleDirection(1, 0);
+			});
+
+			// Also support click for testing
+			btnUp.addEventListener('click', (e) => {
+				e.preventDefault();
+				handleDirection(0, -1);
+			});
+
+			btnDown.addEventListener('click', (e) => {
+				e.preventDefault();
+				handleDirection(0, 1);
+			});
+
+			btnLeft.addEventListener('click', (e) => {
+				e.preventDefault();
+				handleDirection(-1, 0);
+			});
+
+			btnRight.addEventListener('click', (e) => {
+				e.preventDefault();
+				handleDirection(1, 0);
+			});
+		}
+
+		function spawnFood() {
+			const gridSize = 20;
+			const gridWidth = config.width / gridSize;
+			const gridHeight = config.height / gridSize;
+
+			let foodX, foodY;
+			let validPosition = false;
+
+			while (!validPosition) {
+				foodX = Math.floor(Math.random() * gridWidth);
+				foodY = Math.floor(Math.random() * gridHeight);
+				validPosition = true;
+
+				// Check if food spawns on snake
+				for (let segment of snake) {
+					if (segment.x === foodX && segment.y === foodY) {
+						validPosition = false;
+						break;
+					}
+				}
+			}
+
+			if (food) {
+				food.destroy();
+			}
+
+			food = this.add.rectangle(
+				foodX * gridSize + gridSize / 2,
+				foodY * gridSize + gridSize / 2,
+				gridSize - 2,
+				gridSize - 2,
+				0xef4444
+			);
+			food.foodX = foodX;
+			food.foodY = foodY;
+		}
+
+		function moveSnake() {
+			if (!gameStarted) return;
+
+			// Update direction
+			this.direction = { ...this.nextDirection };
+
+			// Calculate new head position
+			const head = snake[0];
+			const newX = head.x + this.direction.x;
+			const newY = head.y + this.direction.y;
+
+			// Check wall collision
+			const gridSize = 20;
+			const gridWidth = config.width / gridSize;
+			const gridHeight = config.height / gridSize;
+
+			if (newX < 0 || newX >= gridWidth || newY < 0 || newY >= gridHeight) {
+				endGame();
+				return;
+			}
+
+			// Check self collision
+			for (let segment of snake) {
+				if (segment.x === newX && segment.y === newY) {
+					endGame();
+					return;
+				}
+			}
+
+			// Check food collision
+			const ateFood = newX === food.foodX && newY === food.foodY;
+
+			if (ateFood) {
+				// Add new segment at head
+				const newSegment = this.add.rectangle(
+					newX * gridSize + gridSize / 2,
+					newY * gridSize + gridSize / 2,
+					gridSize - 2,
+					gridSize - 2,
+					0x4ade80
+				);
+				snake.unshift({ x: newX, y: newY, graphics: newSegment });
+
+				// Update score
+				score += 10;
+				scoreText.setText(`Score: ${score}`);
+
+				// Update high score
+				if (score > highScore) {
+					highScore = score;
+					localStorage.setItem('snakeHighScore', highScore);
+					highScoreText.setText(`High: ${highScore}`);
+				}
+
+				// Spawn new food
+				spawnFood.call(this);
+			} else {
+				// Move snake
+				const tail = snake.pop();
+				tail.x = newX;
+				tail.y = newY;
+				tail.graphics.x = newX * gridSize + gridSize / 2;
+				tail.graphics.y = newY * gridSize + gridSize / 2;
+				snake.unshift(tail);
+			}
+		}
+
+		function update() {
+			// This function runs every frame but we handle movement in the timer
+		}
+
+		function endGame() {
+			gameStarted = false;
+			if (gameTimer) {
+				game.scene.scenes[0].time.removeEvent(gameTimer);
+			}
+			gameOverText.setVisible(true);
+			finalScoreText.setText(`Score: ${score}`);
+			finalScoreText.setVisible(true);
+			replayButton.setVisible(true);
+			replayButtonBg.setVisible(true);
+			
+			// Hide touch controls when game ends
+			if (isMobile) {
+				const touchControls = document.getElementById('touch-controls');
+				if (touchControls) {
+					touchControls.classList.remove('show');
+				}
+			}
+		}
+
+		function startGame() {
+			if (gameStarted) return;
+
+			gameStarted = true;
+			score = 0;
+			scoreText.setText('Score: 0');
+
+			// Hide start screen elements
+			if (startText) {
+				startText.setVisible(false);
+			}
+			if (playButton) {
+				playButton.setVisible(false);
+			}
+			if (playButtonBg) {
+				playButtonBg.setVisible(false);
+			}
+
+			// Hide game over elements
+			gameOverText.setVisible(false);
+			finalScoreText.setVisible(false);
+			if (replayButton) {
+				replayButton.setVisible(false);
+			}
+			if (replayButtonBg) {
+				replayButtonBg.setVisible(false);
+			}
+
+			// Show snake
+			snake.forEach(segment => {
+				segment.graphics.setVisible(true);
+			});
+
+			// Create food
+			spawnFood.call(game.scene.scenes[0]);
+
+			// Start game timer
+			gameTimer = game.scene.scenes[0].time.addEvent({
+				delay: 150,
+				callback: moveSnake,
+				callbackScope: game.scene.scenes[0],
+				loop: true
+			});
+
+			// Show touch controls when game starts (mobile only)
+			if (isMobile) {
+				const touchControls = document.getElementById('touch-controls');
+				if (touchControls) {
+					touchControls.classList.add('show');
+				}
+			}
+		}
+
+		function replayGame() {
+			// Reset score
+			score = 0;
+
+			// Reset game state
+			gameStarted = false;
+
+			// Hide game over elements
+			gameOverText.setVisible(false);
+			finalScoreText.setVisible(false);
+			if (replayButton) {
+				replayButton.setVisible(false);
+			}
+			if (replayButtonBg) {
+				replayButtonBg.setVisible(false);
+			}
+
+			// Show start screen elements
+			if (startText) {
+				startText.setVisible(true);
+			}
+			if (playButton) {
+				playButton.setVisible(true);
+			}
+			if (playButtonBg) {
+				playButtonBg.setVisible(true);
+			}
+
+			// Hide snake
+			snake.forEach(segment => {
+				segment.graphics.setVisible(false);
+			});
+
+			// Destroy food if exists
+			if (food) {
+				food.destroy();
+				food = null;
+			}
+
+			// Reset snake position
+			const gridSize = 20;
+			const gridWidth = config.width / gridSize;
+			const gridHeight = config.height / gridSize;
+			const startX = Math.floor(gridWidth / 2);
+			const startY = Math.floor(gridHeight / 2);
+
+			snake.forEach((segment, i) => {
+				segment.x = startX - i;
+				segment.y = startY;
+				segment.graphics.x = (startX - i) * gridSize + gridSize / 2;
+				segment.graphics.y = startY * gridSize + gridSize / 2;
+			});
+
+			// Reset direction
+			game.scene.scenes[0].direction = { x: 1, y: 0 };
+			game.scene.scenes[0].nextDirection = { x: 1, y: 0 };
+
+			// Update score display
+			scoreText.setText('Score: 0');
+
+			// Hide touch controls when replaying
+			if (isMobile) {
+				const touchControls = document.getElementById('touch-controls');
+				if (touchControls) {
+					touchControls.classList.remove('show');
+				}
+			}
+		}
+
+		// Start the game (but don't start playing yet)
+		game = new Phaser.Game(config);
+
+		// Setup touch controls after game is created
+		setupTouchControls();
+
+		// Handle window resize (only resize if game hasn't started)
+		let resizeTimeout;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(() => {
+				if (game && !gameStarted) {
+					const newSize = getGameSize();
+					if (Math.abs(newSize - config.width) > 20) {
+						// Only resize if significant change
+						game.destroy(true);
+						config.width = newSize;
+						config.height = newSize;
+						game = new Phaser.Game(config);
+						setupTouchControls();
+					}
+				}
+			}, 250);
+		});
+	</script>
+</body>
+</html>
