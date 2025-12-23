@@ -24,3 +24,7 @@ npm run preview
 - Cập nhật thông tin site ở `src/consts.js` và `astro.config.mjs` (`site`).
 - Thay đường dẫn social trong `Header.astro` và `Footer.astro`.
 - Thay favicon, ảnh hero tại thư mục `public/` hoặc `src/assets/`.
+
+## Việc cần làm
+- Tạo 1 trang tổng hợp các từ vựng hsk1, hsk2, hsk3 có pinyin, audio, sắp xếp theo nhóm
+- Tạo 1 trang thi thử các đề hsk1, hsk2, hsk3
