@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HTML Components - DaisyUI + Tailwind</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+	<style>
+		.component-section {
+			margin-bottom: 3rem;
+		}
+		.component-title {
+			font-size: 1.5rem;
+			font-weight: 700;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 2px solid #e5e7eb;
+		}
+		.component-demo {
+			padding: 1.5rem;
+			background: #f9fafb;
+			border-radius: 0.5rem;
+			margin-bottom: 1rem;
+		}
+		.code-block {
+			background: #1f2937;
+			color: #f3f4f6;
+			padding: 1rem;
+			border-radius: 0.5rem;
+			overflow-x: auto;
+			font-family: 'Courier New', monospace;
+			font-size: 0.875rem;
+		}
+	</style>
+</head>
+<body class="bg-base-200 min-h-screen">
+	<div class="container mx-auto px-4 py-8 max-w-6xl">
+		<header class="mb-8">
+			<h1 class="text-4xl font-bold mb-2">HTML Components</h1>
+			<p class="text-gray-600">DaisyUI + Tailwind CSS - 0 JS dependency, pure HTML components</p>
+			<div class="mt-4">
+				<span class="badge badge-primary">DaisyUI</span>
+				<span class="badge badge-secondary">Tailwind CSS</span>
+				<span class="badge badge-accent">0 JS</span>
+			</div>
+		</header>
+
+		<!-- Card Component -->
+		<section class="component-section">
+			<h2 class="component-title">Card Component</h2>
+			<div class="component-demo" data-include="components/card.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/card.html --&gt;<br>
+				&lt;div class="card bg-base-100 shadow-xl"&gt;<br>
+				&nbsp;&nbsp;&lt;figure&gt;&lt;img src="image.jpg" alt="Shoes" /&gt;&lt;/figure&gt;<br>
+				&nbsp;&nbsp;&lt;div class="card-body"&gt;<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&lt;h2 class="card-title"&gt;Tiêu đề card&lt;/h2&gt;<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&lt;p&gt;Nội dung...&lt;/p&gt;<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="card-actions"&gt;&lt;button class="btn btn-primary"&gt;Mua&lt;/button&gt;&lt;/div&gt;<br>
+				&nbsp;&nbsp;&lt;/div&gt;<br>
+				&lt;/div&gt;
+			</div>
+		</section>
+
+		<!-- Button Component -->
+		<section class="component-section">
+			<h2 class="component-title">Button Component</h2>
+			<div class="component-demo" data-include="components/button.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/button.html --&gt;<br>
+				&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;<br>
+				&lt;button class="btn btn-secondary"&gt;Secondary&lt;/button&gt;<br>
+				&lt;button class="btn btn-outline"&gt;Outline&lt;/button&gt;
+			</div>
+		</section>
+
+		<!-- Modal Component -->
+		<section class="component-section">
+			<h2 class="component-title">Modal Component</h2>
+			<div class="component-demo" data-include="components/modal.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/modal.html --&gt;<br>
+				&lt;button class="btn" onclick="modal_1.showModal()"&gt;Open Modal&lt;/button&gt;<br>
+				&lt;dialog id="modal_1" class="modal"&gt;<br>
+				&nbsp;&nbsp;&lt;div class="modal-box"&gt;...&lt;/div&gt;<br>
+				&lt;/dialog&gt;
+			</div>
+		</section>
+
+		<!-- Navbar Component -->
+		<section class="component-section">
+			<h2 class="component-title">Navbar Component</h2>
+			<div class="component-demo" data-include="components/navbar.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/navbar.html --&gt;<br>
+				&lt;div class="navbar bg-base-100"&gt;<br>
+				&nbsp;&nbsp;&lt;div class="flex-1"&gt;&lt;a class="btn btn-ghost text-xl"&gt;Logo&lt;/a&gt;&lt;/div&gt;<br>
+				&nbsp;&nbsp;&lt;div class="flex-none"&gt;&lt;ul class="menu menu-horizontal"&gt;...&lt;/ul&gt;&lt;/div&gt;<br>
+				&lt;/div&gt;
+			</div>
+		</section>
+
+		<!-- Alert Component -->
+		<section class="component-section">
+			<h2 class="component-title">Alert Component</h2>
+			<div class="component-demo" data-include="components/alert.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/alert.html --&gt;<br>
+				&lt;div class="alert alert-info"&gt;&lt;span&gt;Thông báo&lt;/span&gt;&lt;/div&gt;<br>
+				&lt;div class="alert alert-success"&gt;&lt;span&gt;Thành công!&lt;/span&gt;&lt;/div&gt;<br>
+				&lt;div class="alert alert-error"&gt;&lt;span&gt;Lỗi!&lt;/span&gt;&lt;/div&gt;
+			</div>
+		</section>
+
+		<!-- Badge Component -->
+		<section class="component-section">
+			<h2 class="component-title">Badge Component</h2>
+			<div class="component-demo" data-include="components/badge.html"></div>
+			<div class="code-block">
+				&lt;!-- File: components/badge.html --&gt;<br>
+				&lt;div class="badge badge-primary"&gt;Primary&lt;/div&gt;<br>
+				&lt;div class="badge badge-secondary"&gt;Secondary&lt;/div&gt;<br>
+				&lt;div class="badge badge-outline"&gt;Outline&lt;/div&gt;
+			</div>
+		</section>
+
+		<footer class="mt-12 pt-8 border-t border-gray-300 text-center text-gray-600">
+			<p>DaisyUI + Tailwind CSS - Pure HTML components, 0 JS dependency</p>
+			<p class="mt-2">
+				<a href="https://daisyui.com" target="_blank" class="link link-primary">DaisyUI Docs</a> |
+				<a href="https://tailwindcss.com" target="_blank" class="link link-primary">Tailwind CSS Docs</a>
+			</p>
+		</footer>
+	</div>
+
+	<script>
+		// Load components dynamically
+		document.querySelectorAll('[data-include]').forEach(async (el) => {
+			const file = el.getAttribute('data-include');
+			try {
+				const response = await fetch(file);
+				if (!response.ok) throw new Error('Failed to load');
+				const html = await response.text();
+				el.innerHTML = html;
+			} catch (e) {
+				console.warn('Could not load component:', file, e);
+				el.innerHTML = '<p class="text-error">Could not load component. Check console for details.</p>';
+			}
+		});
+	</script>
+</body>
+</html>
