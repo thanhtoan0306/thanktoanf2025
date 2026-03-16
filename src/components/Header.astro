@@ -10,11 +10,11 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 		<div class="internal-links">
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
-			<HeaderLink href="/playground">Playground</HeaderLink>
-			<HeaderLink href="/public">Public</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
+			<HeaderLink href="/playground" class="hidden-nav-item">Playground</HeaderLink>
+			<HeaderLink href="/public" class="hidden-nav-item">Public</HeaderLink>
+			<HeaderLink href="/about" class="hidden-nav-item">About</HeaderLink>
 			<HeaderLink href="/admin" class="dashboard-link">Dashboard</HeaderLink>
-			<HeaderLink href="/login">Login</HeaderLink>
+			<HeaderLink href="/login" class="hidden-nav-item">Login</HeaderLink>
 		</div>
 		<div class="header-right">
 			<ThemeSwitcher />
@@ -134,6 +134,9 @@ header {
 		display: flex;
 	}
 	.dashboard-link {
+		display: none;
+	}
+	.hidden-nav-item {
 		display: none;
 	}
 	@media (max-width: 720px) {
