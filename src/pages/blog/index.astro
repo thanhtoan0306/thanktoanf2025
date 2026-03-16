@@ -3,10 +3,81 @@ import { getCollection } from 'astro:content';
 import PostCard from '../../components/PostCard.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import PageLayout from '../../layouts/PageLayout.astro';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+type HtmlBlogCard = {
+	slug: string;
+	href: string;
+	title: string;
+	description?: string;
+};
+
+function extractFirstMatch(input: string, re: RegExp): string | undefined {
+	const m = input.match(re);
+	return m?.[1]?.trim();
+}
+
+function toTitleFromSlug(slug: string): string {
+	return slug
+		.replace(/[-_]+/g, ' ')
+		.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+async function getHtmlBlogCards(): Promise<HtmlBlogCard[]> {
+	// Run at build/dev time on Node. `public/` files are served as static assets.
+	const publicDir = new URL('../../../public/', import.meta.url);
+	const htmlBlogDir = new URL('./htmlblog/', publicDir);
+
+	let filenames: string[] = [];
+	try {
+		filenames = await fs.readdir(htmlBlogDir);
+	} catch {
+		return [];
+	}
+
+	const htmlFiles = filenames.filter((f) => f.toLowerCase().endsWith('.html'));
+	const cards = await Promise.all(
+		htmlFiles.map(async (filename) => {
+			const slug = path.basename(filename, path.extname(filename));
+			const href = `/htmlblog/${filename}`;
+			const fileUrl = new URL(`./${filename}`, htmlBlogDir);
+
+			let title: string | undefined;
+			let description: string | undefined;
+			try {
+				const html = await fs.readFile(fileUrl, 'utf-8');
+				title = extractFirstMatch(html, /<title>([\s\S]*?)<\/title>/i);
+				description =
+					extractFirstMatch(
+						html,
+						/<meta\s+name=["']description["']\s+content=["']([^"']+)["'][^>]*>/i,
+					) ??
+					extractFirstMatch(
+						html,
+						/<meta\s+content=["']([^"']+)["']\s+name=["']description["'][^>]*>/i,
+					);
+			} catch {
+				// If we can't read/parse, still show a fallback card.
+			}
+
+			return {
+				slug,
+				href,
+				title: title || toTitleFromSlug(slug),
+				description,
+			} satisfies HtmlBlogCard;
+		}),
+	);
+
+	return cards.sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
+const htmlCards = await getHtmlBlogCards();
 ---
 
 <PageLayout title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -27,6 +98,20 @@ const posts = (await getCollection('blog')).sort(
 		<div class="post-grid">
 			{posts.map((post) => (
 				<PostCard post={post} />
+			))}
+
+			{htmlCards.map((card) => (
+				<article class="card">
+					<a href={card.href} class="card__link" aria-label={`Read more: ${card.title}`}>
+						<div class="card__body">
+							<p class="card__date">HTML</p>
+							<h3 class="card__title">{card.title}</h3>
+							<p class="card__description">
+								{card.description ?? 'Bài viết HTML (static)'}
+							</p>
+						</div>
+					</a>
+				</article>
 			))}
 		</div>
 	</section>
@@ -71,6 +156,44 @@ const posts = (await getCollection('blog')).sort(
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 1.4rem;
 	}
+
+	/* Keep HTML cards visually consistent with `PostCard` */
+	.card {
+		background: var(--bg-primary);
+		border-radius: 14px;
+		box-shadow: 0 12px 30px rgba(var(--gray), 12%);
+		transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+	}
+	.card__link {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+	}
+	.card__body {
+		padding: 1.25rem;
+		display: grid;
+		gap: 0.35rem;
+	}
+	.card__date {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+	.card__title {
+		margin: 0;
+		line-height: 1.25;
+		font-size: 1.2rem;
+	}
+	.card__description {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 1rem;
+	}
+	.card:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 16px 40px rgba(var(--gray), 18%);
+	}
+
 	.add-blog-button {
 		align-self: flex-start;
 		padding: 0.5rem 0.9rem;
