@@ -5,12 +5,16 @@ import FormattedDate from './FormattedDate.astro';
 const { post } = Astro.props;
 const { data } = post;
 const link = `/blog/${post.id}/`;
+const FALLBACK_THUMBNAIL =
+	'https://www.jobat.be//-/media/jobat/jobat-be/articles/kalender-2026.jpg?mw=890&hash=2DE5EA7BB922D5601411AC408E0FB2D9';
 ---
 
 <article class="card">
 	<a href={link} class="card__link" aria-label={`Read more: ${data.title}`}>
-		{data.heroImage && (
+		{data.heroImage ? (
 			<Image class="card__image" width={720} height={360} src={data.heroImage} alt="" />
+		) : (
+			<img class="card__image" src={FALLBACK_THUMBNAIL} alt="" loading="lazy" />
 		)}
 		<div class="card__body">
 			<p class="card__date">

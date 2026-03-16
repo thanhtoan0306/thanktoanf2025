@@ -6,6 +6,9 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+const FALLBACK_THUMBNAIL =
+	'https://www.jobat.be//-/media/jobat/jobat-be/articles/kalender-2026.jpg?mw=890&hash=2DE5EA7BB922D5601411AC408E0FB2D9';
+
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
@@ -103,6 +106,7 @@ const htmlCards = await getHtmlBlogCards();
 			{htmlCards.map((card) => (
 				<article class="card">
 					<a href={card.href} class="card__link" aria-label={`Read more: ${card.title}`}>
+						<img class="card__image" src={FALLBACK_THUMBNAIL} alt="" loading="lazy" />
 						<div class="card__body">
 							<p class="card__date">HTML</p>
 							<h3 class="card__title">{card.title}</h3>
