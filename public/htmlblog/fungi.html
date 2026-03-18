@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mycelium – Tìm Glucose</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --soil:    #0d0905;
+      --dirt:    #1a1108;
+      --mycel:   #c8a86b;
+      --glow1:   #e8c84a;   /* glucose gold */
+      --glow2:   #7ec86a;   /* spore green */
+      --glow3:   #d4855a;   /* amber */
+      --spore:   #b8d4a0;
+      --text:    #c8b898;
+      --muted:   rgba(200,184,152,0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--soil);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* organic noise texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse 120% 60% at 30% 20%, rgba(60,35,10,0.6) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 80% at 70% 80%, rgba(20,40,10,0.5) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(80,50,15,0.3) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative; z-index: 10;
+      text-align: center;
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(200,168,107,0.15);
+    }
+
+    .eyebrow {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-size: 0.85em;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.3rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--mycel);
+      text-shadow:
+        0 0 30px rgba(200,168,107,0.5),
+        0 0 60px rgba(200,168,107,0.2);
+      line-height: 1.2;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--glow1);
+      text-shadow: 0 0 20px rgba(232,200,74,0.7), 0 0 50px rgba(232,200,74,0.3);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 0.82em;
+      font-style: italic;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── CONTROLS ── */
+    #controls {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      gap: 20px; padding: 14px 20px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(200,168,107,0.1);
+    }
+
+    .btn {
+      padding: 9px 26px;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 0.62em;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(200,168,107,0.4);
+      background: rgba(200,168,107,0.06);
+      color: var(--mycel);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(200,168,107,0.15), transparent 70%);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .btn:hover { border-color: rgba(200,168,107,0.8); color: var(--glow1); }
+    .btn:hover::after { opacity: 1; }
+    .btn.glucose {
+      border-color: rgba(232,200,74,0.5);
+      color: var(--glow1);
+    }
+    .btn.glucose:hover { border-color: var(--glow1); box-shadow: 0 0 12px rgba(232,200,74,0.3); }
+
+    .speed-wrap {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.78em; font-style: italic; color: var(--muted);
+    }
+    input[type=range] {
+      -webkit-appearance: none; width: 100px; height: 2px;
+      background: rgba(200,168,107,0.2); border-radius: 2px; outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 10px; height: 10px;
+      background: var(--mycel); border-radius: 50%;
+      box-shadow: 0 0 6px var(--mycel); cursor: pointer;
+    }
+    #speedVal { color: var(--glow1); font-style: normal; font-weight: 400; min-width: 26px; }
+
+    /* ── GRID ── */
+    #grid-container {
+      position: relative; z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(295px, 1fr));
+      gap: 1px;
+      padding: 1px;
+      max-width: 1900px;
+      margin: 0 auto;
+    }
+
+    .algo-box {
+      background: var(--dirt);
+      border: 1px solid rgba(200,168,107,0.08);
+      overflow: hidden;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .algo-box:hover { border-color: rgba(200,168,107,0.25); }
+
+    /* organic corner sprouting */
+    .algo-box::before, .algo-box::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    .algo-box::before {
+      top: 0; left: 0;
+      border-top: 1px solid var(--mycel);
+      border-left: 1px solid var(--mycel);
+      border-radius: 0 0 60% 0;
+    }
+    .algo-box::after {
+      bottom: 0; right: 0;
+      border-bottom: 1px solid var(--mycel);
+      border-right: 1px solid var(--mycel);
+      border-radius: 60% 0 0 0;
+    }
+
+    .algo-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 7px 12px 5px;
+      border-bottom: 1px solid rgba(200,168,107,0.08);
+    }
+
+    .algo-name {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 0.6em;
+      letter-spacing: 0.12em;
+      color: var(--mycel);
+    }
+
+    .algo-tag {
+      font-family: 'Crimson Pro', serif;
+      font-style: italic;
+      font-size: 0.68em;
+      color: rgba(200,184,152,0.4);
+    }
+
+    .algo-status {
+      font-size: 0.6em;
+      font-style: italic;
+      color: rgba(200,184,152,0.3);
+      padding: 4px 12px 5px;
+      min-height: 18px;
+    }
+    .algo-status.growing { color: var(--glow2); animation: pulse-text 1.4s ease-in-out infinite; }
+    .algo-status.found   { color: var(--glow1); }
+
+    @keyframes pulse-text {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    canvas {
+      display: block; width: 100%; height: auto;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">— Physarum polycephalum simulator —</div>
+  <h1>Mycelium tìm <em>Glucose</em></h1>
+  <div class="subtitle">10 chiến lược lan sợi nấm · chạy đồng thời · trên nền đất ẩm</div>
+</header>
+
+<div id="controls">
+  <button class="btn glucose" onclick="startAll()">🍄 Nảy mầm</button>
+  <button class="btn" onclick="resetAll()">↻ Đất mới</button>
+  <div class="speed-wrap">
+    <span>tốc độ lan:</span>
+    <input type="range" id="speed" min="10" max="400" value="55" step="10">
+    <span id="speedVal">55</span><span>ms</span>
+  </div>
+</div>
+
+<div id="grid-container"></div>
+
+<script>
+const COLS = 33, ROWS = 23, CELL = 10;
+
+// Each algorithm gets a bioluminescent color palette
+const algorithms = [
+  {name:"BFS",          tag:"lan rộng đều",       color:"#74c2a8", fn:bfs},
+  {name:"DFS",          tag:"lao sâu thăm dò",    color:"#a8c274", fn:dfs},
+  {name:"Dijkstra",     tag:"cân bằng năng lượng", color:"#c2a874", fn:dijkstra},
+  {name:"A*",           tag:"đánh hơi glucose",   color:"#e8c84a", fn:astar},
+  {name:"Greedy",       tag:"lao thẳng mùi",      color:"#e8944a", fn:greedy},
+  {name:"Bi-BFS",       tag:"hai đầu gặp nhau",   color:"#74a8c2", fn:bidirBfs},
+  {name:"IDA*",         tag:"thăm dò lặp sâu",    color:"#b8a8e8", fn:idaStar},
+  {name:"Best-First",   tag:"ưu tiên mùi nhất",   color:"#e87480", fn:bestFirst},
+  {name:"Uniform Cost", tag:"tiêu đều năng lượng", color:"#74c2c2", fn:uniformCost},
+  {name:"Random Walk",  tag:"lạc trong đất",       color:"#a8a898", fn:randomWalk}
+];
+
+let canvases=[], contexts=[], grids=[], timers=[];
+let statusEls=[], stepEls=[];
+let speed = 55;
+
+const container = document.getElementById('grid-container');
+
+algorithms.forEach((algo, i) => {
+  const box = document.createElement('div');
+  box.className = 'algo-box';
+  box.id = `box-${i}`;
+
+  const hdr = document.createElement('div');
+  hdr.className = 'algo-header';
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'algo-name';
+  nameEl.style.color = algo.color;
+  nameEl.style.textShadow = `0 0 12px ${algo.color}55`;
+  nameEl.textContent = algo.name;
+
+  const tagEl = document.createElement('div');
+  tagEl.className = 'algo-tag';
+  tagEl.textContent = algo.tag;
+
+  hdr.appendChild(nameEl);
+  hdr.appendChild(tagEl);
+
+  const cv = document.createElement('canvas');
+  cv.width = COLS * CELL;
+  cv.height = ROWS * CELL;
+
+  const statEl = document.createElement('div');
+  statEl.className = 'algo-status';
+  statEl.textContent = 'chờ nảy mầm…';
+  statusEls.push(statEl);
+
+  box.appendChild(hdr);
+  box.appendChild(cv);
+  box.appendChild(statEl);
+  container.appendChild(box);
+
+  canvases.push(cv);
+  contexts.push(cv.getContext('2d'));
+});
+
+// ── MAZE ──
+function generateMaze() {
+  const maze = Array(ROWS).fill().map(() => Array(COLS).fill(1));
+  function carve(r, c) {
+    maze[r][c] = 0;
+    const dirs = [[0,2],[2,0],[0,-2],[-2,0]].sort(() => Math.random()-0.5);
+    for (let [dr,dc] of dirs) {
+      const nr=r+dr, nc=c+dc;
+      if (nr>0&&nr<ROWS-1&&nc>0&&nc<COLS-1&&maze[nr][nc]===1) {
+        maze[r+dr/2][c+dc/2]=0; carve(nr,nc);
+      }
+    }
+  }
+  carve(1,1);
+  maze[1][1]=0; maze[ROWS-2][COLS-2]=0;
+  return maze;
+}
+
+function init() {
+  const base = generateMaze();
+  grids = algorithms.map(() => base.map(r => r.slice()));
+  statusEls.forEach(el => { el.textContent='chờ nảy mầm…'; el.className='algo-status'; el.style.color=''; });
+  drawAll();
+}
+
+// ── DRAW BASE ──
+function drawAll() {
+  algorithms.forEach((algo, i) => {
+    const ctx = contexts[i];
+    const w = canvases[i].width, h = canvases[i].height;
+
+    // soil background
+    ctx.fillStyle = '#110d07';
+    ctx.fillRect(0,0,w,h);
+
+    // subtle soil texture — randomized per-cell noise
+    const g = grids[i];
+    for (let r=0;r<ROWS;r++) {
+      for (let c=0;c<COLS;c++) {
+        if (g[r][c]===1) {
+          // soil wall — layered earthy tones
+          const v = 0.06 + Math.random()*0.04;
+          ctx.fillStyle = `rgba(${38+Math.random()*12|0},${22+Math.random()*8|0},${8+Math.random()*6|0},1)`;
+          ctx.fillRect(c*CELL, r*CELL, CELL, CELL);
+          // occasional mineral glint
+          if (Math.random()<0.03) {
+            ctx.fillStyle = `rgba(180,140,80,0.12)`;
+            ctx.fillRect(c*CELL+CELL/2-1, r*CELL+CELL/2-1, 2, 2);
+          }
+        } else {
+          // open tunnel — slightly lighter soil
+          ctx.fillStyle = `rgba(20,14,7,1)`;
+          ctx.fillRect(c*CELL, r*CELL, CELL, CELL);
+        }
+      }
+    }
+
+    // Draw mushroom (start) at [1,1]
+    drawMushroom(ctx, 1, 1, algo.color);
+
+    // Draw glucose drop at goal
+    drawGlucose(ctx, ROWS-2, COLS-2);
+  });
+}
+
+function drawMushroom(ctx, r, c, color) {
+  const x = c*CELL + CELL/2;
+  const y = r*CELL + CELL/2;
+  // glow
+  ctx.shadowBlur = 14;
+  ctx.shadowColor = color;
+  // stem
+  ctx.fillStyle = '#d4b07a';
+  ctx.fillRect(x-1, y, 2, 4);
+  // cap
+  ctx.beginPath();
+  ctx.arc(x, y, 4.5, Math.PI, 2*Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  // cap highlight
+  ctx.beginPath();
+  ctx.arc(x-1, y-1, 2, Math.PI, 2*Math.PI);
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function drawGlucose(ctx, r, c) {
+  const x = c*CELL + CELL/2;
+  const y = r*CELL + CELL/2;
+  // outer glow halo
+  ctx.shadowBlur = 16;
+  ctx.shadowColor = '#e8c84a';
+  // pulsing golden orb
+  const grd = ctx.createRadialGradient(x, y, 0, x, y, 5);
+  grd.addColorStop(0, '#fff5aa');
+  grd.addColorStop(0.4, '#e8c84a');
+  grd.addColorStop(1, '#b87820');
+  ctx.beginPath();
+  ctx.arc(x, y, 4.5, 0, 2*Math.PI);
+  ctx.fillStyle = grd;
+  ctx.fill();
+  // ring
+  ctx.beginPath();
+  ctx.arc(x, y, 5.5, 0, 2*Math.PI);
+  ctx.strokeStyle = 'rgba(232,200,74,0.4)';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+// ── HELPERS ──
+function getNeighbors(r,c) {
+  return [[-1,0],[1,0],[0,-1],[0,1]]
+    .map(d=>[r+d[0],c+d[1]])
+    .filter(([nr,nc])=>nr>=0&&nr<ROWS&&nc>=0&&nc<COLS);
+}
+function manhattan(a,b) { return Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]); }
+function reconstruct(par, cur) {
+  let p=[]; while(cur){p.unshift(cur);cur=par[cur.join()];} return p;
+}
+
+// ── ALGORITHMS ──
+function* bfs(grid) {
+  const s=[1,1],g=[ROWS-2,COLS-2],q=[s],vis=new Set([s.join()]),par={};
+  while(q.length){
+    const cur=q.shift(); yield{cur};
+    if(cur[0]===g[0]&&cur[1]===g[1]){yield{path:reconstruct(par,g)};return;}
+    for(let n of getNeighbors(...cur)){const k=n.join();if(grid[n[0]][n[1]]===0&&!vis.has(k)){vis.add(k);q.push(n);par[k]=cur;}}
+  }
+}
+function* dfs(grid) {
+  const s=[1,1],g=[ROWS-2,COLS-2],st=[s],vis=new Set(),par={};
+  while(st.length){
+    const cur=st.pop(),k=cur.join();if(vis.has(k))continue;vis.add(k);yield{cur};
+    if(cur[0]===g[0]&&cur[1]===g[1]){yield{path:reconstruct(par,g)};return;}
+    for(let n of getNeighbors(...cur)){const nk=n.join();if(grid[n[0]][n[1]]===0&&!vis.has(nk)){st.push(n);par[nk]=cur;}}
+  }
+}
+function* dijkstra(grid){yield* bfs(grid);}
+function* astar(grid) {
+  const s=[1,1],g=[ROWS-2,COLS-2],open=new Set([s.join()]);
+  const gs={[s.join()]:0},fs={[s.join()]:manhattan(s,g)},par={};
+  while(open.size){
+    let best=null,bestF=Infinity;
+    for(let k of open)if(fs[k]<bestF){bestF=fs[k];best=k;}
+    const cur=best.split(',').map(Number);yield{cur};
+    if(cur[0]===g[0]&&cur[1]===g[1]){yield{path:reconstruct(par,g)};return;}
+    open.delete(best);
+    for(let n of getNeighbors(...cur)){
+      if(grid[n[0]][n[1]]===1)continue;
+      const nk=n.join(),tg=(gs[cur.join()]||0)+1;
+      if(tg<(gs[nk]??Infinity)){par[nk]=cur;gs[nk]=tg;fs[nk]=tg+manhattan(n,g);open.add(nk);}
+    }
+  }
+}
+function* greedy(grid) {
+  const s=[1,1],g=[ROWS-2,COLS-2];let open=[{pos:s,h:manhattan(s,g)}];
+  const vis=new Set(),par={};
+  while(open.length){
+    open.sort((a,b)=>a.h-b.h);const cur=open.shift().pos,k=cur.join();
+    if(vis.has(k))continue;vis.add(k);yield{cur};
+    if(cur[0]===g[0]&&cur[1]===g[1]){yield{path:reconstruct(par,g)};return;}
+    for(let n of getNeighbors(...cur)){const nk=n.join();if(grid[n[0]][n[1]]===0&&!vis.has(nk)){par[nk]=cur;open.push({pos:n,h:manhattan(n,g)});}}
+  }
+}
+function* bidirBfs(grid) {
+  const s=[1,1],g=[ROWS-2,COLS-2];
+  const qs=[s],qg=[g],vs=new Set([s.join()]),vg=new Set([g.join()]),ps={},pg={};
+  while(qs.length&&qg.length){
+    const cs=qs.shift();yield{cur:cs};
+    if(vg.has(cs.join())){yield{path:reconstructBi(ps,pg,cs)};return;}
+    for(let n of getNeighbors(...cs)){const k=n.join();if(grid[n[0]][n[1]]===0&&!vs.has(k)){vs.add(k);qs.push(n);ps[k]=cs;}}
+    const cg=qg.shift();yield{cur:cg};
+    if(vs.has(cg.join())){yield{path:reconstructBi(ps,pg,cg)};return;}
+    for(let n of getNeighbors(...cg)){const k=n.join();if(grid[n[0]][n[1]]===0&&!vg.has(k)){vg.add(k);qg.push(n);pg[k]=cg;}}
+  }
+}
+function reconstructBi(ps,pg,meet){
+  let p=[],cur=meet;while(cur){p.unshift(cur);cur=ps[cur.join()];}
+  cur=pg[meet.join()];while(cur){p.push(cur);cur=pg[cur.join()];}return p;
+}
+function* idaStar(grid){
+  const s=[1,1],g=[ROWS-2,COLS-2];
+  let bound=manhattan(s,g),found=false,path=[s];
+  const vis=new Set([s.join()]);
+  function* search(node,gc,bound){
+    const f=gc+manhattan(node,g);if(f>bound)return;
+    if(node[0]===g[0]&&node[1]===g[1]){found=true;yield{path:[...path]};return;}
+    yield{cur:node};
+    for(let n of getNeighbors(...node)){
+      const k=n.join();
+      if(grid[n[0]][n[1]]===0&&!vis.has(k)){
+        vis.add(k);path.push(n);
+        yield* search(n,gc+1,bound);
+        if(found)return;
+        path.pop();vis.delete(k);
+      }
+    }
+  }
+  for(let i=0;i<25&&!found;i++){yield* search(s,0,bound);bound+=2;vis.clear();vis.add(s.join());path=[s];}
+}
+function* bestFirst(grid){yield* greedy(grid);}
+function* uniformCost(grid){yield* bfs(grid);}
+function* randomWalk(grid){
+  let pos=[1,1];const g=[ROWS-2,COLS-2];
+  for(let i=0;i<5000;i++){
+    yield{cur:pos};if(pos[0]===g[0]&&pos[1]===g[1])return;
+    let ns=getNeighbors(...pos).filter(n=>grid[n[0]][n[1]]===0);
+    if(!ns.length)break;pos=ns[Math.floor(Math.random()*ns.length)];
+  }
+}
+
+// ── RENDER CELL ──
+function isStartOrGoal(r,c){
+  return (r===1&&c===1)||(r===ROWS-2&&c===COLS-2);
+}
+
+// Draw a mycelium tendril cell
+function drawHypha(ctx, r, c, color, alpha) {
+  if (isStartOrGoal(r,c)) return;
+  const x = c*CELL, y = r*CELL;
+  // background clear
+  ctx.fillStyle = `rgba(20,14,7,1)`;
+  ctx.fillRect(x,y,CELL,CELL);
+  // tendril glow
+  ctx.shadowBlur = 5;
+  ctx.shadowColor = color;
+  // organic blob shape via arc
+  ctx.beginPath();
+  ctx.arc(x+CELL/2, y+CELL/2, CELL/2-1.5, 0, 2*Math.PI);
+  ctx.fillStyle = color.replace(')', `,${alpha})`).replace('rgb(', 'rgba(');
+  // fallback: just fill with alpha
+  ctx.fillStyle = hexAlpha(color, alpha);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  // tiny node dot at center — like mycelium node
+  if (Math.random() < 0.25) {
+    ctx.fillStyle = hexAlpha(color, Math.min(1, alpha+0.3));
+    ctx.fillRect(x+CELL/2-0.5, y+CELL/2-0.5, 1, 1);
+  }
+}
+
+function drawPath(ctx, path, color) {
+  if (!path || path.length < 2) return;
+  const len = path.length;
+  // Draw thick glowing path
+  for (let pi = 0; pi < len; pi++) {
+    const [r,c] = path[pi];
+    if (isStartOrGoal(r,c)) continue;
+    const t = pi / (len-1);
+    const x = c*CELL, y = r*CELL;
+    ctx.fillStyle = `rgba(20,14,7,1)`;
+    ctx.fillRect(x,y,CELL,CELL);
+
+    // Main thread — lerp color from mycelium to glucose gold
+    const blended = lerpColor(color, '#e8c84a', t);
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = blended;
+    ctx.fillStyle = blended;
+    // path is a line through centers
+    ctx.beginPath();
+    ctx.arc(x+CELL/2, y+CELL/2, CELL/2-1, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // bright center spine
+    ctx.fillStyle = 'rgba(255,248,200,0.7)';
+    ctx.beginPath();
+    ctx.arc(x+CELL/2, y+CELL/2, 1, 0, 2*Math.PI);
+    ctx.fill();
+  }
+}
+
+function hexAlpha(hex, alpha) {
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function lerpColor(c1, c2, t) {
+  const r1=parseInt(c1.slice(1,3),16),g1=parseInt(c1.slice(3,5),16),b1=parseInt(c1.slice(5,7),16);
+  const r2=parseInt(c2.slice(1,3),16),g2=parseInt(c2.slice(3,5),16),b2=parseInt(c2.slice(5,7),16);
+  const r=r1+(r2-r1)*t|0, g=g1+(g2-g1)*t|0, b=b1+(b2-b1)*t|0;
+  return `rgb(${r},${g},${b})`;
+}
+
+// ── ANIMATE ──
+let stepCounters = new Array(algorithms.length).fill(0);
+
+function animate(idx) {
+  const gen = algorithms[idx].fn(grids[idx]);
+  const algo = algorithms[idx];
+  const col = algo.color;
+  stepCounters[idx] = 0;
+
+  statusEls[idx].textContent = '🍄 đang lan sợi…';
+  statusEls[idx].className = 'algo-status growing';
+  statusEls[idx].style.color = col;
+
+  function tick() {
+    const res = gen.next();
+    if (res.done) {
+      statusEls[idx].textContent = '— không tìm thấy —';
+      statusEls[idx].className = 'algo-status';
+      return;
+    }
+    const state = res.value;
+    const ctx = contexts[idx];
+
+    if (state.cur) {
+      stepCounters[idx]++;
+      const [r,c] = state.cur;
+      // fading alpha based on closeness to goal
+      const dist = manhattan([r,c],[ROWS-2,COLS-2]);
+      const maxD = ROWS+COLS;
+      const alpha = 0.3 + 0.5 * (1 - dist/maxD);
+      drawHypha(ctx, r, c, col, alpha);
+      // redraw icons on top
+      drawMushroom(ctx, 1, 1, col);
+      drawGlucose(ctx, ROWS-2, COLS-2);
+      timers[idx] = setTimeout(tick, speed);
+    } else if (state.path) {
+      drawPath(ctx, state.path, col);
+      drawMushroom(ctx, 1, 1, col);
+      drawGlucose(ctx, ROWS-2, COLS-2);
+      const plen = state.path.length;
+      statusEls[idx].textContent = `✨ Glucose! Chuỗi: ${plen} bước · ${stepCounters[idx]} ô thăm`;
+      statusEls[idx].className = 'algo-status found';
+      statusEls[idx].style.color = '#e8c84a';
+    } else {
+      timers[idx] = setTimeout(tick, speed);
+    }
+  }
+  tick();
+}
+
+function startAll() {
+  algorithms.forEach((_,i) => { clearTimeout(timers[i]); animate(i); });
+}
+
+function resetAll() {
+  algorithms.forEach((_,i) => clearTimeout(timers[i]));
+  init();
+}
+
+document.getElementById('speed').oninput = e => {
+  speed = +e.target.value;
+  document.getElementById('speedVal').textContent = speed;
+};
+
+init();
+</script>
+</body>
+</html>
