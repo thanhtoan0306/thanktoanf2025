@@ -1,0 +1,2 @@
+hello from public/my-asset/assets
+

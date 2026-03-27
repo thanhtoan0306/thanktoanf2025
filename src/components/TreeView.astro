@@ -1,0 +1,29 @@
+---
+type TreeNode =
+	| { type: 'dir'; name: string; path: string; children: TreeNode[] }
+	| { type: 'file'; name: string; path: string; href: string };
+
+const { node } = Astro.props as { node: TreeNode };
+---
+
+{node.type === 'file' ? (
+	<li class="node node-file">
+		<a href={node.href} target="_blank" rel="noopener noreferrer">
+			{node.name}
+		</a>
+	</li>
+) : (
+	<li class="node node-dir">
+		<details open>
+			<summary>
+				<span class="folder">{node.name}</span>
+			</summary>
+			<ul class="tree">
+				{node.children.map((child) => (
+					<Astro.self node={child} />
+				))}
+			</ul>
+		</details>
+	</li>
+)}
+

@@ -1,0 +1,147 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { readdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import TreeView from '../components/TreeView.astro';
+
+type TreeNode =
+	| { type: 'dir'; name: string; path: string; children: TreeNode[] }
+	| { type: 'file'; name: string; path: string; href: string };
+
+const PUBLIC_SUBDIR = 'my-asset';
+const rootFsPath = fileURLToPath(new URL(`../../public/${PUBLIC_SUBDIR}/`, import.meta.url));
+
+async function buildTree(dirFsPath: string, dirWebPath: string): Promise<TreeNode[]> {
+	const entries = await readdir(dirFsPath, { withFileTypes: true });
+	const sorted = entries.sort((a, b) => a.name.localeCompare(b.name));
+
+	const nodes = await Promise.all(
+		sorted
+			.filter((entry) => !entry.name.startsWith('.'))
+			.map(async (entry) => {
+				const childFsPath = `${dirFsPath}${dirFsPath.endsWith('/') ? '' : '/'}${entry.name}`;
+				const childWebPath = `${dirWebPath}${dirWebPath.endsWith('/') ? '' : '/'}${entry.name}`;
+
+				if (entry.isDirectory()) {
+					return {
+						type: 'dir' as const,
+						name: entry.name,
+						path: childWebPath,
+						children: await buildTree(`${childFsPath}/`, `${childWebPath}/`),
+					};
+				}
+
+				return {
+					type: 'file' as const,
+					name: entry.name,
+					path: childWebPath,
+					href: childWebPath,
+				};
+			}),
+	);
+
+	return nodes;
+}
+
+const tree: TreeNode = {
+	type: 'dir',
+	name: PUBLIC_SUBDIR,
+	path: `/${PUBLIC_SUBDIR}/`,
+	children: await buildTree(`${rootFsPath}`, `/${PUBLIC_SUBDIR}/`),
+};
+---
+
+<PageLayout title={`My assets | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<section class="assets-header">
+		<h1>My assets</h1>
+		<p class="lead">Browse static files under <code>/public/my-asset</code>.</p>
+	</section>
+
+	<section class="browser">
+		<div class="browser-card">
+			<div class="browser-header">
+				<h2>Folder browser</h2>
+				<a class="open-root" href="/my-asset/" target="_blank" rel="noopener noreferrer">Open root</a>
+			</div>
+			<ul class="tree tree-root">
+				<TreeView node={tree} />
+			</ul>
+		</div>
+	</section>
+</PageLayout>
+
+<style>
+	.assets-header {
+		text-align: center;
+		margin-bottom: 3rem;
+	}
+	.assets-header h1 {
+		margin: 0 0 0.5rem 0;
+		font-size: 2.5rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	.lead {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 1.1rem;
+	}
+
+	.browser {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+	.browser-card {
+		border: 1px solid var(--border-color);
+		background: var(--bg-primary);
+		border-radius: 14px;
+		padding: 1rem 1.25rem;
+	}
+	.browser-header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+	}
+	.browser-header h2 {
+		margin: 0;
+		font-size: 1.1rem;
+	}
+	.open-root {
+		color: rgb(var(--accent));
+		text-decoration: none;
+		font-weight: 700;
+	}
+	.open-root:hover {
+		text-decoration: underline;
+	}
+
+	.tree {
+		list-style: none;
+		margin: 0;
+		padding-left: 1rem;
+		display: grid;
+		gap: 0.25rem;
+	}
+	.tree-root {
+		padding-left: 0;
+	}
+	.node details summary {
+		cursor: pointer;
+		user-select: none;
+	}
+	.folder {
+		font-weight: 700;
+	}
+	.node-file a {
+		color: var(--text-primary);
+		text-decoration: none;
+	}
+	.node-file a:hover {
+		text-decoration: underline;
+		color: rgb(var(--accent));
+	}
+</style>
+

@@ -19,31 +19,9 @@ const featured = posts.slice(0, 3);
 		primaryCta={{ href: '/blog', label: 'Read blog' }}
 		secondaryCta={{ href: '/about', label: 'About me' }}
 	/>
-
-	<section class="section highlights">
-		<div>
-			<p class="eyebrow">You will find</p>
-			<h2>Thinking & techniques</h2>
-			<p class="lead">
-				Concise, applicable notes on how I approach front-end, DX and working with product teams.
-			</p>
-		</div>
-		<ul class="pill-list">
-			<li>Practicing Astro, React and web fundamentals</li>
-			<li>Shipping process: from idea to production</li>
-			<li>UI design systems and componentization</li>
-			<li>Dev tooling: testing, linting, CI/CD</li>
-			<li>Soft skills: writing, review, mentoring</li>
-		</ul>
-	</section>
 </PageLayout>
 
 <style>
-	.section {
-		margin-top: 2.5rem;
-		display: grid;
-		gap: 1.25rem;
-	}
 	.section__header {
 		display: flex;
 		align-items: center;
@@ -55,45 +33,10 @@ const featured = posts.slice(0, 3);
 		color: var(--accent);
 		font-weight: 700;
 	}
-	.eyebrow {
-		margin: 0;
-		text-transform: uppercase;
-		letter-spacing: 0.18em;
-		font-size: 0.9rem;
-		color: rgb(var(--gray));
-	}
-	.lead {
-		margin: 0.3rem 0 0;
-		color: rgb(var(--gray));
-		max-width: 720px;
-	}
 	.post-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 1.4rem;
-	}
-	.highlights {
-		background: var(--bg-primary);
-		border-radius: 14px;
-		padding: 1.5rem;
-		box-shadow: 0 14px 36px rgba(var(--gray), 10%);
-		transition: background-color 0.3s ease;
-	}
-	.pill-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	.pill-list li {
-		background: rgba(var(--accent-rgb, 35, 55, 255), 0.08);
-		color: rgb(var(--black));
-		border: 1px solid rgba(var(--accent-rgb, 35, 55, 255), 0.2);
-		border-radius: 999px;
-		padding: 0.55rem 0.9rem;
-		font-size: 0.95rem;
 	}
 
 	@media (max-width: 720px) {

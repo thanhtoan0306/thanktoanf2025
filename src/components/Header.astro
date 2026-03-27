@@ -11,7 +11,8 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/apps">Apps</HeaderLink>
-			<HeaderLink href="/playground" class="hidden-nav-item">Playground</HeaderLink>
+			<HeaderLink href="/playground">Playgrounds</HeaderLink>
+			<a href="/my-assets" class="my-assets-link">My assets</a>
 			<HeaderLink href="/public" class="hidden-nav-item">Public</HeaderLink>
 			<HeaderLink href="/about" class="hidden-nav-item">About</HeaderLink>
 			<HeaderLink href="/admin" class="dashboard-link">Dashboard</HeaderLink>
@@ -70,6 +71,8 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 	</nav>
 	<script>
 		const DASHBOARD_ACCESS_KEY = 'dashboardAccess';
+		const MY_ASSETS_ACCESS_KEY = 'myAssetsAccess';
+		const MY_ASSETS_PASSWORD = '1111';
 
 		function syncDashboardVisibility() {
 			const hasAccess = typeof window !== 'undefined'
@@ -83,6 +86,48 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 			// Initial sync
 			syncDashboardVisibility();
 
+			const myAssetsLink = document.querySelector('.my-assets-link') as HTMLAnchorElement | null;
+			const myAssetsDialog = document.getElementById('my-assets-dialog') as HTMLDialogElement | null;
+			const myAssetsForm = document.getElementById('my-assets-form') as HTMLFormElement | null;
+			const myAssetsInput = document.getElementById('my-assets-password') as HTMLInputElement | null;
+			const myAssetsError = document.getElementById('my-assets-error') as HTMLParagraphElement | null;
+			let pendingMyAssetsHref: string | null = null;
+
+			function hasMyAssetsAccess() {
+				return window.localStorage.getItem(MY_ASSETS_ACCESS_KEY) === 'true';
+			}
+
+			function openMyAssetsDialog(href: string) {
+				pendingMyAssetsHref = href;
+				if (myAssetsError) myAssetsError.textContent = '';
+				if (myAssetsInput) myAssetsInput.value = '';
+				myAssetsDialog?.showModal();
+				setTimeout(() => myAssetsInput?.focus(), 0);
+			}
+
+			myAssetsLink?.addEventListener('click', (event) => {
+				if (hasMyAssetsAccess()) return;
+				event.preventDefault();
+				openMyAssetsDialog(myAssetsLink.href);
+			});
+
+			myAssetsForm?.addEventListener('submit', (event) => {
+				event.preventDefault();
+				const value = (myAssetsInput?.value || '').trim();
+				if (value !== MY_ASSETS_PASSWORD) {
+					if (myAssetsError) myAssetsError.textContent = 'Wrong password';
+					myAssetsInput?.focus();
+					return;
+				}
+				window.localStorage.setItem(MY_ASSETS_ACCESS_KEY, 'true');
+				myAssetsDialog?.close();
+				if (pendingMyAssetsHref) window.location.href = pendingMyAssetsHref;
+			});
+
+			myAssetsDialog?.addEventListener('close', () => {
+				pendingMyAssetsHref = null;
+			});
+
 			// React to storage changes (e.g. login/logout in other tabs)
 			window.addEventListener('storage', (event) => {
 				if (event.key === DASHBOARD_ACCESS_KEY) {
@@ -92,6 +137,25 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 		}
 	</script>
 </header>
+
+<dialog id="my-assets-dialog" class="my-assets-dialog">
+	<form id="my-assets-form" method="dialog" class="my-assets-form">
+		<h3>My assets</h3>
+		<p class="my-assets-subtitle">Enter password to continue.</p>
+		<input
+			id="my-assets-password"
+			type="password"
+			inputmode="numeric"
+			autocomplete="one-time-code"
+			placeholder="Password"
+		/>
+		<p id="my-assets-error" class="my-assets-error" aria-live="polite"></p>
+		<div class="my-assets-actions">
+			<button type="button" class="my-assets-cancel" onclick="document.getElementById('my-assets-dialog')?.close()">Cancel</button>
+			<button type="submit" class="my-assets-submit">Continue</button>
+		</div>
+	</form>
+</dialog>
 <style>
 header {
 	margin: 0;
@@ -139,6 +203,67 @@ header {
 	}
 	.hidden-nav-item {
 		display: none;
+	}
+
+	.my-assets-dialog {
+		border: 1px solid var(--border-color);
+		border-radius: 14px;
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		padding: 0;
+		max-width: 420px;
+		width: calc(100% - 2rem);
+	}
+	.my-assets-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.my-assets-form {
+		padding: 1.25rem;
+		display: grid;
+		gap: 0.75rem;
+	}
+	.my-assets-form h3 {
+		margin: 0;
+		font-size: 1.1rem;
+	}
+	.my-assets-subtitle {
+		margin: 0;
+		color: rgb(var(--gray));
+	}
+	.my-assets-form input {
+		padding: 0.75rem;
+		border-radius: 10px;
+		border: 1px solid var(--border-color);
+		background: var(--bg-secondary);
+		color: inherit;
+	}
+	.my-assets-error {
+		margin: 0;
+		min-height: 1.25rem;
+		color: #d32f2f;
+		font-weight: 600;
+	}
+	.my-assets-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+	.my-assets-cancel {
+		padding: 0.6rem 0.9rem;
+		border-radius: 999px;
+		border: 1px solid var(--border-color);
+		background: transparent;
+		color: inherit;
+		cursor: pointer;
+	}
+	.my-assets-submit {
+		padding: 0.6rem 0.9rem;
+		border-radius: 999px;
+		border: none;
+		background: rgb(var(--accent));
+		color: white;
+		font-weight: 700;
+		cursor: pointer;
 	}
 	@media (max-width: 720px) {
 		.social-links {
