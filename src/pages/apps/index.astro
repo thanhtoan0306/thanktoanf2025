@@ -1,0 +1,140 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const FALLBACK_THUMBNAIL =
+	'https://www.jobat.be//-/media/jobat/jobat-be/articles/kalender-2026.jpg?mw=890&hash=2DE5EA7BB922D5601411AC408E0FB2D9';
+
+const apps = [
+	{
+		slug: 'app-1',
+		title: 'App 1',
+		description: 'Placeholder app (bạn sẽ bổ sung folder sau).',
+	},
+	{
+		slug: 'app-2',
+		title: 'App 2',
+		description: 'Placeholder app (bạn sẽ bổ sung folder sau).',
+	},
+	{
+		slug: 'app-3',
+		title: 'App 3',
+		description: 'Placeholder app (bạn sẽ bổ sung folder sau).',
+	},
+	{
+		slug: 'app-4',
+		title: 'App 4',
+		description: 'Placeholder app (bạn sẽ bổ sung folder sau).',
+	},
+];
+---
+
+<PageLayout title={`Apps | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<section class="page-header">
+		<div>
+			<p class="eyebrow">Apps</p>
+			<h1>Apps của Thanktoanf</h1>
+		</div>
+	</section>
+
+	<section>
+		<div class="post-grid">
+			{apps.map((app) => (
+				<article class="card">
+					<a href="#" class="card__link" aria-label={`Open app: ${app.title}`}>
+						<img class="card__image" src={FALLBACK_THUMBNAIL} alt="" loading="lazy" />
+						<div class="card__body">
+							<p class="card__date">APP</p>
+							<h3 class="card__title">{app.title}</h3>
+							<p class="card__description">{app.description}</p>
+						</div>
+					</a>
+				</article>
+			))}
+		</div>
+	</section>
+</PageLayout>
+
+<style>
+	.page-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		font-size: 0.9rem;
+		letter-spacing: 0.15em;
+		color: rgb(var(--gray));
+	}
+	.post-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.4rem;
+	}
+	.card {
+		background: var(--bg-primary);
+		border-radius: 14px;
+		box-shadow: 0 12px 30px rgba(var(--gray), 12%);
+		transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		height: 400px;
+	}
+	.card__link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+		text-decoration: none;
+		pointer-events: none;
+	}
+	.card__image {
+		display: block;
+		width: 100%;
+		height: 200px;
+		flex-shrink: 0;
+		object-fit: cover;
+	}
+	.card__body {
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+	}
+	.card__date {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+	.card__title {
+		margin: 0;
+		line-height: 1.25;
+		font-size: 1.2rem;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.card__description {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 1rem;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.card:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 16px 40px rgba(var(--gray), 18%);
+	}
+</style>
+
