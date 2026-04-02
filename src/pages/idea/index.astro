@@ -1,0 +1,108 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const pages = [
+	{
+		href: '/idea/planet',
+		title: 'The Solar System',
+		description: 'Overview of the Sun, planets, and small bodies.',
+		icon: '🪐',
+	},
+	{
+		href: '/idea/bacteria',
+		title: 'Microbes and alternative energy',
+		description: 'Bacteria and archaea that use energy sources other than glucose.',
+		icon: '🦠',
+	},
+];
+---
+
+<PageLayout title={`Idea | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<section class="idea-header">
+		<h1>Idea</h1>
+		<p class="lead">Short notes and reference pages.</p>
+	</section>
+
+	<section class="idea-content">
+		<ul class="idea-list">
+			{pages.map((p) => (
+				<li>
+					<a href={p.href} class="idea-card">
+						<span class="idea-icon" aria-hidden="true">{p.icon}</span>
+						<div class="idea-text">
+							<h2 class="idea-title">{p.title}</h2>
+							<p class="idea-description">{p.description}</p>
+						</div>
+					</a>
+				</li>
+			))}
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.idea-header {
+		text-align: center;
+		margin-bottom: 2.5rem;
+	}
+	.idea-header h1 {
+		margin: 0 0 0.5rem 0;
+		font-size: 2.5rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	.lead {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 1.1rem;
+	}
+	.idea-content {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 0 0 2rem;
+	}
+	.idea-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1rem;
+	}
+	.idea-card {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		padding: 1.25rem 1.5rem;
+		border-radius: 14px;
+		border: 1px solid var(--border-color);
+		background: var(--bg-secondary);
+		text-decoration: none;
+		color: inherit;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+	.idea-card:hover {
+		border-color: rgb(var(--accent));
+		box-shadow: 0 4px 20px rgba(var(--black), 8%);
+	}
+	.idea-icon {
+		font-size: 1.75rem;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+	.idea-text {
+		min-width: 0;
+	}
+	.idea-title {
+		margin: 0 0 0.35rem 0;
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
+	.idea-description {
+		margin: 0;
+		font-size: 0.95rem;
+		color: rgb(var(--gray));
+		line-height: 1.45;
+	}
+</style>
