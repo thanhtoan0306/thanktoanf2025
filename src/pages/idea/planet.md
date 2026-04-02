@@ -1,3 +1,8 @@
+---
+icon: 🪐
+order: 1
+---
+
 # The Solar System
 
 The **solar system** is the gravitationally bound system of the Sun and everything that orbits it. At its center is the **Sun**, a medium-sized star that contains more than 99% of the system’s mass and provides the light and energy that shape the planets and smaller bodies.

@@ -1,21 +1,13 @@
 ---
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import PageLayout from '../../layouts/PageLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { getIdeaPages } from '../../utils/ideaPages';
 
-const pages = [
-	{
-		href: '/idea/planet',
-		title: 'The Solar System',
-		description: 'Overview of the Sun, planets, and small bodies.',
-		icon: '🪐',
-	},
-	{
-		href: '/idea/bacteria',
-		title: 'Microbes and alternative energy',
-		description: 'Bacteria and archaea that use energy sources other than glucose.',
-		icon: '🦠',
-	},
-];
+const ideaDir = path.dirname(fileURLToPath(import.meta.url));
+const pages = await getIdeaPages(ideaDir);
 ---
 
 <PageLayout title={`Idea | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>

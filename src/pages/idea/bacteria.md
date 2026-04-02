@@ -1,3 +1,8 @@
+---
+icon: 🦠
+order: 2
+---
+
 # Microbes That Don’t Run on Glucose
 
 Many familiar bacteria get energy by breaking down sugars like **glucose**. The groups below use **other** sources of energy—light, inorganic chemicals, or unusual compounds—so their “fuel” is not carbohydrate metabolism in the usual sense.
