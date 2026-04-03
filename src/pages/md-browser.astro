@@ -1,0 +1,281 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout title="MD Browser">
+	<section class="page-header">
+		<p class="eyebrow">Tools</p>
+		<h1>MD Browser</h1>
+		<p class="lead">Gọi API `/api/md-items` và preview nội dung markdown trong thư mục `md/`.</p>
+	</section>
+
+	<section class="layout">
+		<aside class="panel">
+			<div class="panel-head">
+				<h2>Files</h2>
+				<button id="refresh" class="secondary-btn" type="button">Refresh</button>
+			</div>
+			<p id="count" class="meta"></p>
+			<ul id="list" class="list" aria-label="Markdown files"></ul>
+		</aside>
+
+		<main class="panel">
+			<div class="panel-head">
+				<h2 id="title">Preview</h2>
+				<div class="actions">
+					<button id="copy" class="secondary-btn" type="button" disabled>Copy</button>
+					<button id="open" class="secondary-btn" type="button" disabled>Open raw</button>
+				</div>
+			</div>
+			<p id="status" class="meta" aria-live="polite"></p>
+			<details id="debug" class="debug" open>
+				<summary>Debug</summary>
+				<pre class="debug-box"><code id="debugContent">{`{}`}</code></pre>
+			</details>
+			<pre class="preview"><code id="content">Chọn 1 file bên trái…</code></pre>
+		</main>
+	</section>
+
+	<script>
+		const listEl = document.getElementById('list');
+		const countEl = document.getElementById('count');
+		const statusEl = document.getElementById('status');
+		const titleEl = document.getElementById('title');
+		const contentEl = document.getElementById('content');
+		const debugContentEl = document.getElementById('debugContent');
+		const refreshEl = document.getElementById('refresh');
+		const copyEl = document.getElementById('copy') as HTMLButtonElement | null;
+		const openEl = document.getElementById('open') as HTMLButtonElement | null;
+
+		let currentName = '';
+		let currentContent = '';
+
+		function setStatus(text) {
+			if (statusEl) statusEl.textContent = text;
+		}
+		function setCount(text) {
+			if (countEl) countEl.textContent = text;
+		}
+		function setTitle(text) {
+			if (titleEl) titleEl.textContent = text;
+		}
+		function setContent(text) {
+			if (contentEl) contentEl.textContent = text;
+		}
+		function setDebug(obj) {
+			if (!debugContentEl) return;
+			try {
+				debugContentEl.textContent = JSON.stringify(obj, null, 2);
+			} catch {
+				debugContentEl.textContent = String(obj);
+			}
+		}
+
+		function setCurrent(name, content) {
+			currentName = name;
+			currentContent = content;
+			if (copyEl) copyEl.disabled = !content;
+			if (openEl) openEl.disabled = !name;
+		}
+
+		function makeItemButton(name) {
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'item';
+			btn.textContent = name;
+			btn.addEventListener('click', () => loadPreview(name));
+			return btn;
+		}
+
+		async function loadList() {
+			setStatus('');
+			setCount('Loading…');
+			if (listEl) listEl.innerHTML = '';
+			try {
+				const res = await fetch('/api/md-items');
+				const data = await res.json();
+				const items = Array.isArray(data?.items) ? data.items : [];
+				const files = items.filter((i) => i?.type === 'file' && String(i?.name || '').toLowerCase().endsWith('.md'));
+
+				setCount(`${files.length} item(s)`);
+				for (const f of files) {
+					const li = document.createElement('li');
+					li.appendChild(makeItemButton(f.name));
+					listEl?.appendChild(li);
+				}
+				if (files.length === 0) setStatus('No markdown files found in /md.');
+			} catch (err) {
+				setCount('');
+				setStatus(err instanceof Error ? err.message : String(err));
+			}
+		}
+
+		async function loadPreview(name) {
+			const requestUrl = `/api/md-preview/${encodeURIComponent(name)}`;
+			setStatus('Loading preview…');
+			setTitle(`Preview • ${name}`);
+			setContent('');
+			setCurrent(name, '');
+			setDebug({ requestUrl, name });
+
+			try {
+				const res = await fetch(requestUrl);
+				const data = await res.json().catch(() => ({}));
+				setDebug({ requestUrl, status: res.status, ok: res.ok, response: data });
+				if (!res.ok) {
+					throw new Error(data?.message || `Request failed (${res.status})`);
+				}
+				const content = String(data?.content || '');
+				setContent(content || '(empty)');
+				setStatus(`OK • ${content.length} chars`);
+				setCurrent(name, content);
+			} catch (err) {
+				setStatus(err instanceof Error ? err.message : String(err));
+				setContent('');
+			}
+		}
+
+		refreshEl?.addEventListener('click', loadList);
+		copyEl?.addEventListener('click', async () => {
+			if (!currentContent) return;
+			try {
+				await navigator.clipboard.writeText(currentContent);
+				setStatus('Copied');
+			} catch (err) {
+				setStatus(err instanceof Error ? err.message : String(err));
+			}
+		});
+		openEl?.addEventListener('click', () => {
+			if (!currentName) return;
+			window.open(`/api/md-preview/${encodeURIComponent(currentName)}`, '_blank', 'noopener,noreferrer');
+		});
+
+		loadList();
+	</script>
+
+	<style>
+		.page-header {
+			display: grid;
+			gap: 0.5rem;
+			margin-bottom: 2rem;
+		}
+		.eyebrow {
+			margin: 0;
+			text-transform: uppercase;
+			font-size: 0.9rem;
+			letter-spacing: 0.15em;
+			color: rgb(var(--gray));
+		}
+		.lead {
+			margin: 0;
+			color: rgb(var(--gray));
+			max-width: 72ch;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+		@media (min-width: 980px) {
+			.layout {
+				grid-template-columns: 360px 1fr;
+				align-items: start;
+			}
+		}
+
+		.panel {
+			border: 1px solid var(--border-color);
+			border-radius: 1rem;
+			background: var(--bg-primary);
+			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
+			padding: 1rem;
+			display: grid;
+			gap: 0.75rem;
+		}
+
+		.panel-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		h2 {
+			margin: 0;
+			font-size: 1.25rem;
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
+
+		.meta {
+			margin: 0;
+			color: rgb(var(--gray));
+			font-size: 0.95rem;
+		}
+
+		.secondary-btn {
+			padding: 0.6rem 0.9rem;
+			border-radius: 999px;
+			border: 1px solid var(--border-color);
+			background: var(--bg-secondary);
+			color: var(--text-primary);
+			font-weight: 600;
+			cursor: pointer;
+		}
+		.secondary-btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			gap: 0.5rem;
+		}
+		.item {
+			width: 100%;
+			text-align: left;
+			padding: 0.65rem 0.85rem;
+			border-radius: 12px;
+			border: 1px solid var(--border-color);
+			background: var(--bg-secondary);
+			color: var(--text-primary);
+			font-weight: 600;
+			cursor: pointer;
+			transition: border-color 0.2s ease, transform 0.05s ease;
+		}
+		.item:hover {
+			border-color: rgb(var(--accent));
+		}
+		.item:active {
+			transform: translateY(1px);
+		}
+
+		.preview {
+			margin: 0;
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			background: var(--bg-secondary);
+			overflow: auto;
+			max-height: 70vh;
+		}
+		.preview code {
+			display: block;
+			padding: 1rem;
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+				"Courier New", monospace;
+			font-size: 0.95rem;
+			line-height: 1.5;
+			white-space: pre;
+		}
+	</style>
+</PageLayout>
+

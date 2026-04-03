@@ -1,0 +1,77 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout title="API Docs">
+	<section class="page-header">
+		<p class="eyebrow">Docs</p>
+		<h1>API Docs</h1>
+		<p class="lead">Swagger UI cho các endpoint trong dự án.</p>
+	</section>
+
+	<section class="card">
+		<div id="swagger-ui"></div>
+	</section>
+
+	<script is:inline>
+		// Load Swagger UI from CDN (no extra deps).
+		const css = document.createElement('link');
+		css.rel = 'stylesheet';
+		css.href = 'https://unpkg.com/swagger-ui-dist@5/swagger-ui.css';
+		document.head.appendChild(css);
+
+		const script = document.createElement('script');
+		script.src = 'https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js';
+		script.onload = () => {
+			// @ts-ignore
+			const SwaggerUIBundle = window.SwaggerUIBundle;
+			if (!SwaggerUIBundle) return;
+
+			SwaggerUIBundle({
+				dom_id: '#swagger-ui',
+				url: '/api/openapi.json',
+				presets: [
+					SwaggerUIBundle.presets.apis,
+					SwaggerUIBundle.SwaggerUIStandalonePreset,
+				],
+				layout: 'BaseLayout',
+				tryItOutEnabled: true,
+			});
+		};
+		document.head.appendChild(script);
+	</script>
+
+	<style>
+		.page-header {
+			display: grid;
+			gap: 0.5rem;
+			margin-bottom: 2rem;
+		}
+		.eyebrow {
+			margin: 0;
+			text-transform: uppercase;
+			font-size: 0.9rem;
+			letter-spacing: 0.15em;
+			color: rgb(var(--gray));
+		}
+		.lead {
+			margin: 0;
+			color: rgb(var(--gray));
+			max-width: 64ch;
+		}
+
+		.card {
+			border: 1px solid var(--border-color);
+			border-radius: 1rem;
+			background: var(--bg-primary);
+			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
+			padding: 0.75rem;
+		}
+
+		/* Make Swagger UI blend into theme a bit */
+		.card :global(.swagger-ui) {
+			font-size: 16px;
+		}
+	</style>
+</PageLayout>
+

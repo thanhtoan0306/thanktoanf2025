@@ -1,0 +1,308 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout title="API Tester">
+	<section class="page-header">
+		<p class="eyebrow">Tools</p>
+		<h1>API Tester</h1>
+		<p class="lead">Test nhanh các endpoint trong dự án (fetch trực tiếp từ browser).</p>
+	</section>
+
+	<section class="grid">
+		<div class="card">
+			<div class="row">
+				<label for="method">Method</label>
+				<select id="method">
+					<option>GET</option>
+					<option>POST</option>
+					<option>PUT</option>
+					<option>PATCH</option>
+					<option>DELETE</option>
+				</select>
+			</div>
+
+			<div class="row">
+				<label for="url">URL</label>
+				<input id="url" type="text" value="/api/helloworld" />
+			</div>
+
+			<div class="row">
+				<label for="headers">Headers (JSON)</label>
+				<textarea id="headers" rows="4">{`{ "Content-Type": "application/json" }`}</textarea>
+			</div>
+
+			<div class="row">
+				<label for="body">Body (JSON - optional)</label>
+				<textarea id="body" rows="6">{`{}`}</textarea>
+			</div>
+
+			<div class="actions">
+				<button id="send" class="primary-btn" type="button">Send</button>
+				<button id="clear" class="secondary-btn" type="button">Clear response</button>
+			</div>
+
+			<div class="quick">
+				<p class="quick-title">Quick test</p>
+				<div class="quick-buttons">
+					<button class="pill" type="button" data-method="GET" data-url="/api/helloworld">GET /api/helloworld</button>
+					<button class="pill" type="button" data-method="GET" data-url="/api/md-items">GET /api/md-items</button>
+					<button
+						class="pill"
+						type="button"
+						data-method="GET"
+						data-url="/api/todos"
+					>GET /api/todos</button>
+					<button
+						class="pill"
+						type="button"
+						data-method="POST"
+						data-url="/api/todos"
+						data-body='{ "title": "hello", "status": "active" }'
+					>POST /api/todos</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="result-header">
+				<h2>Response</h2>
+				<p id="meta" class="meta" aria-live="polite"></p>
+			</div>
+			<pre class="result"><code id="result">{}</code></pre>
+		</div>
+	</section>
+
+	<script>
+		const methodEl = document.getElementById('method') as HTMLSelectElement | null;
+		const urlEl = document.getElementById('url') as HTMLInputElement | null;
+		const headersEl = document.getElementById('headers') as HTMLTextAreaElement | null;
+		const bodyEl = document.getElementById('body') as HTMLTextAreaElement | null;
+		const sendEl = document.getElementById('send') as HTMLButtonElement | null;
+		const clearEl = document.getElementById('clear') as HTMLButtonElement | null;
+		const resultEl = document.getElementById('result') as HTMLElement | null;
+		const metaEl = document.getElementById('meta') as HTMLElement | null;
+
+		function safeJsonParse(text, fallback) {
+			try {
+				return JSON.parse(text);
+			} catch {
+				return fallback;
+			}
+		}
+
+		function prettyMaybeJson(text) {
+			const parsed = safeJsonParse(text, null);
+			if (parsed === null) return text;
+			return JSON.stringify(parsed, null, 2);
+		}
+
+		function setMeta(text) {
+			if (metaEl) metaEl.textContent = text;
+		}
+
+		function setResult(text) {
+			if (resultEl) resultEl.textContent = text;
+		}
+
+		async function send() {
+			const method = methodEl?.value || 'GET';
+			const url = urlEl?.value || '/';
+			const headers = safeJsonParse(headersEl?.value || '{}', {});
+			const rawBody = bodyEl?.value || '';
+
+			const init: RequestInit = { method, headers };
+			if (!['GET', 'HEAD'].includes(method)) {
+				const parsedBody = safeJsonParse(rawBody, null);
+				init.body = parsedBody === null ? rawBody : JSON.stringify(parsedBody);
+			}
+
+			const started = performance.now();
+			setMeta('Loading...');
+			setResult('');
+
+			try {
+				const res = await fetch(url, init);
+				const elapsedMs = Math.round(performance.now() - started);
+				const contentType = res.headers.get('content-type') || '';
+				const text = await res.text();
+
+				setMeta(`${res.status} ${res.statusText} • ${elapsedMs}ms • ${contentType || 'no content-type'}`);
+				setResult(prettyMaybeJson(text));
+			} catch (err) {
+				setMeta('Request failed');
+				setResult(err instanceof Error ? err.message : String(err));
+			}
+		}
+
+		sendEl?.addEventListener('click', send);
+		clearEl?.addEventListener('click', () => {
+			setMeta('');
+			setResult('{}');
+		});
+
+		document.querySelectorAll('button[data-url]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const m = btn.getAttribute('data-method') || 'GET';
+				const u = btn.getAttribute('data-url') || '/';
+				const b = btn.getAttribute('data-body') || '{}';
+
+				if (methodEl) methodEl.value = m;
+				if (urlEl) urlEl.value = u;
+				if (bodyEl) bodyEl.value = b;
+			});
+		});
+	</script>
+
+	<style>
+		.page-header {
+			display: grid;
+			gap: 0.5rem;
+			margin-bottom: 2rem;
+		}
+		.eyebrow {
+			margin: 0;
+			text-transform: uppercase;
+			font-size: 0.9rem;
+			letter-spacing: 0.15em;
+			color: rgb(var(--gray));
+		}
+		.lead {
+			margin: 0;
+			color: rgb(var(--gray));
+			max-width: 64ch;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		@media (min-width: 980px) {
+			.grid {
+				grid-template-columns: 1fr 1fr;
+				align-items: start;
+			}
+		}
+
+		.card {
+			border: 1px solid var(--border-color);
+			border-radius: 1rem;
+			background: var(--bg-primary);
+			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
+			padding: 1.25rem;
+			display: grid;
+			gap: 0.75rem;
+		}
+
+		.row {
+			display: grid;
+			gap: 0.35rem;
+		}
+
+		label {
+			font-weight: 600;
+			font-size: 0.95rem;
+		}
+
+		input,
+		select,
+		textarea {
+			width: 100%;
+			padding: 0.6rem 0.75rem;
+			border-radius: 0.6rem;
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 1rem;
+		}
+
+		textarea {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+				"Courier New", monospace;
+			font-size: 0.95rem;
+		}
+
+		.actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			align-items: center;
+			margin-top: 0.25rem;
+		}
+
+		.primary-btn {
+			padding: 0.75rem 1.25rem;
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			background: rgb(var(--accent));
+			color: white;
+			font-weight: 700;
+			cursor: pointer;
+		}
+		.primary-btn:hover {
+			background: rgb(var(--accent-dark));
+		}
+		.secondary-btn {
+			padding: 0.75rem 1.25rem;
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			background: var(--bg-secondary);
+			color: var(--text-primary);
+			font-weight: 600;
+			cursor: pointer;
+		}
+
+		.quick {
+			margin-top: 0.5rem;
+			padding-top: 0.75rem;
+			border-top: 1px solid var(--border-color);
+		}
+		.quick-title {
+			margin: 0 0 0.5rem 0;
+			font-weight: 700;
+			font-size: 0.95rem;
+		}
+		.quick-buttons {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		.pill {
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			border-radius: 999px;
+			padding: 0.45rem 0.8rem;
+			font-weight: 600;
+			cursor: pointer;
+			font-size: 0.9rem;
+		}
+		.pill:hover {
+			background: var(--bg-secondary);
+		}
+
+		.result-header {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+		}
+		.meta {
+			margin: 0;
+			color: rgb(var(--gray));
+			font-size: 0.95rem;
+		}
+		.result {
+			margin: 0;
+			max-height: 70vh;
+			overflow: auto;
+			border-radius: 0.75rem;
+			border: 1px solid var(--border-color);
+			background: var(--bg-secondary);
+		}
+	</style>
+</PageLayout>
+
