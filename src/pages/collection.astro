@@ -1,0 +1,223 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import items from '../data/collection.json';
+
+const tags = ['All', ...Array.from(new Set(items.map((i) => i.tag))).sort()];
+---
+
+<PageLayout title="Collection">
+	<section class="page-header">
+		<p class="eyebrow">Collection</p>
+		<h1>Chủ đề quan tâm</h1>
+		<p class="lead">Tổng hợp các công nghệ, ngôn ngữ và chủ đề đang theo dõi.</p>
+	</section>
+
+	<!-- Filter tabs -->
+	<div class="filter-bar" role="tablist" aria-label="Filter by tag">
+		{tags.map((tag) => (
+			<button
+				class="filter-btn"
+				type="button"
+				role="tab"
+				data-tag={tag}
+				aria-selected={tag === 'All' ? 'true' : 'false'}
+			>
+				{tag}
+			</button>
+		))}
+	</div>
+
+	<p id="count" class="result-count"></p>
+
+	<!-- Grid -->
+	<ul class="grid" id="grid">
+		{items.map((item) => (
+			<li class="card" data-tag={item.tag}>
+				<div class="card-top">
+					<span class="card-icon" aria-hidden="true">{item.icon}</span>
+					<span class={`badge badge-${item.tagColor}`}>{item.tag}</span>
+				</div>
+				<h2 class="card-title">{item.title}</h2>
+				<p class="card-desc">{item.description}</p>
+				{item.link && (
+					<a class="card-link" href={item.link} target="_blank" rel="noreferrer noopener">
+						Xem thêm
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+						</svg>
+					</a>
+				)}
+			</li>
+		))}
+	</ul>
+
+	<script>
+		const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+		const cards = document.querySelectorAll<HTMLLIElement>('.card');
+		const countEl = document.getElementById('count');
+
+		function updateCount() {
+			const visible = document.querySelectorAll('.card:not(.hidden)').length;
+			if (countEl) countEl.textContent = `${visible} item${visible !== 1 ? 's' : ''}`;
+		}
+
+		function setFilter(tag: string) {
+			btns.forEach((b) => b.setAttribute('aria-selected', b.dataset.tag === tag ? 'true' : 'false'));
+			cards.forEach((card) => {
+				const match = tag === 'All' || card.dataset.tag === tag;
+				card.classList.toggle('hidden', !match);
+			});
+			updateCount();
+		}
+
+		btns.forEach((btn) => {
+			btn.addEventListener('click', () => setFilter(btn.dataset.tag ?? 'All'));
+		});
+
+		updateCount();
+	</script>
+
+	<style>
+		.page-header {
+			display: grid;
+			gap: 0.4rem;
+			margin-bottom: 2rem;
+		}
+		.eyebrow {
+			margin: 0;
+			text-transform: uppercase;
+			font-size: 0.85rem;
+			letter-spacing: 0.15em;
+			color: rgb(var(--gray));
+		}
+		h1 { margin: 0; font-size: 2rem; }
+		.lead { margin: 0; color: rgb(var(--gray)); font-size: 1rem; max-width: 64ch; }
+
+		/* Filter */
+		.filter-bar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.4rem;
+			margin-bottom: 1rem;
+			padding: 0.5rem;
+			border-radius: 14px;
+			border: 2px solid #111;
+			background: #fb923c; /* orange */
+			box-shadow: 6px 6px 0 #111;
+		}
+
+		.filter-btn {
+			padding: 0.45rem 0.85rem;
+			border-radius: 999px;
+			border: 2px solid #111;
+			background: #ffd7a8; /* light orange */
+			color: #111; /* black text */
+			font-size: 0.9rem;
+			font-weight: 800;
+			cursor: pointer;
+			transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+		}
+		.filter-btn:hover {
+			background: #fff;
+			box-shadow: 3px 3px 0 #111;
+			transform: translateY(-1px);
+		}
+		.filter-btn:active {
+			transform: translateY(0px);
+		}
+		.filter-btn:focus-visible {
+			outline: 3px solid #111;
+			outline-offset: 2px;
+		}
+		.filter-btn[aria-selected="true"] {
+			background: #111;
+			color: #fb923c; /* orange text on black */
+			box-shadow: 3px 3px 0 #111;
+		}
+		.filter-btn[aria-selected="true"]:hover {
+			background: #000;
+			color: #fb923c;
+		}
+
+		.result-count {
+			margin: 0 0 1.25rem;
+			font-size: 0.9rem;
+			color: rgb(var(--gray));
+		}
+
+		/* Grid */
+		.grid {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+			gap: 1rem;
+		}
+		.card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			border: 1px solid var(--border-color);
+			border-radius: 1rem;
+			background: var(--bg-primary);
+			padding: 1.25rem;
+			transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+		}
+		.card:hover {
+			border-color: rgb(var(--accent));
+			box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.1);
+			transform: translateY(-2px);
+		}
+		.card.hidden { display: none; }
+
+		.card-top {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.card-icon { font-size: 1.75rem; line-height: 1; }
+
+		/* Badges */
+		.badge {
+			font-size: 0.75rem;
+			font-weight: 700;
+			padding: 0.2rem 0.6rem;
+			border-radius: 999px;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+		.badge-blue    { background: rgba(37,99,235,.12); color: #2563eb; }
+		.badge-orange  { background: rgba(234,88,12,.12);  color: #ea580c; }
+		.badge-green   { background: rgba(22,163,74,.12);  color: #16a34a; }
+		.badge-purple  { background: rgba(147,51,234,.12); color: #9333ea; }
+		.badge-red     { background: rgba(220,38,38,.12);  color: #dc2626; }
+		.badge-teal    { background: rgba(20,184,166,.12); color: #0f766e; }
+		.badge-gray    { background: rgba(var(--gray),.12); color: rgb(var(--gray)); }
+
+		.card-title {
+			margin: 0;
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: var(--text-primary);
+		}
+		.card-desc {
+			margin: 0;
+			font-size: 0.92rem;
+			color: rgb(var(--gray));
+			line-height: 1.55;
+			flex: 1;
+		}
+		.card-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.3rem;
+			font-size: 0.88rem;
+			font-weight: 600;
+			color: rgb(var(--accent));
+			text-decoration: none;
+			margin-top: 0.25rem;
+		}
+		.card-link:hover { text-decoration: underline; }
+	</style>
+</PageLayout>

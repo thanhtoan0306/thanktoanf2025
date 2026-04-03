@@ -1,0 +1,38 @@
+[
+  {
+    "id": "biology",
+    "title": "Biology",
+    "description": "Vi khuẩn, tế bào, gene, enzyme — các note sinh học/micro trong /md.",
+    "icon": "🧬",
+    "tag": "Science",
+    "tagColor": "teal",
+    "link": ""
+  },
+  {
+    "id": "chemistry",
+    "title": "Chemistry",
+    "description": "Nguyên tố, phản ứng, acid-base, organic cơ bản — ghi chú học dần.",
+    "icon": "⚗️",
+    "tag": "Science",
+    "tagColor": "teal",
+    "link": ""
+  },
+  {
+    "id": "planets",
+    "title": "Planets",
+    "description": "Hệ Mặt Trời, hành tinh, quỹ đạo, hiện tượng thiên văn — note khám phá.",
+    "icon": "🪐",
+    "tag": "Science",
+    "tagColor": "teal",
+    "link": ""
+  },
+  {
+    "id": "math",
+    "title": "Math",
+    "description": "Đại số, giải tích, xác suất/thống kê — nền tảng để làm sản phẩm tốt hơn.",
+    "icon": "📐",
+    "tag": "Science",
+    "tagColor": "teal",
+    "link": ""
+  }
+]
