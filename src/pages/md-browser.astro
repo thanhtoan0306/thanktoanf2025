@@ -6,148 +6,170 @@ import PageLayout from '../layouts/PageLayout.astro';
 	<section class="page-header">
 		<p class="eyebrow">Tools</p>
 		<h1>MD Browser</h1>
-		<p class="lead">Gọi API `/api/md-items` và preview nội dung markdown trong thư mục `md/`.</p>
+		<p class="lead">Duyệt và preview các file markdown trong thư mục <code>md/</code>.</p>
 	</section>
 
 	<section class="layout">
-		<aside class="panel">
-			<div class="panel-head">
-				<h2>Files</h2>
-				<button id="refresh" class="secondary-btn" type="button">Refresh</button>
+		<!-- Sidebar -->
+		<aside class="sidebar">
+			<div class="sidebar-head">
+				<span class="sidebar-title">Files</span>
+				<button id="refresh" class="icon-btn" type="button" title="Refresh">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+						<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+					</svg>
+				</button>
 			</div>
-			<p id="count" class="meta"></p>
-			<ul id="list" class="list" aria-label="Markdown files"></ul>
+			<p id="count" class="sidebar-count"></p>
+			<ul id="list" class="file-list" aria-label="Markdown files"></ul>
 		</aside>
 
-		<main class="panel">
-			<div class="panel-head">
-				<h2 id="title">Preview</h2>
-				<div class="actions">
-					<button id="copy" class="secondary-btn" type="button" disabled>Copy</button>
-					<button id="open" class="secondary-btn" type="button" disabled>Open raw</button>
+		<!-- Preview pane -->
+		<main class="preview-pane">
+			<div class="preview-toolbar" id="toolbar" hidden>
+				<h2 id="title" class="preview-title"></h2>
+				<div class="toolbar-actions">
+					<button id="copy" class="pill-btn" type="button">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+						</svg>
+						Copy
+					</button>
+					<button id="toggleRaw" class="pill-btn" type="button">Raw</button>
 				</div>
 			</div>
-			<p id="status" class="meta" aria-live="polite"></p>
-			<details id="debug" class="debug" open>
-				<summary>Debug</summary>
-				<pre class="debug-box"><code id="debugContent">{`{}`}</code></pre>
-			</details>
-			<pre class="preview"><code id="content">Chọn 1 file bên trái…</code></pre>
+
+			<div id="empty" class="empty-state">
+				<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+				</svg>
+				<p>Chọn một file bên trái để preview</p>
+			</div>
+
+			<div id="rendered" class="md-body prose" hidden></div>
+			<pre id="raw" class="raw-view" hidden><code id="rawCode"></code></pre>
+
+			<p id="status" class="status-bar" aria-live="polite" hidden></p>
 		</main>
 	</section>
 
 	<script>
+		import { marked } from 'marked';
+
 		const listEl = document.getElementById('list');
 		const countEl = document.getElementById('count');
-		const statusEl = document.getElementById('status');
-		const titleEl = document.getElementById('title');
-		const contentEl = document.getElementById('content');
-		const debugContentEl = document.getElementById('debugContent');
+		const statusEl = document.getElementById('status') as HTMLElement;
+		const titleEl = document.getElementById('title') as HTMLElement;
+		const toolbarEl = document.getElementById('toolbar') as HTMLElement;
+		const emptyEl = document.getElementById('empty') as HTMLElement;
+		const renderedEl = document.getElementById('rendered') as HTMLElement;
+		const rawEl = document.getElementById('raw') as HTMLElement;
+		const rawCodeEl = document.getElementById('rawCode') as HTMLElement;
 		const refreshEl = document.getElementById('refresh');
 		const copyEl = document.getElementById('copy') as HTMLButtonElement | null;
-		const openEl = document.getElementById('open') as HTMLButtonElement | null;
+		const toggleRawEl = document.getElementById('toggleRaw') as HTMLButtonElement | null;
 
-		let currentName = '';
 		let currentContent = '';
+		let isRawMode = false;
+		let activeBtn: HTMLButtonElement | null = null;
 
-		function setStatus(text) {
-			if (statusEl) statusEl.textContent = text;
+		function showStatus(text: string, isError = false) {
+			statusEl.textContent = text;
+			statusEl.className = 'status-bar' + (isError ? ' error' : '');
+			statusEl.hidden = !text;
 		}
-		function setCount(text) {
-			if (countEl) countEl.textContent = text;
+
+		function setCount(n: number) {
+			if (countEl) countEl.textContent = `${n} file${n !== 1 ? 's' : ''}`;
 		}
-		function setTitle(text) {
-			if (titleEl) titleEl.textContent = text;
+
+		function showEmpty() {
+			emptyEl.hidden = false;
+			renderedEl.hidden = true;
+			rawEl.hidden = true;
+			toolbarEl.hidden = true;
 		}
-		function setContent(text) {
-			if (contentEl) contentEl.textContent = text;
-		}
-		function setDebug(obj) {
-			if (!debugContentEl) return;
-			try {
-				debugContentEl.textContent = JSON.stringify(obj, null, 2);
-			} catch {
-				debugContentEl.textContent = String(obj);
+
+		function showContent() {
+			emptyEl.hidden = true;
+			toolbarEl.hidden = false;
+			if (isRawMode) {
+				renderedEl.hidden = true;
+				rawEl.hidden = false;
+			} else {
+				renderedEl.hidden = false;
+				rawEl.hidden = true;
 			}
 		}
 
-		function setCurrent(name, content) {
-			currentName = name;
-			currentContent = content;
-			if (copyEl) copyEl.disabled = !content;
-			if (openEl) openEl.disabled = !name;
-		}
-
-		function makeItemButton(name) {
-			const btn = document.createElement('button');
-			btn.type = 'button';
-			btn.className = 'item';
-			btn.textContent = name;
-			btn.addEventListener('click', () => loadPreview(name));
-			return btn;
-		}
-
 		async function loadList() {
-			setStatus('');
-			setCount('Loading…');
+			showStatus('');
 			if (listEl) listEl.innerHTML = '';
 			try {
 				const res = await fetch('/api/md-items');
 				const data = await res.json();
-				const items = Array.isArray(data?.items) ? data.items : [];
-				const files = items.filter((i) => i?.type === 'file' && String(i?.name || '').toLowerCase().endsWith('.md'));
-
-				setCount(`${files.length} item(s)`);
-				for (const f of files) {
+				const items = (data?.items ?? []).filter(
+					(i: any) => i?.type === 'file' && String(i?.name ?? '').toLowerCase().endsWith('.md')
+				);
+				setCount(items.length);
+				for (const f of items) {
 					const li = document.createElement('li');
-					li.appendChild(makeItemButton(f.name));
+					const btn = document.createElement('button');
+					btn.type = 'button';
+					btn.className = 'file-item';
+					btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>${f.name}</span>`;
+					btn.addEventListener('click', () => {
+						if (activeBtn) activeBtn.classList.remove('active');
+						btn.classList.add('active');
+						activeBtn = btn;
+						loadPreview(f.name);
+					});
+					li.appendChild(btn);
 					listEl?.appendChild(li);
 				}
-				if (files.length === 0) setStatus('No markdown files found in /md.');
+				if (items.length === 0) showStatus('Không có file markdown nào.');
 			} catch (err) {
-				setCount('');
-				setStatus(err instanceof Error ? err.message : String(err));
+				showStatus(err instanceof Error ? err.message : String(err), true);
 			}
 		}
 
-		async function loadPreview(name) {
-			const requestUrl = `/api/md-preview/${encodeURIComponent(name)}`;
-			setStatus('Loading preview…');
-			setTitle(`Preview • ${name}`);
-			setContent('');
-			setCurrent(name, '');
-			setDebug({ requestUrl, name });
+		async function loadPreview(name: string) {
+			showStatus('Đang tải…');
+			titleEl.textContent = name;
+			currentContent = '';
 
 			try {
-				const res = await fetch(requestUrl);
-				const data = await res.json().catch(() => ({}));
-				setDebug({ requestUrl, status: res.status, ok: res.ok, response: data });
-				if (!res.ok) {
-					throw new Error(data?.message || `Request failed (${res.status})`);
-				}
-				const content = String(data?.content || '');
-				setContent(content || '(empty)');
-				setStatus(`OK • ${content.length} chars`);
-				setCurrent(name, content);
+				const res = await fetch(`/api/md-preview/${encodeURIComponent(name)}`);
+				const data = await res.json();
+				if (!res.ok) throw new Error(data?.message ?? `Error ${res.status}`);
+
+				currentContent = String(data?.content ?? '');
+				rawCodeEl.textContent = currentContent;
+				renderedEl.innerHTML = await marked.parse(currentContent);
+				showContent();
+				showStatus('');
+				if (copyEl) copyEl.disabled = false;
 			} catch (err) {
-				setStatus(err instanceof Error ? err.message : String(err));
-				setContent('');
+				showStatus(err instanceof Error ? err.message : String(err), true);
+				showEmpty();
 			}
 		}
 
 		refreshEl?.addEventListener('click', loadList);
+
 		copyEl?.addEventListener('click', async () => {
 			if (!currentContent) return;
-			try {
-				await navigator.clipboard.writeText(currentContent);
-				setStatus('Copied');
-			} catch (err) {
-				setStatus(err instanceof Error ? err.message : String(err));
-			}
+			await navigator.clipboard.writeText(currentContent).catch(() => {});
+			const orig = copyEl.innerHTML;
+			copyEl.textContent = 'Copied!';
+			setTimeout(() => { copyEl.innerHTML = orig; }, 1500);
 		});
-		openEl?.addEventListener('click', () => {
-			if (!currentName) return;
-			window.open(`/api/md-preview/${encodeURIComponent(currentName)}`, '_blank', 'noopener,noreferrer');
+
+		toggleRawEl?.addEventListener('click', () => {
+			isRawMode = !isRawMode;
+			if (toggleRawEl) toggleRawEl.textContent = isRawMode ? 'Rendered' : 'Raw';
+			showContent();
 		});
 
 		loadList();
@@ -162,120 +184,253 @@ import PageLayout from '../layouts/PageLayout.astro';
 		.eyebrow {
 			margin: 0;
 			text-transform: uppercase;
-			font-size: 0.9rem;
+			font-size: 0.85rem;
 			letter-spacing: 0.15em;
 			color: rgb(var(--gray));
 		}
-		.lead {
-			margin: 0;
-			color: rgb(var(--gray));
-			max-width: 72ch;
-		}
+		h1 { margin: 0; font-size: 2rem; }
+		.lead { margin: 0; color: rgb(var(--gray)); font-size: 1rem; }
 
+		/* Layout */
 		.layout {
 			display: grid;
 			grid-template-columns: 1fr;
 			gap: 1rem;
+			align-items: start;
 		}
-		@media (min-width: 980px) {
-			.layout {
-				grid-template-columns: 360px 1fr;
-				align-items: start;
-			}
+		@media (min-width: 900px) {
+			.layout { grid-template-columns: 260px 1fr; }
 		}
 
-		.panel {
+		/* Sidebar */
+		.sidebar {
 			border: 1px solid var(--border-color);
 			border-radius: 1rem;
 			background: var(--bg-primary);
-			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
-			padding: 1rem;
+			padding: 0.85rem;
 			display: grid;
-			gap: 0.75rem;
+			gap: 0.5rem;
 		}
-
-		.panel-head {
+		.sidebar-head {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			gap: 0.75rem;
-			flex-wrap: wrap;
 		}
-
-		h2 {
-			margin: 0;
-			font-size: 1.25rem;
-		}
-
-		.actions {
-			display: flex;
-			gap: 0.5rem;
-			flex-wrap: wrap;
-		}
-
-		.meta {
-			margin: 0;
-			color: rgb(var(--gray));
+		.sidebar-title {
+			font-weight: 700;
 			font-size: 0.95rem;
 		}
-
-		.secondary-btn {
-			padding: 0.6rem 0.9rem;
-			border-radius: 999px;
+		.sidebar-count {
+			margin: 0;
+			font-size: 0.85rem;
+			color: rgb(var(--gray));
+		}
+		.icon-btn {
+			background: none;
 			border: 1px solid var(--border-color);
-			background: var(--bg-secondary);
-			color: var(--text-primary);
-			font-weight: 600;
+			border-radius: 8px;
+			padding: 0.35rem;
 			cursor: pointer;
+			color: var(--text-primary);
+			display: flex;
+			align-items: center;
 		}
-		.secondary-btn:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-		}
+		.icon-btn:hover { background: var(--bg-secondary); }
 
-		.list {
+		.file-list {
 			list-style: none;
 			margin: 0;
 			padding: 0;
 			display: grid;
-			gap: 0.5rem;
+			gap: 2px;
 		}
-		.item {
+		.file-item {
 			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
 			text-align: left;
-			padding: 0.65rem 0.85rem;
-			border-radius: 12px;
+			padding: 0.5rem 0.65rem;
+			border-radius: 8px;
+			border: none;
+			background: none;
+			color: var(--text-primary);
+			font-size: 0.95rem;
+			cursor: pointer;
+			transition: background 0.15s;
+		}
+		.file-item:hover { background: var(--bg-secondary); }
+		.file-item.active {
+			background: rgba(var(--accent-rgb), 0.1);
+			color: rgb(var(--accent));
+			font-weight: 600;
+		}
+		.file-item svg { flex-shrink: 0; opacity: 0.6; }
+		.file-item.active svg { opacity: 1; }
+
+		/* Preview pane */
+		.preview-pane {
+			border: 1px solid var(--border-color);
+			border-radius: 1rem;
+			background: var(--bg-primary);
+			min-height: 60vh;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.preview-toolbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.75rem;
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border-color);
+			flex-wrap: wrap;
+		}
+		.preview-title {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 700;
+			color: var(--text-primary);
+			font-family: ui-monospace, monospace;
+		}
+		.toolbar-actions { display: flex; gap: 0.4rem; }
+		.pill-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			padding: 0.4rem 0.75rem;
+			border-radius: 999px;
 			border: 1px solid var(--border-color);
 			background: var(--bg-secondary);
 			color: var(--text-primary);
+			font-size: 0.88rem;
 			font-weight: 600;
 			cursor: pointer;
-			transition: border-color 0.2s ease, transform 0.05s ease;
 		}
-		.item:hover {
-			border-color: rgb(var(--accent));
+		.pill-btn:hover { border-color: rgb(var(--accent)); color: rgb(var(--accent)); }
+		.pill-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+		/* Empty state */
+		.empty-state {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 1rem;
+			color: rgb(var(--gray));
+			padding: 4rem 2rem;
+			font-size: 1rem;
 		}
-		.item:active {
-			transform: translateY(1px);
+		.empty-state p { margin: 0; }
+
+		/* Rendered markdown */
+		.md-body {
+			padding: 1.5rem;
+			flex: 1;
+			overflow: auto;
+			font-size: 1rem;
+			line-height: 1.75;
 		}
 
-		.preview {
-			margin: 0;
-			border-radius: 0.75rem;
+		/* Prose styling for rendered md */
+		.prose :global(h1),
+		.prose :global(h2),
+		.prose :global(h3),
+		.prose :global(h4) {
+			margin-top: 1.5em;
+			margin-bottom: 0.5em;
+			line-height: 1.3;
+			color: var(--text-primary);
+		}
+		.prose :global(h1) { font-size: 1.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.35em; }
+		.prose :global(h2) { font-size: 1.35rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25em; }
+		.prose :global(h3) { font-size: 1.15rem; }
+		.prose :global(p) { margin: 0 0 1em; }
+		.prose :global(ul),
+		.prose :global(ol) { padding-left: 1.5em; margin: 0 0 1em; }
+		.prose :global(li) { margin-bottom: 0.25em; }
+		.prose :global(a) { color: rgb(var(--accent)); text-decoration: underline; }
+		.prose :global(blockquote) {
+			border-left: 4px solid rgb(var(--accent));
+			margin: 0 0 1em;
+			padding: 0.5em 1em;
+			background: var(--bg-secondary);
+			border-radius: 0 8px 8px 0;
+			color: rgb(var(--gray));
+		}
+		.prose :global(code) {
+			font-family: ui-monospace, monospace;
+			font-size: 0.9em;
+			background: var(--bg-secondary);
 			border: 1px solid var(--border-color);
+			padding: 0.15em 0.4em;
+			border-radius: 4px;
+		}
+		.prose :global(pre) {
+			background: var(--bg-secondary);
+			border: 1px solid var(--border-color);
+			border-radius: 10px;
+			padding: 1rem;
+			overflow-x: auto;
+			margin: 0 0 1em;
+		}
+		.prose :global(pre code) {
+			background: none;
+			border: none;
+			padding: 0;
+			font-size: 0.92rem;
+		}
+		.prose :global(hr) {
+			border: none;
+			border-top: 1px solid var(--border-color);
+			margin: 2em 0;
+		}
+		.prose :global(table) {
+			border-collapse: collapse;
+			width: 100%;
+			margin: 0 0 1em;
+			font-size: 0.95rem;
+		}
+		.prose :global(th),
+		.prose :global(td) {
+			border: 1px solid var(--border-color);
+			padding: 0.5em 0.75em;
+		}
+		.prose :global(th) {
+			background: var(--bg-secondary);
+			font-weight: 700;
+		}
+		.prose :global(img) { max-width: 100%; border-radius: 8px; }
+
+		/* Raw view */
+		.raw-view {
+			flex: 1;
+			margin: 0;
+			border-radius: 0;
+			border: none;
 			background: var(--bg-secondary);
 			overflow: auto;
-			max-height: 70vh;
 		}
-		.preview code {
+		.raw-view code {
 			display: block;
-			padding: 1rem;
-			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-				"Courier New", monospace;
-			font-size: 0.95rem;
-			line-height: 1.5;
+			padding: 1.25rem;
+			font-family: ui-monospace, monospace;
+			font-size: 0.9rem;
+			line-height: 1.6;
 			white-space: pre;
 		}
+
+		/* Status bar */
+		.status-bar {
+			margin: 0;
+			padding: 0.5rem 1rem;
+			border-top: 1px solid var(--border-color);
+			font-size: 0.85rem;
+			color: rgb(var(--gray));
+		}
+		.status-bar.error { color: #dc2626; }
 	</style>
 </PageLayout>
-
