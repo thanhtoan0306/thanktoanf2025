@@ -1,0 +1,306 @@
+{
+    "1033": {
+        "id": 1033,
+        "name": "Null-Magic Mantle",
+        "description": "<mainText><stats><attention>20</attention> Magic Resist</stats><br><br></mainText>",
+        "categories": ["SpellBlock"],
+        "priceTotal": 400,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "magicResistance": { "flat": 20, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1033_base_t1_magicmantle.png",
+        "patchChange": null,
+        "search": "spellblock,magicresist"
+    },
+    "1036": {
+        "id": 1036,
+        "name": "Long Sword",
+        "description": "<mainText><stats><attention>10</attention> Attack Damage</stats><br><br></mainText>",
+        "categories": ["Damage", "Lane"],
+        "priceTotal": 350,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackDamage": { "flat": 10, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1036_class_t1_longsword.png",
+        "patchChange": null,
+        "search": "damage,lane"
+    },
+    "1037": {
+        "id": 1037,
+        "name": "Pickaxe",
+        "description": "<mainText><stats><attention>25</attention> Attack Damage</stats><br><br></mainText>",
+        "categories": ["Damage"],
+        "priceTotal": 875,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackDamage": { "flat": 25, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1037_class_t1_pickaxe.png",
+        "patchChange": null,
+        "search": "damage"
+    },
+    "1038": {
+        "id": 1038,
+        "name": "B. F. Sword",
+        "description": "<mainText><stats><attention>40</attention> Attack Damage</stats><br><br></mainText>",
+        "categories": ["Damage"],
+        "priceTotal": 1300,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackDamage": { "flat": 40, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1038_marksman_t1_bfsword.png",
+        "patchChange": null,
+        "search": "damage"
+    },
+    "1004": {
+        "id": 1004,
+        "name": "Faerie Charm",
+        "description": "<mainText><stats><attention>50</attention> Mana Regeneration</stats><br><br></mainText>",
+        "categories": ["ManaRegen"],
+        "priceTotal": 250,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "manaRegen": { "flat": 50, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1004_base_t1_faeriecharm.png",
+        "patchChange": null,
+        "search": "manaregen"
+    },
+    "1006": {
+        "id": 1006,
+        "name": "Rejuvenation Bead",
+        "description": "<mainText><stats><attention>50</attention> Health Regeneration</stats><br><br></mainText>",
+        "categories": ["HealthRegen"],
+        "priceTotal": 300,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "healthRegen": { "flat": 50, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1006_base_t1_rejuvenationbead.png",
+        "patchChange": null,
+        "search": "healthregen"
+    },
+    "1011": {
+        "id": 1011,
+        "name": "Giant's Belt",
+        "description": "<mainText><stats><attention>350</attention> Health</stats><br><br></mainText>",
+        "categories": ["Health"],
+        "priceTotal": 900,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "health": { "flat": 350, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1011_base_t1_giantsbelt.png",
+        "patchChange": null,
+        "search": "health"
+    },
+    "1026": {
+        "id": 1026,
+        "name": "Blasting Wand",
+        "description": "<mainText><stats><attention>40</attention> Ability Power</stats><br><br></mainText>",
+        "categories": ["SpellDamage"],
+        "priceTotal": 850,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "abilityPower": { "flat": 40, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1026_base_t1_blastingwand.png",
+        "patchChange": null,
+        "search": "ap,spellpower"
+    },
+    "1027": {
+        "id": 1027,
+        "name": "Sapphire Crystal",
+        "description": "<mainText><stats><attention>250</attention> Mana</stats><br><br></mainText>",
+        "categories": ["Mana"],
+        "priceTotal": 350,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "mana": { "flat": 250, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1027_base_t1_sapphirecrystal.png",
+        "patchChange": null,
+        "search": "mana"
+    },
+    "1028": {
+        "id": 1028,
+        "name": "Ruby Crystal",
+        "description": "<mainText><stats><attention>150</attention> Health</stats><br><br></mainText>",
+        "categories": ["Health"],
+        "priceTotal": 400,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "health": { "flat": 150, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1028_base_t1_rubycrystal.png",
+        "patchChange": null,
+        "search": "health"
+    },
+    "1029": {
+        "id": 1029,
+        "name": "Cloth Armor",
+        "description": "<mainText><stats><attention>15</attention> Armor</stats><br><br></mainText>",
+        "categories": ["Armor"],
+        "priceTotal": 300,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "armor": { "flat": 15, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1029_base_t1_clotharmor.png",
+        "patchChange": null,
+        "search": "armor"
+    },
+    "1031": {
+        "id": 1031,
+        "name": "Chain Vest",
+        "description": "<mainText><stats><attention>40</attention> Armor</stats><br><br></mainText>",
+        "categories": ["Armor"],
+        "priceTotal": 800,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "armor": { "flat": 40, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1031_base_t1_chainvest.png",
+        "patchChange": null,
+        "search": "armor"
+    },
+    "1035": {
+        "id": 1035,
+        "name": "Emberknife",
+        "description": "<mainText><stats><attention>10</attention> Attack Damage<br><attention>150</attention> Health</stats><br><br><passive>Jungle Expertise:</passive> ...</mainText>",
+        "categories": ["Jungle"],
+        "priceTotal": 350,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackDamage": { "flat": 10, "percent": 0 },
+            "health": { "flat": 150, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1035_jungle_t1_emberknife.png",
+        "patchChange": null,
+        "search": "jungle"
+    },
+    "1042": {
+        "id": 1042,
+        "name": "Dagger",
+        "description": "<mainText><stats><attention>12</attention> Attack Speed</stats><br><br></mainText>",
+        "categories": ["AttackSpeed"],
+        "priceTotal": 250,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackSpeed": { "flat": 0, "percent": 12 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1042_base_t1_dagger.png",
+        "patchChange": null,
+        "search": "attackspeed"
+    },
+    "1043": {
+        "id": 1043,
+        "name": "Recurve Bow",
+        "description": "<mainText><stats><attention>25</attention> Attack Speed</stats><br><br></mainText>",
+        "categories": ["AttackSpeed"],
+        "priceTotal": 700,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackSpeed": { "flat": 0, "percent": 25 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1043_base_t1_recurvebow.png",
+        "patchChange": null,
+        "search": "attackspeed"
+    },
+    "1052": {
+        "id": 1052,
+        "name": "Amplifying Tome",
+        "description": "<mainText><stats><attention>20</attention> Ability Power</stats><br><br></mainText>",
+        "categories": ["SpellDamage"],
+        "priceTotal": 400,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "abilityPower": { "flat": 20, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1052_base_t1_amplifyingtome.png",
+        "patchChange": null,
+        "search": "ap,spellpower"
+    },
+    "1055": {
+        "id": 1055,
+        "name": "Doran's Blade",
+        "description": "<mainText><stats><attention>8</attention> Attack Damage<br><attention>80</attention> Health</stats><br><br><passive>Basic attacks deal 5 bonus physical damage to minions.</passive></mainText>",
+        "categories": ["Damage", "Health", "Lane"],
+        "priceTotal": 450,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "attackDamage": { "flat": 8, "percent": 0 },
+            "health": { "flat": 80, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1055_starter_t1_doransblade.png",
+        "patchChange": null,
+        "search": "damage,health,starter"
+    },
+    "1056": {
+        "id": 1056,
+        "name": "Doran's Ring",
+        "description": "<mainText><stats><attention>18</attention> Ability Power<br><attention>90</attention> Health</stats><br><br><passive>Restore 1.5 mana every second.</passive></mainText>",
+        "categories": ["SpellDamage", "Health", "ManaRegen", "Lane"],
+        "priceTotal": 450,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "abilityPower": { "flat": 18, "percent": 0 },
+            "health": { "flat": 90, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1056_starter_t1_doransring.png",
+        "patchChange": null,
+        "search": "ap,health,starter"
+    },
+    "1058": {
+        "id": 1058,
+        "name": "Needlessly Large Rod",
+        "description": "<mainText><stats><attention>60</attention> Ability Power</stats><br><br></mainText>",
+        "categories": ["SpellDamage"],
+        "priceTotal": 1300,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "abilityPower": { "flat": 60, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1058_base_t1_needlesslylargerod.png",
+        "patchChange": null,
+        "search": "ap,spellpower"
+    },
+    "1082": {
+        "id": 1082,
+        "name": "Dark Seal",
+        "description": "<mainText><stats><attention>50</attention> Health<br><attention>15</attention> Ability Power</stats><br><br><passive>Glory:</passive> Gain 4 stacks for champion takedowns...</mainText>",
+        "categories": ["SpellDamage", "Health", "Lane"],
+        "priceTotal": 350,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "abilityPower": { "flat": 15, "percent": 0 },
+            "health": { "flat": 50, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1082_starter_t1_darkseal.png",
+        "patchChange": null,
+        "search": "ap,health,starter"
+    }
+}

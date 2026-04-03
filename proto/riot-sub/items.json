@@ -1,0 +1,163 @@
+[
+  {
+    "id": "6653",
+    "name": "Liandry's Torment",
+    "type": "Mythic • AP",
+    "tier": 3,
+    "section": "legendary",
+    "tags": ["AP"],
+    "gold": 3200,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png",
+    "stats": [
+      "90 Ability Power",
+      "300 Health",
+      "15 Ability Haste",
+      "Torment: Burn sát thương theo thời gian"
+    ],
+    "recipe": {
+      "components": [
+        { "name": "Blasting Wand", "gold": 850 },
+        { "name": "Haunting Guise", "gold": 1300 },
+        { "name": "Amplifying Tome", "gold": 400 }
+      ]
+    }
+  },
+  {
+    "id": "4636",
+    "name": "Blackfire Torch",
+    "type": "Legendary • AP",
+    "tier": 2,
+    "section": "legendary",
+    "tags": ["AP"],
+    "gold": 2800,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4636.png",
+    "stats": [
+      "90 Ability Power",
+      "600 Mana",
+      "20 Ability Haste",
+      "Blackfire: Sát thương khu vực mạnh"
+    ],
+    "recipe": {
+      "components": [
+        { "name": "Lost Chapter", "gold": 1200 },
+        { "name": "Amplifying Tome", "gold": 400 }
+      ]
+    }
+  },
+  {
+    "id": "3876",
+    "name": "Heartsteel",
+    "type": "Tank • Legendary",
+    "tier": 3,
+    "section": "legendary",
+    "tags": ["Tank"],
+    "gold": 3000,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3876.png",
+    "stats": [
+      "800 Health",
+      "200% Base Health Regen",
+      "Colossal Consumption: Stack HP cực mạnh"
+    ],
+    "recipe": {
+      "components": [
+        { "name": "Giant's Belt", "gold": 900 },
+        { "name": "Ruby Crystal", "gold": 400 }
+      ]
+    }
+  },
+  {
+    "id": "3068",
+    "name": "Sunfire Aegis",
+    "type": "Tank • Legendary",
+    "tier": 2,
+    "section": "legendary",
+    "tags": ["Tank"],
+    "gold": 2700,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png",
+    "stats": ["500 Health", "50 Armor", "Immolate: Burn sát thương xung quanh"],
+    "recipe": {
+      "components": [
+        { "name": "Bami's Cinder", "gold": 1000 },
+        { "name": "Chain Vest", "gold": 800 }
+      ]
+    }
+  },
+  {
+    "id": "3072",
+    "name": "Bloodthirster",
+    "type": "AD • Legendary",
+    "tier": 3,
+    "section": "legendary",
+    "tags": ["AD", "Crit"],
+    "gold": 3400,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3072.png",
+    "stats": [
+      "80 Attack Damage",
+      "20% Life Steal",
+      "25% Crit Chance",
+      "Shield khi full lifesteal"
+    ],
+    "recipe": {
+      "components": [
+        { "name": "B. F. Sword", "gold": 1300 },
+        { "name": "Vampiric Scepter", "gold": 900 }
+      ]
+    }
+  },
+  {
+    "id": "6676",
+    "name": "Kraken Slayer",
+    "type": "Crit • Legendary",
+    "tier": 2,
+    "section": "legendary",
+    "tags": ["AD", "Crit"],
+    "gold": 3100,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6676.png",
+    "stats": [
+      "65 Attack Damage",
+      "30% Attack Speed",
+      "25% Crit Chance",
+      "Bring It Down: Sát thương true damage"
+    ],
+    "recipe": {
+      "components": [
+        { "name": "Noonquiver", "gold": 1300 },
+        { "name": "Cloak of Agility", "gold": 600 }
+      ]
+    }
+  },
+  {
+    "id": "3089",
+    "name": "Rabadon's Deathcap",
+    "type": "AP • Legendary",
+    "tier": 3,
+    "section": "legendary",
+    "tags": ["AP"],
+    "gold": 3600,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3089.png",
+    "stats": ["120 Ability Power", "Magical Opus: +35% AP tổng"],
+    "recipe": {
+      "components": [
+        { "name": "Needlessly Large Rod", "gold": 1250 },
+        { "name": "Blasting Wand", "gold": 850 }
+      ]
+    }
+  },
+  {
+    "id": "3157",
+    "name": "Zhonya's Hourglass",
+    "type": "AP • Defensive",
+    "tier": 1,
+    "section": "starter",
+    "tags": ["AP", "Def"],
+    "gold": 3000,
+    "img": "https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png",
+    "stats": ["80 Ability Power", "45 Armor", "Stasis: Dừng thời gian 2.5s"],
+    "recipe": {
+      "components": [
+        { "name": "Seeker's Armguard", "gold": 1000 },
+        { "name": "Stopwatch", "gold": 750 }
+      ]
+    }
+  }
+]

@@ -1,0 +1,17 @@
+{
+    "1033": {
+        "id": 1033,
+        "name": "Null-Magic Mantle",
+        "description": "<mainText><stats><attention>20</attention> Magic Resist</stats><br><br></mainText>",
+        "categories": ["SpellBlock"],
+        "priceTotal": 400,
+        "from": [],
+        "isBoots": false,
+        "stats": {
+            "magicResistance": { "flat": 20, "percent": 0 }
+        },
+        "iconPath": "https://raw.communitydragon.org/pbe/game/assets/items/icons2d/1033_base_t1_magicmantle.png",
+        "patchChange": null,
+        "search": "spellblock,magicresist"
+    }
+}

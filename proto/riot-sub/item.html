@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARAM Items - League of Legends</title>
+    <link rel="stylesheet" href="./item.css">
+</head>
+<body>
+    <header>
+        <h1>🛡️ ARAM ITEMS</h1>
+        <p class="subtitle">Một số item phổ biến & mạnh nhất ở Howling Abyss • Season 2026</p>
+    </header>
+
+    <div class="shop-wrap">
+        <div class="panel" style="margin-bottom: 12px;">
+            <div class="panel-header">
+                <div class="tabs" role="tablist" aria-label="Shop tabs">
+                    <button class="tab" id="tabRecommended" role="tab" aria-selected="false" type="button">RECOMMENDED ITEMS</button>
+                    <button class="tab" id="tabAll" role="tab" aria-selected="true" type="button">ALL ITEMS</button>
+                    <button class="tab" id="tabSets" role="tab" aria-selected="false" type="button">ITEM SETS</button>
+                </div>
+                <div class="panel-hint" id="tabHint">ARAM shop prototype</div>
+            </div>
+        </div>
+
+        <div class="shop-shell">
+            <aside class="panel" aria-label="Quick categories">
+                <div class="sidebar">
+                    <button class="side-btn" type="button" data-side="all" aria-selected="true" title="All">
+                        A<small>All</small>
+                    </button>
+                    <button class="side-btn" type="button" data-side="starter" aria-selected="false" title="Starter">
+                        S<small>Starter</small>
+                    </button>
+                    <button class="side-btn" type="button" data-side="ap" aria-selected="false" title="AP">
+                        ✦<small>AP</small>
+                    </button>
+                    <button class="side-btn" type="button" data-side="ad" aria-selected="false" title="AD">
+                        ⚔<small>AD</small>
+                    </button>
+                    <button class="side-btn" type="button" data-side="tank" aria-selected="false" title="Tank">
+                        ⛨<small>Tank</small>
+                    </button>
+                </div>
+            </aside>
+
+            <main class="panel mid" aria-label="Item list">
+                <div class="controls">
+                    <div class="search">
+                        <span style="opacity:0.75;font-weight:700;">⌕</span>
+                        <input id="searchInput" type="search" placeholder="Type to search..." autocomplete="off">
+                    </div>
+                    <div class="filters">
+                        <div class="filter-group" aria-label="Tier filter">
+                            <div style="opacity:0.75;font-weight:700;min-width:44px;">Tier</div>
+                            <div class="pill-row">
+                                <button class="pill" type="button" data-tier="1" aria-pressed="false">1</button>
+                                <button class="pill" type="button" data-tier="2" aria-pressed="false">2</button>
+                                <button class="pill" type="button" data-tier="3" aria-pressed="false">3</button>
+                            </div>
+                        </div>
+                        <div class="filter-group" aria-label="Type filter">
+                            <div style="opacity:0.75;font-weight:700;min-width:44px;">Type</div>
+                            <div class="pill-row">
+                                <button class="pill" type="button" data-tag="AP" aria-pressed="false">AP</button>
+                                <button class="pill" type="button" data-tag="AD" aria-pressed="false">AD</button>
+                                <button class="pill" type="button" data-tag="Tank" aria-pressed="false">Tank</button>
+                                <button class="pill" type="button" data-tag="Def" aria-pressed="false">Def</button>
+                                <button class="pill" type="button" data-tag="Crit" aria-pressed="false">Crit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" aria-label="Legendary items">
+                    <div class="section-title">
+                        <h3>LEGENDARY</h3>
+                        <span id="legendaryCount"></span>
+                    </div>
+                    <div id="legendaryGrid" class="item-grid" role="listbox" aria-label="Legendary grid"></div>
+                </div>
+
+                <div class="section" aria-label="Starter & basic items">
+                    <div class="section-title">
+                        <h3>STARTER &amp; BASIC</h3>
+                        <span id="starterCount"></span>
+                    </div>
+                    <div id="starterGrid" class="item-grid" role="listbox" aria-label="Starter grid"></div>
+                </div>
+            </main>
+
+            <section class="panel detail-panel" aria-label="Item details">
+                <div class="panel-header">
+                    <div class="panel-title">DETAILS</div>
+                    <div id="selectedLabel" class="panel-hint">Chọn 1 item</div>
+                </div>
+                <div id="itemDetail"></div>
+                <div class="purchase">
+                    <button id="buyBtn" class="btn-buy" type="button" disabled>PURCHASE</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+
+        const itemDetail = document.getElementById("itemDetail");
+        const selectedLabel = document.getElementById("selectedLabel");
+        const buyBtn = document.getElementById("buyBtn");
+        const searchInput = document.getElementById("searchInput");
+        const legendaryGrid = document.getElementById("legendaryGrid");
+        const starterGrid = document.getElementById("starterGrid");
+        const legendaryCount = document.getElementById("legendaryCount");
+        const starterCount = document.getElementById("starterCount");
+
+        let selectedId = null;
+        let activeSide = "all";
+        const activeTiers = new Set();
+        const activeTags = new Set();
+        let query = "";
+
+        async function loadItems() {
+            try {
+                const res = await fetch("./items.json", { cache: "no-store" });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error("Invalid JSON shape");
+                items = data;
+                selectedId = items[0]?.id ?? null;
+                renderLists();
+                renderDetail();
+            } catch (err) {
+                items = [];
+                selectedId = null;
+                renderLists();
+                buyBtn.disabled = true;
+                selectedLabel.textContent = "Load failed";
+                itemDetail.innerHTML = `
+                    <div class="empty-detail">
+                        Không load được <b>items.json</b>.<br><br>
+                        Nếu bạn đang mở file bằng <b>file://</b> thì trình duyệt sẽ chặn fetch local JSON.<br>
+                        Hãy chạy 1 local server trong thư mục <b>proto/riot-sub</b>, ví dụ:<br><br>
+                        <code>python3 -m http.server 5173</code><br>
+                        rồi mở <code>http://localhost:5173/item.html</code>
+                    </div>
+                `;
+            }
+        }
+
+        function matchesSide(item) {
+            if (activeSide === "all") return true;
+            if (activeSide === "starter") return item.section === "starter";
+            if (activeSide === "ap") return item.tags?.includes("AP");
+            if (activeSide === "ad") return item.tags?.includes("AD");
+            if (activeSide === "tank") return item.tags?.includes("Tank");
+            return true;
+        }
+
+        function matchesFilters(item) {
+            if (query) {
+                const hay = `${item.name} ${item.type} ${(item.tags || []).join(" ")}`.toLowerCase();
+                if (!hay.includes(query)) return false;
+            }
+            if (activeTiers.size > 0 && !activeTiers.has(String(item.tier))) return false;
+            if (activeTags.size > 0) {
+                const tags = item.tags || [];
+                for (const t of activeTags) {
+                    if (!tags.includes(t)) return false;
+                }
+            }
+            return matchesSide(item);
+        }
+
+        function itemButton(item) {
+            const isSelected = item.id === selectedId;
+            return `
+                <div class="item-tile">
+                    <button
+                        type="button"
+                        class="item-btn"
+                        role="option"
+                        aria-selected="${isSelected ? "true" : "false"}"
+                        data-id="${escapeHtml(item.id)}"
+                        title="${escapeHtml(item.name)}"
+                    >
+                        <img src="${item.img}" alt="${escapeHtml(item.name)}">
+                    </button>
+                    <div class="price">${item.gold}</div>
+                </div>
+            `;
+        }
+
+        function renderLists() {
+            const visible = items.filter(matchesFilters);
+            const legendary = visible.filter((x) => x.section === "legendary");
+            const starter = visible.filter((x) => x.section === "starter");
+
+            legendaryGrid.innerHTML = legendary.map(itemButton).join("") || `<div class="empty-detail">Không có item phù hợp.</div>`;
+            starterGrid.innerHTML = starter.map(itemButton).join("") || `<div class="empty-detail">Không có item phù hợp.</div>`;
+
+            legendaryCount.textContent = `${legendary.length} items`;
+            starterCount.textContent = `${starter.length} items`;
+
+            // ensure selected item is still visible; if not, auto select first visible
+            const stillVisible = visible.some((x) => x.id === selectedId);
+            if (!stillVisible) {
+                selectedId = visible[0]?.id ?? null;
+            }
+        }
+
+        function renderDetail() {
+            const item = items.find((x) => x.id === selectedId);
+            if (!item) {
+                selectedLabel.textContent = "Chọn 1 item";
+                buyBtn.disabled = true;
+                itemDetail.innerHTML = `<div class="empty-detail">Click vào icon ở giữa để xem thông tin chi tiết.</div>`;
+                return;
+            }
+
+            selectedLabel.textContent = item.name;
+            buyBtn.disabled = false;
+            const statsLis = item.stats.map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+            const comps = item.recipe?.components || [];
+            const compNodes = comps
+                .slice(0, 6)
+                .map((c) => {
+                    return `
+                        <div class="tree-node" title="${escapeHtml(c.name)}">
+                            <div style="font-weight:900;opacity:0.9;">+</div>
+                            <small>${escapeHtml(c.gold)}</small>
+                        </div>
+                    `;
+                })
+                .join("");
+
+            const treeRows = comps.length
+                ? `
+                    <div class="build">
+                        <div class="build-title">
+                            <span>Builds into</span>
+                            <span style="opacity:0.75;">${escapeHtml(String(item.gold))}</span>
+                        </div>
+                        <div class="tree" aria-label="Build tree">
+                            <div class="tree-row">
+                                <div></div>
+                                <div class="tree-node" title="${escapeHtml(item.name)}">
+                                    <img src="${item.img}" alt="${escapeHtml(item.name)}">
+                                    <small>${escapeHtml(String(item.gold))}</small>
+                                </div>
+                                <div></div>
+                            </div>
+                            <div class="tree-row">${compNodes}</div>
+                        </div>
+                    </div>
+                `
+                : `
+                    <div class="build">
+                        <div class="build-title"><span>Builds into</span><span style="opacity:0.75;">—</span></div>
+                        <div class="tree"><div class="empty-detail" style="padding:10px 12px;">Chưa có dữ liệu công thức cho item này.</div></div>
+                    </div>
+                `;
+
+            itemDetail.innerHTML = `
+                <div class="detail-top">
+                    <div class="detail-img">
+                        <img src="${item.img}" alt="${escapeHtml(item.name)}">
+                    </div>
+                    <div>
+                        <div class="detail-name">${escapeHtml(item.name)}</div>
+                        <div class="detail-type">${escapeHtml(item.type)}</div>
+                        <div class="detail-gold">${item.gold} Gold</div>
+                    </div>
+                </div>
+                ${treeRows}
+                <div class="detail-body">
+                    <div class="detail-section-title">Chỉ số / Hiệu ứng</div>
+                    <ul class="stat-list">${statsLis}</ul>
+                </div>
+            `;
+        }
+
+        document.addEventListener("click", (e) => {
+            const itemBtn = e.target.closest(".item-btn[data-id]");
+            if (itemBtn) {
+                selectedId = itemBtn.getAttribute("data-id");
+                renderLists();
+                renderDetail();
+                return;
+            }
+
+            const sideBtn = e.target.closest(".side-btn[data-side]");
+            if (sideBtn) {
+                activeSide = sideBtn.getAttribute("data-side");
+                document.querySelectorAll(".side-btn[data-side]").forEach((b) => b.setAttribute("aria-selected", "false"));
+                sideBtn.setAttribute("aria-selected", "true");
+                renderLists();
+                renderDetail();
+                return;
+            }
+
+            const tierBtn = e.target.closest(".pill[data-tier]");
+            if (tierBtn) {
+                const t = tierBtn.getAttribute("data-tier");
+                if (activeTiers.has(t)) activeTiers.delete(t);
+                else activeTiers.add(t);
+                tierBtn.setAttribute("aria-pressed", activeTiers.has(t) ? "true" : "false");
+                renderLists();
+                renderDetail();
+                return;
+            }
+
+            const tagBtn = e.target.closest(".pill[data-tag]");
+            if (tagBtn) {
+                const tag = tagBtn.getAttribute("data-tag");
+                if (activeTags.has(tag)) activeTags.delete(tag);
+                else activeTags.add(tag);
+                tagBtn.setAttribute("aria-pressed", activeTags.has(tag) ? "true" : "false");
+                renderLists();
+                renderDetail();
+                return;
+            }
+
+            const tabBtn = e.target.closest(".tab[role='tab']");
+            if (tabBtn) {
+                const id = tabBtn.id;
+                document.querySelectorAll(".tab[role='tab']").forEach((b) => b.setAttribute("aria-selected", "false"));
+                tabBtn.setAttribute("aria-selected", "true");
+                const hint = document.getElementById("tabHint");
+                if (id === "tabRecommended") hint.textContent = "Gợi ý: filter theo tier/tag bên dưới";
+                else if (id === "tabAll") hint.textContent = "Tất cả items";
+                else hint.textContent = "Item sets (prototype)";
+                return;
+            }
+        });
+
+        searchInput.addEventListener("input", () => {
+            query = (searchInput.value || "").trim().toLowerCase();
+            renderLists();
+            renderDetail();
+        });
+
+        buyBtn.addEventListener("click", () => {
+            const item = items.find((x) => x.id === selectedId);
+            if (!item) return;
+            // prototype interaction
+            buyBtn.textContent = `PURCHASED: ${item.gold}G`;
+            setTimeout(() => (buyBtn.textContent = "PURCHASE"), 900);
+        });
+
+        // init
+        itemDetail.innerHTML = `<div class="empty-detail">Loading data...</div>`;
+        loadItems();
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+
+    <footer>
+        Made for fun • Dữ liệu tham khảo Season 2026 • Hình ảnh từ League of Legends CDN
+    </footer>
+</body>
+</html>
