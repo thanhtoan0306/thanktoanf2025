@@ -1,0 +1,275 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<PageLayout title={`Gallery Firebase | ${SITE_TITLE}`} description="Upload ảnh lên Cloud Storage, lưu link và mô tả vào Firestore (gói Spark).">
+	<section class="gf-hero">
+		<p class="gf-eyebrow">Firebase · Storage + Firestore</p>
+		<h1>Gallery</h1>
+		<p class="gf-lead">
+			Ảnh lưu trên <strong>Cloud Storage</strong>; mỗi mục trong <strong>Firestore</strong> gồm link ảnh và nội dung text (như file .txt gắn kèm).
+		</p>
+	</section>
+
+	<nav class="gf-menu" aria-label="Gallery">
+		<button type="button" class="gf-menu__btn is-active" data-panel="view" id="gf-tab-view">Xem gallery</button>
+		<button type="button" class="gf-menu__btn" data-panel="upload" id="gf-tab-upload">Upload ảnh</button>
+	</nav>
+
+	<div id="gf-config-missing" class="gf-banner gf-banner--warn" hidden>
+		<p>
+			<strong>Chưa cấu hình Firebase.</strong> Tạo project Spark, bật Storage và Firestore, rồi copy config vào file <code>.env</code> (theo <code>.env.example</code>) và khởi động lại <code>npm run dev</code>.
+		</p>
+	</div>
+
+	<div id="gf-panel-view" class="gf-panel" role="tabpanel" aria-labelledby="gf-tab-view">
+		<div id="gf-gallery-status" class="gf-status" aria-live="polite"></div>
+		<ul id="gf-gallery" class="gf-grid" aria-label="Danh sách ảnh"></ul>
+	</div>
+
+	<div id="gf-panel-upload" class="gf-panel" hidden role="tabpanel" aria-labelledby="gf-tab-upload">
+		<form id="gf-upload-form" class="gf-form">
+			<label class="gf-label">
+				<span>Chọn ảnh</span>
+				<input id="gf-file" type="file" accept="image/*" required />
+			</label>
+			<label class="gf-label">
+				<span>Nội dung text (mô tả / ghi chú)</span>
+				<textarea id="gf-text" rows="5" placeholder="Nhập nội dung sẽ lưu cùng ảnh trong Firestore…"></textarea>
+			</label>
+			<button type="submit" class="gf-submit" id="gf-submit">Tải lên &amp; lưu</button>
+			<p id="gf-upload-msg" class="gf-status" aria-live="polite"></p>
+		</form>
+	</div>
+</PageLayout>
+
+<script>
+	import {
+		isFirebaseConfigured,
+		subscribeGallery,
+		uploadGalleryImage,
+		type GalleryItem,
+	} from '../lib/firebase-gallery-client';
+
+	const tabView = document.getElementById('gf-tab-view');
+	const tabUpload = document.getElementById('gf-tab-upload');
+	const panelView = document.getElementById('gf-panel-view');
+	const panelUpload = document.getElementById('gf-panel-upload');
+	const configMissing = document.getElementById('gf-config-missing');
+	const galleryEl = document.getElementById('gf-gallery');
+	const galleryStatus = document.getElementById('gf-gallery-status');
+	const form = document.getElementById('gf-upload-form') as HTMLFormElement | null;
+	const fileInput = document.getElementById('gf-file') as HTMLInputElement | null;
+	const textInput = document.getElementById('gf-text') as HTMLTextAreaElement | null;
+	const submitBtn = document.getElementById('gf-submit') as HTMLButtonElement | null;
+	const uploadMsg = document.getElementById('gf-upload-msg');
+
+	function setActiveTab(panel: 'view' | 'upload') {
+		tabView?.classList.toggle('is-active', panel === 'view');
+		tabUpload?.classList.toggle('is-active', panel === 'upload');
+		panelView?.toggleAttribute('hidden', panel !== 'view');
+		panelUpload?.toggleAttribute('hidden', panel !== 'upload');
+	}
+
+	tabView?.addEventListener('click', () => setActiveTab('view'));
+	tabUpload?.addEventListener('click', () => setActiveTab('upload'));
+
+	function renderGallery(items: GalleryItem[]) {
+		if (!galleryEl) return;
+		galleryEl.innerHTML = '';
+		for (const item of items) {
+			const li = document.createElement('li');
+			li.className = 'gf-card';
+			const img = document.createElement('img');
+			img.src = item.imageUrl;
+			img.alt = item.text.slice(0, 120) || 'Gallery image';
+			img.loading = 'lazy';
+			const cap = document.createElement('p');
+			cap.className = 'gf-card__text';
+			cap.textContent = item.text || '(Không có mô tả)';
+			li.append(img, cap);
+			galleryEl.appendChild(li);
+		}
+		if (items.length === 0 && galleryStatus) {
+			galleryStatus.textContent = 'Chưa có ảnh nào. Chuyển sang tab Upload để thêm.';
+		} else if (galleryStatus) {
+			galleryStatus.textContent = '';
+		}
+	}
+
+	if (!isFirebaseConfigured()) {
+		configMissing?.removeAttribute('hidden');
+		if (galleryStatus) galleryStatus.textContent = '';
+	} else {
+		subscribeGallery(
+			renderGallery,
+			(err) => {
+				if (galleryStatus) {
+					galleryStatus.textContent = err.message || String(err);
+				}
+			},
+		);
+	}
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const file = fileInput?.files?.[0];
+		if (!file || !submitBtn) return;
+		submitBtn.disabled = true;
+		if (uploadMsg) uploadMsg.textContent = 'Đang tải lên…';
+		try {
+			await uploadGalleryImage(file, textInput?.value ?? '');
+			if (uploadMsg) uploadMsg.textContent = 'Đã lưu. Ảnh hiện trong tab Xem gallery.';
+			form.reset();
+			setActiveTab('view');
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			if (uploadMsg) uploadMsg.textContent = msg;
+		} finally {
+			submitBtn.disabled = false;
+		}
+	});
+</script>
+
+<style>
+	.gf-hero {
+		margin-bottom: 1.5rem;
+	}
+	.gf-eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		font-size: 0.85rem;
+		color: rgb(var(--gray));
+	}
+	.gf-lead {
+		margin: 0.5rem 0 0;
+		color: rgb(var(--gray));
+		max-width: 42rem;
+	}
+	.gf-menu {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+		padding: 0.35rem;
+		border-radius: 999px;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border-color);
+		width: fit-content;
+		max-width: 100%;
+	}
+	.gf-menu__btn {
+		padding: 0.55rem 1.1rem;
+		border-radius: 999px;
+		border: none;
+		background: transparent;
+		color: var(--text-primary);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.15s ease;
+	}
+	.gf-menu__btn:hover {
+		background: rgba(var(--accent-rgb), 0.12);
+	}
+	.gf-menu__btn.is-active {
+		background: rgb(var(--accent));
+		color: #fff;
+	}
+	.gf-banner {
+		padding: 1rem 1.1rem;
+		border-radius: 12px;
+		margin-bottom: 1.25rem;
+		font-size: 0.95rem;
+		line-height: 1.5;
+	}
+	.gf-banner--warn {
+		background: rgba(234, 179, 8, 0.15);
+		border: 1px solid rgba(234, 179, 8, 0.45);
+		color: var(--text-primary);
+	}
+	.gf-banner code {
+		font-size: 0.88em;
+	}
+	.gf-panel {
+		min-height: 8rem;
+	}
+	.gf-status {
+		margin: 0 0 0.75rem;
+		min-height: 1.25rem;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+	.gf-grid {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
+	}
+	.gf-card {
+		margin: 0;
+		border-radius: 12px;
+		overflow: hidden;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border-color);
+		display: flex;
+		flex-direction: column;
+	}
+	.gf-card img {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		display: block;
+	}
+	.gf-card__text {
+		margin: 0;
+		padding: 0.65rem 0.75rem;
+		font-size: 0.88rem;
+		line-height: 1.45;
+		color: var(--text-primary);
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+	.gf-form {
+		display: grid;
+		gap: 1rem;
+		max-width: 32rem;
+	}
+	.gf-label {
+		display: grid;
+		gap: 0.4rem;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.gf-label input[type='file'] {
+		font: inherit;
+	}
+	.gf-label textarea {
+		font: inherit;
+		padding: 0.65rem 0.75rem;
+		border-radius: 10px;
+		border: 1px solid var(--border-color);
+		background: var(--bg-primary);
+		color: inherit;
+		resize: vertical;
+	}
+	.gf-submit {
+		justify-self: start;
+		padding: 0.65rem 1.25rem;
+		border: none;
+		border-radius: 999px;
+		background: rgb(var(--accent));
+		color: #fff;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+	}
+	.gf-submit:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+</style>
