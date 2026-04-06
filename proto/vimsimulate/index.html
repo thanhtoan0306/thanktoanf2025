@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vim Simulate — quiet practice</title>
+  <style>
+    :root {
+      --bg: #1c1b19;
+      --surface: #252320;
+      --border: #3d3834;
+      --text: #e8e4df;
+      --muted: #9a928a;
+      --accent: #c4a57b;
+      --cursor: #7eb8a8;
+      --insert-hi: #8b9dc3;
+      --status-bg: #2f2b27;
+      --glow: rgba(0, 0, 0, 0.35);
+      --font: "JetBrains Mono", "SF Mono", "Fira Code", Consolas, monospace;
+      --radius: 10px;
+      --ease: cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 50% 0%, #2a2622 0%, var(--bg) 55%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    header {
+      max-width: 720px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.15rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 720px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 24px 50px var(--glow);
+      overflow: hidden;
+    }
+
+    .caption {
+      padding: 1rem 1.25rem 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      min-height: 2.6rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.45s var(--ease), opacity 0.45s var(--ease);
+    }
+
+    .caption strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .editor-wrap {
+      position: relative;
+      padding: 1rem 0 0;
+      background: linear-gradient(180deg, #1f1c1a 0%, #1a1816 100%);
+    }
+
+    .gutter {
+      position: absolute;
+      left: 0;
+      top: 1rem;
+      bottom: 3.5rem;
+      width: 2.5rem;
+      text-align: right;
+      padding-right: 0.65rem;
+      font-size: 0.72rem;
+      color: #5c544c;
+      user-select: none;
+      line-height: 1.65;
+    }
+
+    .buffer {
+      margin-left: 2.5rem;
+      margin-right: 1rem;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      white-space: pre;
+      padding-bottom: 1rem;
+      min-height: 8.5rem;
+    }
+
+    .line {
+      display: block;
+      min-height: 1.65em;
+    }
+
+    .ch,
+    .cursor-cell {
+      display: inline;
+      white-space: pre;
+    }
+
+    .cursor-cell {
+      position: relative;
+      background: color-mix(in srgb, var(--cursor) 28%, transparent);
+      border-bottom: 2px solid var(--cursor);
+      transition:
+        background 0.22s var(--ease),
+        border-color 0.22s var(--ease),
+        transform 0.22s var(--ease);
+    }
+
+    body.insert-mode .cursor-cell {
+      background: color-mix(in srgb, var(--insert-hi) 28%, transparent);
+      border-color: var(--insert-hi);
+    }
+
+    .cmd-row {
+      padding: 0.5rem 1rem 0.75rem 2.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      min-height: 2.25rem;
+      border-top: 1px solid var(--border);
+      background: #171513;
+    }
+
+    .cmd-row .prefix {
+      color: #6d9f7c;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      background: var(--status-bg);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .status .mode {
+      color: var(--accent);
+    }
+
+    .status .pos {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      padding: 0.65rem 1rem 1rem;
+      min-height: 2.75rem;
+    }
+
+    .chord {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #2c2824;
+      color: var(--text);
+      font-size: 0.8rem;
+      opacity: 0;
+      transform: scale(0.92);
+      animation: chord-in 0.5s var(--ease) forwards;
+    }
+
+    @keyframes chord-in {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .chord {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      .cursor-cell {
+        transition: none;
+      }
+
+      .caption {
+        transition: none;
+      }
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      padding: 0.85rem 1rem 1rem;
+      border-top: 1px solid var(--border);
+      background: #201d1a;
+    }
+
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    button {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #2f2b26;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    button:hover {
+      border-color: #5a524a;
+      background: #3a342e;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    input[type="range"] {
+      width: 120px;
+      accent-color: var(--accent);
+    }
+
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vim simulate</h1>
+    <p>A slow, quiet walkthrough — like catching someone’s calm practice session.</p>
+  </header>
+
+  <main class="shell" aria-label="Simulated editor">
+    <div id="caption" class="caption" aria-live="polite"></div>
+    <div class="editor-wrap">
+      <div id="gutter" class="gutter" aria-hidden="true"></div>
+      <div id="buffer" class="buffer" aria-hidden="false"></div>
+    </div>
+    <div id="cmd" class="cmd-row" aria-live="polite"></div>
+    <div class="status">
+      <span id="modeLabel" class="mode">NORMAL</span>
+      <span id="fileLabel">scratch.txt</span>
+      <span id="posLabel" class="pos">Ln 1, Col 1</span>
+    </div>
+    <div id="chords" class="chords" aria-live="polite"></div>
+    <div class="controls">
+      <button type="button" id="btnPlay" aria-pressed="false">Play</button>
+      <button type="button" id="btnPause">Pause</button>
+      <button type="button" id="btnRestart">Restart</button>
+      <button type="button" id="btnPrevScene">Prev scene</button>
+      <button type="button" id="btnNextScene">Next scene</button>
+      <label>
+        <span class="sr">Playback speed</span>
+        <span aria-hidden="true">Speed</span>
+        <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1" />
+        <span id="speedLabel" aria-hidden="true">1×</span>
+      </label>
+      <label>
+        <input type="checkbox" id="sound" />
+        <span>Soft keys (quiet)</span>
+      </label>
+    </div>
+  </main>
+
+  <script>
+(function () {
+  "use strict";
+
+  const INITIAL_LINES = ["# Quiet notes", "learning vim", "  one key at a time"];
+
+  /** @typedef {'normal' | 'insert' | 'cmdline'} EditorMode */
+
+  const state = {
+    lines: INITIAL_LINES.slice(),
+    row: 0,
+    col: 0,
+    /** @type {EditorMode} */
+    mode: "normal",
+    cmd: "",
+    pending: null,
+    echo: "",
+    undoStack: [],
+    bodyInsertMode: false,
+  };
+
+  const captionEl = document.getElementById("caption");
+  const bufferEl = document.getElementById("buffer");
+  const gutterEl = document.getElementById("gutter");
+  const cmdEl = document.getElementById("cmd");
+  const modeLabel = document.getElementById("modeLabel");
+  const posLabel = document.getElementById("posLabel");
+  const chordsEl = document.getElementById("chords");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnPause = document.getElementById("btnPause");
+  const btnRestart = document.getElementById("btnRestart");
+  const btnPrev = document.getElementById("btnPrevScene");
+  const btnNext = document.getElementById("btnNextScene");
+  const speedInput = document.getElementById("speed");
+  const speedLabel = document.getElementById("speedLabel");
+  const soundToggle = document.getElementById("sound");
+
+  let audioCtx = null;
+  function reducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function playClick() {
+    if (!soundToggle.checked || reducedMotion()) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.exponentialRampToValueAtTime(220, t + 0.04);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.035, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.07);
+    } catch (_e) {
+      /* ignore */
+    }
+  }
+
+  function snapshot() {
+    state.undoStack.push({
+      lines: state.lines.slice(),
+      row: state.row,
+      col: state.col,
+      mode: state.mode,
+      cmd: state.cmd,
+      pending: state.pending,
+    });
+    if (state.undoStack.length > 80) state.undoStack.shift();
+  }
+
+  function undoOnce() {
+    const s = state.undoStack.pop();
+    if (!s) return;
+    state.lines = s.lines;
+    state.row = s.row;
+    state.col = s.col;
+    state.mode = s.mode;
+    state.cmd = s.cmd;
+    state.pending = s.pending;
+  }
+
+  function clampCol() {
+    const line = state.lines[state.row] || "";
+    if (state.col > line.length) state.col = line.length;
+    if (state.col < 0) state.col = 0;
+  }
+
+  function lineLen(r) {
+    return (state.lines[r] || "").length;
+  }
+
+  function firstNonBlankCol(line) {
+    const m = /^(\s*)/.exec(line);
+    const i = m ? m[1].length : 0;
+    return i >= line.length ? 0 : i;
+  }
+
+  function saveMutate(fn) {
+    snapshot();
+    fn();
+    clampCol();
+  }
+
+  /** word boundary: alnum + underscore */
+  function isWordChar(ch) {
+    return ch && /[\w]/.test(ch);
+  }
+
+  function nextWordStart(line, col) {
+    let i = col;
+    if (i < line.length && isWordChar(line[i])) {
+      while (i < line.length && isWordChar(line[i])) i++;
+      while (i < line.length && !isWordChar(line[i])) i++;
+      return Math.min(i, line.length);
+    }
+    while (i < line.length && !isWordChar(line[i])) i++;
+    while (i < line.length && isWordChar(line[i])) i++;
+    return Math.min(i, line.length);
+  }
+
+  function prevWordStart(line, col) {
+    let i = col;
+    if (i > 0) i--;
+    while (i > 0 && !isWordChar(line[i])) i--;
+    while (i > 0 && isWordChar(line[i - 1])) i--;
+    return Math.max(0, i);
+  }
+
+  function deleteWordForward() {
+    const line = state.lines[state.row];
+    let i = state.col;
+    if (i >= line.length) return;
+    if (!isWordChar(line[i])) {
+      while (i < line.length && !isWordChar(line[i])) i++;
+    } else {
+      while (i < line.length && isWordChar(line[i])) i++;
+    }
+    const before = line.slice(0, state.col);
+    const after = line.slice(i);
+    state.lines[state.row] = before + after;
+  }
+
+  function applyCmdLineEnter() {
+    if (state.cmd === ":w") {
+      state.echo = '"scratch.txt" written';
+    } else {
+      state.echo = state.cmd || "";
+    }
+    state.mode = "normal";
+    state.cmd = "";
+  }
+
+  function applyNormalKey(key) {
+    const line = state.lines[state.row];
+
+    if (state.pending === "d" && key === "w") {
+      state.pending = null;
+      saveMutate(deleteWordForward);
+      return;
+    }
+
+    if (key === "d") {
+      state.pending = "d";
+      return;
+    }
+
+    state.pending = null;
+
+    if (key === "i") {
+      state.mode = "insert";
+      return;
+    }
+    if (key === "h" && state.col > 0) state.col--;
+    else if (key === "l" && state.col < line.length) state.col++;
+    else if (key === "j" && state.row < state.lines.length - 1) {
+      state.row++;
+      clampCol();
+    } else if (key === "k" && state.row > 0) {
+      state.row--;
+      clampCol();
+    } else if (key === "0") {
+      state.col = 0;
+    } else if (key === "$") {
+      state.col = line.length > 0 ? line.length - 1 : 0;
+    } else if (key === "^") {
+      state.col = firstNonBlankCol(line);
+    } else if (key === "w") {
+      const nw = nextWordStart(line, state.col);
+      state.col = nw;
+    } else if (key === "b") {
+      state.col = prevWordStart(line, state.col);
+    } else if (key === "x" && line.length > 0 && state.col < line.length) {
+      saveMutate(() => {
+        state.lines[state.row] = line.slice(0, state.col) + line.slice(state.col + 1);
+      });
+    } else if (key === "u") {
+      undoOnce();
+    } else if (key === ":") {
+      state.mode = "cmdline";
+      state.cmd = ":";
+    }
+  }
+
+  function applyInsertKey(key) {
+    if (key === "Escape") {
+      state.mode = "normal";
+      return;
+    }
+    if (key === "Backspace") {
+      saveMutate(() => {
+        const ln = state.lines[state.row];
+        if (state.col > 0) {
+          state.lines[state.row] = ln.slice(0, state.col - 1) + ln.slice(state.col);
+          state.col--;
+        }
+      });
+      return;
+    }
+    if (key.length === 1) {
+      saveMutate(() => {
+        const ln = state.lines[state.row];
+        state.lines[state.row] = ln.slice(0, state.col) + key + ln.slice(state.col);
+        state.col++;
+      });
+    }
+  }
+
+  function applyCmdlineKey(key) {
+    if (key === "Enter") {
+      applyCmdLineEnter();
+      return;
+    }
+    if (key === "Escape") {
+      state.mode = "normal";
+      state.cmd = "";
+      state.echo = "";
+      return;
+    }
+    if (key === "Backspace") {
+      if (state.cmd.length > 1) state.cmd = state.cmd.slice(0, -1);
+      else {
+        state.mode = "normal";
+        state.cmd = "";
+      }
+      return;
+    }
+    if (key.length === 1 && key !== ":") {
+      state.cmd += key;
+    }
+  }
+
+  function applyKeyEvent(key) {
+    if (state.mode === "normal") applyNormalKey(key);
+    else if (state.mode === "insert") applyInsertKey(key);
+    else if (state.mode === "cmdline") applyCmdlineKey(key);
+    clampCol();
+  }
+
+  function syncModeClass() {
+    document.body.classList.toggle("insert-mode", state.mode === "insert");
+  }
+
+  function render() {
+    gutterEl.textContent = state.lines.map((_, i) => String(i + 1)).join("\n");
+
+    bufferEl.innerHTML = "";
+    state.lines.forEach((lineText, r) => {
+      const row = document.createElement("span");
+      row.className = "line";
+      if (r === state.row) {
+        const left = lineText.slice(0, state.col);
+        const at = state.mode === "normal" && state.col >= lineText.length ? " " : lineText[state.col] || " ";
+        const right =
+          state.mode === "normal" && state.col < lineText.length ? lineText.slice(state.col + 1) : lineText.slice(state.col + 1);
+
+        const a = document.createElement("span");
+        a.className = "ch";
+        a.textContent = left;
+
+        const c = document.createElement("span");
+        c.className = "cursor-cell";
+        c.textContent = at;
+
+        const b = document.createElement("span");
+        b.className = "ch";
+        b.textContent = right;
+
+        row.appendChild(a);
+        row.appendChild(c);
+        row.appendChild(b);
+      } else {
+        const t = document.createElement("span");
+        t.className = "ch";
+        t.textContent = lineText;
+        row.appendChild(t);
+      }
+      bufferEl.appendChild(row);
+    });
+
+    if (state.mode === "cmdline") {
+      cmdEl.innerHTML = `<span class="prefix"></span><span>${escapeHtml(state.cmd)}▌</span>`;
+    } else if (state.echo) {
+      cmdEl.innerHTML = `<span class="prefix"></span>${escapeHtml(state.echo)}`;
+    } else {
+      cmdEl.textContent = "";
+    }
+
+    const modeText =
+      state.mode === "normal" ? "NORMAL" : state.mode === "insert" ? "INSERT" : "COMMAND";
+    modeLabel.textContent = modeText;
+    posLabel.textContent = `Ln ${state.row + 1}, Col ${state.col + 1}`;
+    syncModeClass();
+  }
+
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function resetEditor() {
+    state.lines = INITIAL_LINES.slice();
+    state.row = 0;
+    state.col = 0;
+    state.mode = "normal";
+    state.cmd = "";
+    state.pending = null;
+    state.echo = "";
+    state.undoStack = [];
+    render();
+  }
+
+  /**
+   * Script steps: delay ms after previous, optional startScene for skips.
+   * type: 'pause' | 'key' | 'combo' (combo = single logical action with displayChord)
+   */
+  const SCRIPT = [
+    { startScene: "intro", delay: 1600, caption: "You’re watching a tiny editor buffer — <strong>normal mode</strong> first.", type: "pause" },
+    { delay: 700, caption: "Move on one axis at a time: <strong>l</strong> goes right.", type: "key", key: "l", show: "l" },
+    { delay: 650, type: "key", key: "j", show: "j" },
+    { delay: 550, type: "key", key: "j", show: "j" },
+    { delay: 600, type: "key", key: "k", show: "k" },
+    { delay: 600, type: "key", key: "h", show: "h" },
+
+    { startScene: "insert", delay: 1200, caption: "<strong>i</strong> enters insert mode before the cursor. A short word, then <strong>Esc</strong>.", type: "pause" },
+    { delay: 550, type: "key", key: "i", show: "i" },
+    { delay: 420, type: "key", key: "!", show: "!", caption: "Typing one character — calm and small." },
+    { delay: 450, type: "key", key: "Escape", show: "Esc" },
+
+    { startScene: "words", delay: 1100, caption: "Word motion: <strong>w</strong> forward, <strong>b</strong> back.", type: "pause" },
+    { delay: 500, type: "key", key: "w", show: "w" },
+    { delay: 450, type: "key", key: "w", show: "w" },
+    { delay: 500, type: "key", key: "b", show: "b" },
+
+    { startScene: "line", delay: 1100, caption: "Line edges: <strong>0</strong> start, <strong>$</strong> last char, <strong>^</strong> first non-blank.", type: "pause" },
+    { delay: 450, type: "key", key: "j", show: "j" },
+    { delay: 500, type: "key", key: "0", show: "0" },
+    { delay: 500, type: "key", key: "$", show: "$" },
+    { delay: 500, type: "key", key: "^", show: "^" },
+
+    { startScene: "delete", delay: 1100, caption: "<strong>x</strong> deletes the character under the cursor — gently.", type: "pause" },
+    { delay: 500, type: "key", key: "h", show: "h" },
+    { delay: 500, type: "key", key: "h", show: "h" },
+    { delay: 550, type: "key", key: "x", show: "x" },
+
+    { startScene: "undo", delay: 1000, caption: "<strong>u</strong> steps back one change — like a soft breath.", type: "pause" },
+    { delay: 600, type: "key", key: "u", show: "u" },
+
+    { startScene: "dw", delay: 1000, caption: "Operator then motion: <strong>d</strong> then <strong>w</strong> deletes a word.", type: "pause" },
+    { delay: 500, type: "key", key: "w", show: "w" },
+    { delay: 350, type: "key", key: "d", show: "d" },
+    { delay: 320, type: "key", key: "w", show: "w" },
+
+    { startScene: "save", delay: 1200, caption: "Pretend save: <strong>:w</strong> then Enter — nothing hits your disk.", type: "pause" },
+    { delay: 450, type: "key", key: ":", show: ":" },
+    { delay: 350, type: "key", key: "w", show: "w" },
+    { delay: 400, type: "key", key: "Enter", show: "⏎" },
+
+    { startScene: "outro", delay: 2200, caption: "End of the quiet run. Restart anytime, slow the speed, or skip scenes.", type: "pause" },
+  ];
+
+  let stepIndex = 0;
+  let playing = false;
+  let timerId = null;
+
+  const sceneStarts = [];
+  SCRIPT.forEach((step, i) => {
+    if (step.startScene) sceneStarts.push(i);
+  });
+
+  function scaledDelay(ms) {
+    const spd = parseFloat(speedInput.value, 10) || 1;
+    return Math.round(ms / spd);
+  }
+
+  function showCaption(text) {
+    captionEl.innerHTML = text || "";
+  }
+
+  function pushChord(label) {
+    const el = document.createElement("span");
+    el.className = "chord";
+    el.textContent = label;
+    chordsEl.appendChild(el);
+    while (chordsEl.children.length > 6) {
+      chordsEl.removeChild(chordsEl.firstChild);
+    }
+  }
+
+  function clearChords() {
+    chordsEl.innerHTML = "";
+  }
+
+  function runStep(step) {
+    if (step.caption) showCaption(step.caption);
+    if (step.type === "pause") {
+      render();
+      return;
+    }
+    if (step.type === "key") {
+      pushChord(step.show || step.key);
+      playClick();
+      applyKeyEvent(step.key);
+      render();
+      return;
+    }
+  }
+
+  function scheduleNext() {
+    if (!playing || stepIndex >= SCRIPT.length) {
+      if (stepIndex >= SCRIPT.length) {
+        playing = false;
+        btnPlay.setAttribute("aria-pressed", "false");
+        btnPlay.textContent = "Play";
+      }
+      return;
+    }
+
+    const step = SCRIPT[stepIndex];
+    timerId = window.setTimeout(() => {
+      runStep(step);
+      stepIndex++;
+      if (playing) scheduleNext();
+    }, scaledDelay(step.delay));
+  }
+
+  function startFrom(index) {
+    if (timerId) clearTimeout(timerId);
+    timerId = null;
+    stepIndex = Math.max(0, Math.min(index, SCRIPT.length));
+    playing = true;
+    btnPlay.setAttribute("aria-pressed", "true");
+    btnPlay.textContent = "Playing";
+    scheduleNext();
+  }
+
+  function pause() {
+    playing = false;
+    if (timerId) clearTimeout(timerId);
+    timerId = null;
+    btnPlay.setAttribute("aria-pressed", "false");
+    btnPlay.textContent = "Play";
+  }
+
+  function restart() {
+    pause();
+    resetEditor();
+    clearChords();
+    showCaption("Press <strong>Play</strong> for a slow walkthrough — or step between scenes.");
+    stepIndex = 0;
+  }
+
+  function findSceneIndex(direction) {
+    const cur = stepIndex;
+    if (direction > 0) {
+      for (const s of sceneStarts) {
+        if (s > cur) return s;
+      }
+      return SCRIPT.length;
+    }
+    let prev = 0;
+    for (const s of sceneStarts) {
+      if (s >= cur) break;
+      prev = s;
+    }
+    return prev;
+  }
+
+  function jumpScene(direction) {
+    const wasPlaying = playing;
+    pause();
+    const target = findSceneIndex(direction);
+    resetEditor();
+    clearChords();
+    showCaption("");
+    for (let i = 0; i < target; i++) {
+      const step = SCRIPT[i];
+      if (step.type === "key") applyKeyEvent(step.key);
+    }
+    stepIndex = target;
+    render();
+    if (wasPlaying) startFrom(target);
+  }
+
+  btnPlay.addEventListener("click", () => {
+    if (playing) return;
+    if (stepIndex >= SCRIPT.length) {
+      restart();
+    }
+    startFrom(stepIndex);
+  });
+
+  btnPause.addEventListener("click", pause);
+
+  btnRestart.addEventListener("click", () => {
+    restart();
+  });
+
+  btnNext.addEventListener("click", () => jumpScene(1));
+  btnPrev.addEventListener("click", () => jumpScene(-1));
+
+  speedInput.addEventListener("input", () => {
+    const v = parseFloat(speedInput.value, 10);
+    speedLabel.textContent = `${v.toFixed(1)}×`;
+  });
+
+  speedLabel.textContent = `${parseFloat(speedInput.value, 10).toFixed(1)}×`;
+
+  resetEditor();
+  showCaption("Press <strong>Play</strong> for a slow walkthrough — or step between scenes.");
+})();
+  </script>
+</body>
+</html>
