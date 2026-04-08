@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Chat - Client A</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1220;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.1);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --border: rgba(255, 255, 255, 0.12);
+        --accent: #7c5cff;
+        --danger: #ff5c7a;
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+          monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+          "Segoe UI Emoji";
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f5f7ff;
+          --panel: rgba(0, 0, 0, 0.04);
+          --panel2: rgba(0, 0, 0, 0.06);
+          --text: rgba(0, 0, 0, 0.86);
+          --muted: rgba(0, 0, 0, 0.62);
+          --border: rgba(0, 0, 0, 0.12);
+          --shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        background: radial-gradient(1200px 800px at 15% 10%, rgba(124, 92, 255, 0.35), transparent 60%),
+          radial-gradient(900px 700px at 80% 35%, rgba(56, 189, 248, 0.22), transparent 55%),
+          radial-gradient(900px 700px at 35% 90%, rgba(34, 197, 94, 0.12), transparent 55%), var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 28px 16px;
+      }
+
+      .app {
+        width: min(980px, 100%);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      header {
+        padding: 18px 18px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+      }
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      h1 {
+        font-size: 15px;
+        letter-spacing: 0.2px;
+        margin: 0;
+        font-weight: 650;
+      }
+
+      .sub {
+        font-size: 12px;
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--danger);
+        box-shadow: 0 0 0 4px rgba(255, 92, 122, 0.15);
+      }
+
+      .dot.ok {
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        min-height: 560px;
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        padding: 16px;
+        border-right: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      @media (max-width: 860px) {
+        .panel {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+      }
+
+      .panel h2 {
+        font-size: 12px;
+        font-family: var(--mono);
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      input,
+      textarea {
+        font: inherit;
+        color: var(--text);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        outline: none;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: rgba(124, 92, 255, 0.55);
+        box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.18);
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .row > * {
+        flex: 1;
+      }
+
+      button {
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(124, 92, 255, 0.95), rgba(124, 92, 255, 0.78));
+        color: white;
+        border-radius: 12px;
+        padding: 10px 12px;
+        cursor: pointer;
+        font-weight: 650;
+      }
+
+      button.secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+      }
+
+      button.danger {
+        background: rgba(255, 92, 122, 0.16);
+        color: var(--text);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .help {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .help code {
+        font-family: var(--mono);
+        padding: 2px 6px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .chat {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        min-height: 560px;
+      }
+
+      .log {
+        padding: 16px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .bubble {
+        align-self: flex-start;
+        max-width: min(680px, 100%);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 10px 12px;
+        display: grid;
+        gap: 4px;
+      }
+
+      .bubble.me {
+        align-self: flex-end;
+        border-color: rgba(124, 92, 255, 0.38);
+        background: rgba(124, 92, 255, 0.14);
+      }
+
+      .meta {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .meta .who {
+        font-family: var(--mono);
+        color: var(--text);
+        opacity: 0.9;
+      }
+
+      .meta .ts {
+        font-family: var(--mono);
+        opacity: 0.75;
+      }
+
+      .text {
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.35;
+        font-size: 14px;
+      }
+
+      .composer {
+        border-top: 1px solid var(--border);
+        padding: 12px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: end;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .composer textarea {
+        min-height: 44px;
+        max-height: 140px;
+        resize: vertical;
+      }
+
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="title">
+          <h1>WebSocket Chat</h1>
+          <div class="sub">Client A</div>
+        </div>
+        <div class="status" title="Connection status">
+          <span id="dot" class="dot"></span>
+          <span id="statusText">disconnected</span>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Connection</h2>
+
+          <div class="field">
+            <label for="wsUrl">WebSocket URL</label>
+            <input id="wsUrl" spellcheck="false" inputmode="url" placeholder="ws://localhost:8080/ws" />
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="room">Room (optional)</label>
+              <input id="room" spellcheck="false" placeholder="lobby" />
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="connectBtn">Connect</button>
+            <button id="disconnectBtn" class="secondary" disabled>Disconnect</button>
+          </div>
+
+          <div class="row" style="margin-top: 10px">
+            <button id="pingBtn" class="secondary" disabled>Ping</button>
+            <button id="clearBtn" class="danger">Clear log</button>
+          </div>
+
+          <div class="help">
+            Works with any WS server that <b>broadcasts</b> received messages to all clients.
+            Message format sent:
+            <div class="small" style="margin-top: 8px">
+              <code>{"type":"chat","room":"lobby","name":"A","text":"..."}</code>
+            </div>
+          </div>
+        </section>
+
+        <section class="chat">
+          <div id="log" class="log" aria-live="polite"></div>
+
+          <form id="form" class="composer">
+            <textarea id="msg" placeholder="Type a message… (Enter to send, Shift+Enter for newline)"></textarea>
+            <button id="sendBtn" type="submit" disabled>Send</button>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const els = {
+        wsUrl: document.getElementById("wsUrl"),
+        name: document.getElementById("name"),
+        room: document.getElementById("room"),
+        connectBtn: document.getElementById("connectBtn"),
+        disconnectBtn: document.getElementById("disconnectBtn"),
+        pingBtn: document.getElementById("pingBtn"),
+        clearBtn: document.getElementById("clearBtn"),
+        dot: document.getElementById("dot"),
+        statusText: document.getElementById("statusText"),
+        log: document.getElementById("log"),
+        form: document.getElementById("form"),
+        msg: document.getElementById("msg"),
+        sendBtn: document.getElementById("sendBtn"),
+      };
+
+      const defaults = {
+        wsUrl: "ws://localhost:8080/ws",
+        name: "A",
+        room: "lobby",
+      };
+
+      const storageKeys = {
+        wsUrl: "ws-chat.wsUrl",
+        room: "ws-chat.room",
+      };
+
+      let ws = null;
+
+      function nowTs() {
+        return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      }
+
+      function setStatus(kind, text) {
+        els.statusText.textContent = text;
+        els.dot.classList.toggle("ok", kind === "ok");
+      }
+
+      function setControls(connected) {
+        els.connectBtn.disabled = connected;
+        els.disconnectBtn.disabled = !connected;
+        els.pingBtn.disabled = !connected;
+        els.sendBtn.disabled = !connected;
+      }
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function addBubble({ name, text, ts, me = false }) {
+        const wrap = document.createElement("div");
+        wrap.className = `bubble${me ? " me" : ""}`;
+        wrap.innerHTML = `
+          <div class="meta">
+            <span class="who">${escapeHtml(name || "unknown")}</span>
+            <span class="ts">${escapeHtml(ts || nowTs())}</span>
+          </div>
+          <div class="text">${escapeHtml(text || "")}</div>
+        `;
+        els.log.appendChild(wrap);
+        els.log.scrollTop = els.log.scrollHeight;
+      }
+
+      function addSystem(text) {
+        addBubble({ name: "system", text, ts: nowTs(), me: false });
+      }
+
+      function buildMessage(type, payload = {}) {
+        const room = (els.room.value || "").trim();
+        const name = (els.name.value || "").trim();
+        return {
+          type,
+          room: room || undefined,
+          name: name || undefined,
+          ...payload,
+        };
+      }
+
+      function connect() {
+        const url = (els.wsUrl.value || "").trim();
+        if (!url) return;
+
+        try {
+          ws = new WebSocket(url);
+        } catch (e) {
+          addSystem(`Failed to create WebSocket: ${e?.message || String(e)}`);
+          return;
+        }
+
+        setStatus("bad", "connecting…");
+
+        ws.addEventListener("open", () => {
+          setStatus("ok", "connected");
+          setControls(true);
+          addSystem("Connected.");
+          ws.send(JSON.stringify(buildMessage("join", { ts: Date.now() })));
+        });
+
+        ws.addEventListener("message", (ev) => {
+          const raw = typeof ev.data === "string" ? ev.data : "";
+          let data = null;
+          try {
+            data = raw ? JSON.parse(raw) : null;
+          } catch {
+            data = null;
+          }
+
+          if (data && typeof data === "object") {
+            if (data.type === "chat") {
+              const me = (data.name || "").trim() && (data.name || "").trim() === (els.name.value || "").trim();
+              addBubble({
+                name: data.name || "peer",
+                text: data.text || "",
+                ts: data.ts ? new Date(data.ts).toLocaleTimeString() : nowTs(),
+                me,
+              });
+              return;
+            }
+
+            if (data.type === "system") {
+              addSystem(data.text || "");
+              return;
+            }
+
+            addSystem(`Received: ${raw}`);
+            return;
+          }
+
+          addSystem(`Received (raw): ${raw}`);
+        });
+
+        ws.addEventListener("close", (ev) => {
+          const reason = ev.reason ? ` (${ev.reason})` : "";
+          addSystem(`Disconnected. code=${ev.code}${reason}`);
+          setStatus("bad", "disconnected");
+          setControls(false);
+          ws = null;
+        });
+
+        ws.addEventListener("error", () => {
+          addSystem("WebSocket error (check server + URL).");
+        });
+      }
+
+      function disconnect() {
+        if (!ws) return;
+        ws.close(1000, "client disconnect");
+      }
+
+      function sendChat(text) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+        const trimmed = (text || "").trimEnd();
+        if (!trimmed) return;
+        const msg = buildMessage("chat", { text: trimmed, ts: Date.now() });
+        ws.send(JSON.stringify(msg));
+        els.msg.value = "";
+      }
+
+      function ping() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify(buildMessage("ping", { ts: Date.now() })));
+        addSystem("Ping sent.");
+      }
+
+      function loadPrefs() {
+        els.wsUrl.value = localStorage.getItem(storageKeys.wsUrl) || defaults.wsUrl;
+        els.name.value = defaults.name;
+        els.room.value = localStorage.getItem(storageKeys.room) || defaults.room;
+      }
+
+      function savePrefs() {
+        localStorage.setItem(storageKeys.wsUrl, (els.wsUrl.value || "").trim() || defaults.wsUrl);
+        localStorage.setItem(storageKeys.room, (els.room.value || "").trim() || defaults.room);
+      }
+
+      // Wire up
+      loadPrefs();
+      setStatus("bad", "disconnected");
+      setControls(false);
+
+      els.connectBtn.addEventListener("click", () => {
+        savePrefs();
+        connect();
+      });
+      els.disconnectBtn.addEventListener("click", disconnect);
+      els.pingBtn.addEventListener("click", ping);
+      els.clearBtn.addEventListener("click", () => {
+        els.log.innerHTML = "";
+      });
+
+      els.form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendChat(els.msg.value);
+      });
+
+      els.msg.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendChat(els.msg.value);
+        }
+      });
+    </script>
+  </body>
+</html>
