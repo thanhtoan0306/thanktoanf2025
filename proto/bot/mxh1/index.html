@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MXH1 — Posts (Firebase)</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f0f2f5;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --primary: #1877f2;
+        --shadow: 0 8px 30px rgba(2, 8, 23, 0.08);
+        --radius: 14px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 24px auto;
+        padding: 0 16px 48px;
+      }
+
+      header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+
+      .brand p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .badgeRow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .pill {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid var(--border);
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--muted);
+        box-shadow: 0 2px 10px rgba(2, 8, 23, 0.05);
+      }
+
+      .pill b {
+        color: var(--text);
+        font-weight: 650;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .cardHeader {
+        padding: 14px 14px 10px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .cardHeader h2 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.2px;
+      }
+
+      .cardBody {
+        padding: 14px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .rowWrap {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      textarea,
+      input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        outline: none;
+        background: #fff;
+        color: var(--text);
+      }
+
+      textarea::placeholder,
+      input::placeholder {
+        color: #94a3b8;
+      }
+
+      textarea:focus,
+      input:focus {
+        border-color: rgba(24, 119, 242, 0.45);
+        box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.12);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 92px;
+        max-height: 260px;
+      }
+
+      button {
+        border: 0;
+        background: var(--primary);
+        color: white;
+        font-weight: 650;
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .ghost {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .subtle {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+
+      .error {
+        color: #b91c1c;
+        font-size: 12px;
+        margin-top: 8px;
+      }
+
+      .feed {
+        display: grid;
+        gap: 12px;
+      }
+
+      .post {
+        border-top: 1px solid var(--border);
+        padding: 14px;
+      }
+
+      .post:first-child {
+        border-top: 0;
+      }
+
+      .postTop {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .postMeta {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .name {
+        font-weight: 750;
+        font-size: 13px;
+      }
+
+      .time {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .content {
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 10px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .smallBtn {
+        padding: 8px 10px;
+        font-weight: 650;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+
+      .hr {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 0;
+      }
+
+      .footerNote {
+        margin-top: 14px;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+
+      .dividerText {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .dividerText::before,
+      .dividerText::after {
+        content: "";
+        height: 1px;
+        background: var(--border);
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="brand">
+          <h1>MXH1 — Quick Firebase Feed</h1>
+          <p>
+            Single-file HTML demo: add posts with Firestore realtime updates. Uses anonymous sign-in.
+          </p>
+        </div>
+        <div class="badgeRow">
+          <div class="pill">Auth: <b id="authStatus">…</b></div>
+          <button class="ghost smallBtn" id="copyUidBtn" title="Copy full UID">Copy UID</button>
+          <div class="pill">User: <b id="userId">…</b></div>
+          <button class="ghost smallBtn" id="signOutBtn" title="Anonymous sign-out">Sign out</button>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="card">
+          <div class="cardHeader">
+            <h2>Sign in</h2>
+            <div class="subtle" id="readyState">Initializing…</div>
+          </div>
+          <div class="cardBody">
+            <div class="rowWrap">
+              <input id="email" placeholder="Email" autocomplete="email" />
+              <input id="password" placeholder="Password" type="password" autocomplete="current-password" />
+            </div>
+            <div style="height: 10px"></div>
+            <div class="row" style="justify-content: space-between; align-items: center">
+              <div class="subtle">Enable Email/Password provider in Firebase Auth.</div>
+              <div class="actions">
+                <button id="signInBtn" class="smallBtn">Sign in</button>
+                <button id="signUpBtn" class="ghost smallBtn">Sign up</button>
+              </div>
+            </div>
+            <div class="dividerText">Posts</div>
+            <div class="row">
+              <input id="displayName" placeholder="Your name (optional, e.g. Tony)" />
+              <button id="saveNameBtn" class="smallBtn" title="Saved locally">Save name</button>
+            </div>
+            <div style="height: 10px"></div>
+            <div class="row">
+              <textarea id="postText" placeholder="What’s on your mind?"></textarea>
+            </div>
+            <div style="height: 10px"></div>
+            <div class="row" style="justify-content: space-between; align-items: center">
+              <div class="subtle">Tip: open this page in 2 tabs to see realtime sync.</div>
+              <div class="actions">
+                <button id="addPostBtn">Post</button>
+              </div>
+            </div>
+            <div class="error" id="topError" style="display: none"></div>
+            <div class="footerNote">
+              Data model: `posts/{postId}` with fields `text`, `authorUid`, `authorName`, `createdAt`.
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="cardHeader">
+            <h2>Feed</h2>
+            <div class="subtle" id="feedInfo">Loading…</div>
+          </div>
+          <div class="feed" id="feed"></div>
+        </section>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      import { getAnalytics, isSupported as analyticsSupported } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        doc,
+        deleteDoc,
+        serverTimestamp,
+        query,
+        orderBy,
+        limit,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+      // Firebase config (from your snippet)
+      const firebaseConfig = {
+        apiKey: "AIzaSyB2-i4NLL611XEPpBXg_qq1ozRBT-ADs7I",
+        authDomain: "thanktoanf2025.firebaseapp.com",
+        projectId: "thanktoanf2025",
+        storageBucket: "thanktoanf2025.firebasestorage.app",
+        messagingSenderId: "375043502497",
+        appId: "1:375043502497:web:6fe759962e549f14691be0",
+        measurementId: "G-YRZYPM9R47",
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      const authStatusEl = $("authStatus");
+      const userIdEl = $("userId");
+      const readyStateEl = $("readyState");
+      const topErrorEl = $("topError");
+      const feedInfoEl = $("feedInfo");
+      const feedEl = $("feed");
+
+      const displayNameEl = $("displayName");
+      const saveNameBtn = $("saveNameBtn");
+      const postTextEl = $("postText");
+      const addPostBtn = $("addPostBtn");
+      const signOutBtn = $("signOutBtn");
+      const copyUidBtn = $("copyUidBtn");
+      const emailEl = $("email");
+      const passwordEl = $("password");
+      const signInBtn = $("signInBtn");
+      const signUpBtn = $("signUpBtn");
+
+      const MAX_POSTS = 30;
+
+      const escapeHtml = (s) =>
+        String(s)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+
+      const formatTime = (ts) => {
+        if (!ts) return "just now";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return new Intl.DateTimeFormat(undefined, {
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(d);
+      };
+
+      const showError = (message) => {
+        topErrorEl.textContent = message;
+        topErrorEl.style.display = message ? "block" : "none";
+      };
+
+      const formatFirebaseError = (e) => {
+        const code = e?.code ? String(e.code) : "";
+        const msg = e?.message ? String(e.message) : "Unknown error";
+        if (code === "auth/admin-restricted-operation") {
+          return (
+            "This sign-in method is disabled. Enable Email/Password in Firebase Console → Authentication → Sign-in method."
+          );
+        }
+        if (code === "auth/unauthorized-domain") {
+          return (
+            "Unauthorized domain. Add this domain in Firebase Console → Authentication → Settings → Authorized domains."
+          );
+        }
+        if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
+          return "Wrong email or password.";
+        }
+        if (code === "auth/user-not-found") {
+          return "No user found for that email. Click Sign up.";
+        }
+        if (code === "auth/email-already-in-use") {
+          return "Email already in use. Click Sign in.";
+        }
+        if (code === "auth/weak-password") {
+          return "Weak password. Use at least 6 characters.";
+        }
+        if (code === "auth/invalid-email") {
+          return "Invalid email.";
+        }
+        return code ? `${code}: ${msg}` : msg;
+      };
+
+      const getLocalName = () => localStorage.getItem("mxh1_displayName") || "";
+      const setLocalName = (v) => localStorage.setItem("mxh1_displayName", v);
+
+      displayNameEl.value = getLocalName();
+      saveNameBtn.addEventListener("click", () => {
+        setLocalName(displayNameEl.value.trim().slice(0, 40));
+        displayNameEl.value = getLocalName();
+      });
+
+      const app = initializeApp(firebaseConfig);
+      if (await analyticsSupported().catch(() => false)) {
+        try {
+          getAnalytics(app);
+        } catch {
+          // ignore analytics errors in local dev
+        }
+      }
+
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const postsCol = collection(db, "posts");
+      const postsQ = query(postsCol, orderBy("createdAt", "desc"), limit(MAX_POSTS));
+
+      let currentUser = null;
+
+      const setAuthUiState = (u) => {
+        const signedIn = !!u;
+        signInBtn.disabled = signedIn;
+        signUpBtn.disabled = signedIn;
+        emailEl.disabled = signedIn;
+        passwordEl.disabled = signedIn;
+        addPostBtn.disabled = !signedIn;
+      };
+
+      const doSignIn = async () => {
+        showError("");
+        readyStateEl.textContent = "Signing in…";
+        setAuthUiState(null);
+        signInBtn.disabled = true;
+        signUpBtn.disabled = true;
+        try {
+          const email = String(emailEl.value || "").trim();
+          const password = String(passwordEl.value || "");
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (e) {
+          showError(formatFirebaseError(e));
+          readyStateEl.textContent = "Auth error";
+          signInBtn.disabled = false;
+          signUpBtn.disabled = false;
+        }
+      };
+
+      const doSignUp = async () => {
+        showError("");
+        readyStateEl.textContent = "Creating account…";
+        setAuthUiState(null);
+        signInBtn.disabled = true;
+        signUpBtn.disabled = true;
+        try {
+          const email = String(emailEl.value || "").trim();
+          const password = String(passwordEl.value || "");
+          await createUserWithEmailAndPassword(auth, email, password);
+        } catch (e) {
+          showError(formatFirebaseError(e));
+          readyStateEl.textContent = "Auth error";
+          signInBtn.disabled = false;
+          signUpBtn.disabled = false;
+        }
+      };
+
+      signInBtn.addEventListener("click", doSignIn);
+      signUpBtn.addEventListener("click", doSignUp);
+
+      passwordEl.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter") doSignIn();
+      });
+
+      const renderFeed = (postsDocs) => {
+        feedEl.innerHTML = "";
+        feedInfoEl.textContent = `${postsDocs.length} post(s)`;
+
+        for (const p of postsDocs) {
+          const data = p.data();
+          const postId = p.id;
+
+          const postWrap = document.createElement("div");
+          postWrap.className = "post";
+          postWrap.dataset.postId = postId;
+
+          const canDelete = currentUser && data?.authorUid && currentUser.uid === data.authorUid;
+
+          postWrap.innerHTML = `
+            <div class="postTop">
+              <div class="postMeta">
+                <div class="name">${escapeHtml(data?.authorName || "Anonymous")}</div>
+                <div class="time">${escapeHtml(formatTime(data?.createdAt))}</div>
+              </div>
+              <div class="actions">
+                ${
+                  canDelete
+                    ? `<button class="ghost smallBtn" data-action="delete-post">Delete</button>`
+                    : ""
+                }
+              </div>
+            </div>
+            <p class="content">${escapeHtml(data?.text || "")}</p>
+          `;
+
+          postWrap.addEventListener("click", async (ev) => {
+            const btn = ev.target?.closest?.("button");
+            if (!btn) return;
+            if (btn.dataset.action !== "delete-post") return;
+
+            showError("");
+            if (!currentUser) return showError("Not signed in yet.");
+
+            btn.disabled = true;
+            try {
+              await deleteDoc(doc(db, "posts", postId));
+            } catch (e) {
+              showError(formatFirebaseError(e));
+              btn.disabled = false;
+            }
+          });
+
+          feedEl.appendChild(postWrap);
+        }
+      };
+
+      addPostBtn.addEventListener("click", async () => {
+        showError("");
+        if (!currentUser) return showError("Not signed in yet.");
+
+        const text = String(postTextEl.value || "").trim();
+        if (!text) return;
+
+        addPostBtn.disabled = true;
+        try {
+          const authorName = (getLocalName() || "").trim() || "Anonymous";
+          await addDoc(postsCol, {
+            text: text.slice(0, 5000),
+            authorUid: currentUser.uid,
+            authorName,
+            createdAt: serverTimestamp(),
+          });
+          postTextEl.value = "";
+        } catch (e) {
+          showError(formatFirebaseError(e));
+        } finally {
+          addPostBtn.disabled = false;
+        }
+      });
+
+      copyUidBtn.addEventListener("click", async () => {
+        showError("");
+        if (!currentUser?.uid) return showError("Not signed in yet.");
+        try {
+          await navigator.clipboard.writeText(currentUser.uid);
+          copyUidBtn.textContent = "Copied";
+          setTimeout(() => (copyUidBtn.textContent = "Copy UID"), 900);
+        } catch {
+          showError("Clipboard blocked by browser. You can copy UID from the Auth users table.");
+        }
+      });
+
+      signOutBtn.addEventListener("click", async () => {
+        showError("");
+        signOutBtn.disabled = true;
+        try {
+          await signOut(auth);
+        } catch (e) {
+          showError(formatFirebaseError(e));
+        } finally {
+          signOutBtn.disabled = false;
+        }
+      });
+
+      onAuthStateChanged(auth, async (u) => {
+        currentUser = u || null;
+        authStatusEl.textContent = u ? "signed in" : "signed out";
+        userIdEl.textContent = u ? `${u.uid.slice(0, 8)}…` : "—";
+        setAuthUiState(u);
+        readyStateEl.textContent = u ? "Ready" : "Signed out";
+        if (!u) showError("");
+      });
+
+      // Realtime feed
+      onSnapshot(
+        postsQ,
+        (snap) => {
+          renderFeed(snap.docs);
+        },
+        (err) => {
+          showError(formatFirebaseError(err));
+          readyStateEl.textContent = "Listener error";
+        }
+      );
+    </script>
+  </body>
+</html>
