@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSK 1 vocabulary</title>
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --card: #fff;
+      --text: #1a1a1a;
+      --muted: #5c5c5c;
+      --accent: #c45c26;
+      --accent-soft: rgba(196, 92, 38, 0.12);
+      --border: #e8e4dc;
+      --font-han: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+    header {
+      margin-bottom: 1.5rem;
+    }
+    header h1 {
+      margin: 0 0 0.35rem 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .toolbar label {
+      flex: 1;
+      min-width: 200px;
+    }
+    .toolbar input[type="search"] {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      background: var(--card);
+      font-family: inherit;
+    }
+    .toolbar input[type="search"]:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .count {
+      font-size: 0.875rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      padding: 0.85rem 1rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      border-color: rgba(196, 92, 38, 0.35);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .hanzi {
+      font-family: var(--font-han);
+      font-size: 1.45rem;
+      font-weight: 600;
+      margin: 0 0 0.2rem 0;
+      line-height: 1.3;
+    }
+    .pinyin {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .en {
+      margin: 0.35rem 0 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .hidden { display: none !important; }
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    a.back {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    a.back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/apps/">← Apps</a>
+    <header>
+      <h1>HSK 1 vocabulary</h1>
+      <p>Simplified Chinese · Pinyin · English (classic HSK 1 list). Search matches 汉字, pinyin, or English.</p>
+    </header>
+    <div class="toolbar">
+      <label>
+        <span class="visually-hidden">Search</span>
+        <input type="search" id="q" placeholder="Search 汉字, pinyin, or English…" autocomplete="off" spellcheck="false" />
+      </label>
+      <span class="count" id="meta"></span>
+    </div>
+    <div class="grid" id="grid" aria-live="polite"></div>
+    <footer>Single-file reference · HSK 汉语水平考试 level 1</footer>
+  </div>
+  <script>
+    const VOCAB = [{"hanzi":"爱","pinyin":"ài","en":"to love"},{"hanzi":"八","pinyin":"bā","en":"eight"},{"hanzi":"爸爸","pinyin":"bàba","en":"father"},{"hanzi":"杯子","pinyin":"bēizi","en":"cup; glass"},{"hanzi":"北京","pinyin":"Běijīng","en":"Beijing"},{"hanzi":"本","pinyin":"běn","en":"measure word (books)"},{"hanzi":"不客气","pinyin":"bú kèqi","en":"you're welcome"},{"hanzi":"不","pinyin":"bù","en":"not"},{"hanzi":"菜","pinyin":"cài","en":"dish; vegetable"},{"hanzi":"茶","pinyin":"chá","en":"tea"},{"hanzi":"吃","pinyin":"chī","en":"to eat"},{"hanzi":"出租车","pinyin":"chūzūchē","en":"taxi"},{"hanzi":"打电话","pinyin":"dǎ diànhuà","en":"to make a phone call"},{"hanzi":"大","pinyin":"dà","en":"big"},{"hanzi":"的","pinyin":"de","en":"possessive / modifying particle"},{"hanzi":"点","pinyin":"diǎn","en":"o'clock; a bit"},{"hanzi":"电脑","pinyin":"diànnǎo","en":"computer"},{"hanzi":"电视","pinyin":"diànshì","en":"television"},{"hanzi":"电影","pinyin":"diànyǐng","en":"movie"},{"hanzi":"东西","pinyin":"dōngxi","en":"thing; stuff"},{"hanzi":"都","pinyin":"dōu","en":"all; both"},{"hanzi":"读","pinyin":"dú","en":"to read"},{"hanzi":"对不起","pinyin":"duìbuqǐ","en":"sorry"},{"hanzi":"多","pinyin":"duō","en":"many; much"},{"hanzi":"多少","pinyin":"duōshao","en":"how much; how many"},{"hanzi":"儿子","pinyin":"érzi","en":"son"},{"hanzi":"二","pinyin":"èr","en":"two"},{"hanzi":"饭店","pinyin":"fàndiàn","en":"restaurant"},{"hanzi":"飞机","pinyin":"fēijī","en":"airplane"},{"hanzi":"分钟","pinyin":"fēnzhōng","en":"minute"},{"hanzi":"高兴","pinyin":"gāoxìng","en":"happy"},{"hanzi":"个","pinyin":"gè","en":"general measure word"},{"hanzi":"工作","pinyin":"gōngzuò","en":"work; to work"},{"hanzi":"狗","pinyin":"gǒu","en":"dog"},{"hanzi":"汉语","pinyin":"Hànyǔ","en":"Chinese (language)"},{"hanzi":"好","pinyin":"hǎo","en":"good"},{"hanzi":"号","pinyin":"hào","en":"number; day of month"},{"hanzi":"喝","pinyin":"hē","en":"to drink"},{"hanzi":"和","pinyin":"hé","en":"and"},{"hanzi":"很","pinyin":"hěn","en":"very"},{"hanzi":"后面","pinyin":"hòumiàn","en":"behind; back"},{"hanzi":"回","pinyin":"huí","en":"to return"},{"hanzi":"会","pinyin":"huì","en":"can; will; to know how"},{"hanzi":"几","pinyin":"jǐ","en":"how many; several"},{"hanzi":"家","pinyin":"jiā","en":"home; family"},{"hanzi":"叫","pinyin":"jiào","en":"to be called; to call"},{"hanzi":"今天","pinyin":"jīntiān","en":"today"},{"hanzi":"九","pinyin":"jiǔ","en":"nine"},{"hanzi":"开","pinyin":"kāi","en":"to open; to drive"},{"hanzi":"看","pinyin":"kàn","en":"to look; to watch"},{"hanzi":"看见","pinyin":"kànjiàn","en":"to see"},{"hanzi":"块","pinyin":"kuài","en":"piece; yuan (colloquial)"},{"hanzi":"来","pinyin":"lái","en":"to come"},{"hanzi":"老师","pinyin":"lǎoshī","en":"teacher"},{"hanzi":"冷","pinyin":"lěng","en":"cold"},{"hanzi":"里","pinyin":"lǐ","en":"inside"},{"hanzi":"零","pinyin":"líng","en":"zero"},{"hanzi":"六","pinyin":"liù","en":"six"},{"hanzi":"妈妈","pinyin":"māma","en":"mother"},{"hanzi":"吗","pinyin":"ma","en":"question particle"},{"hanzi":"买","pinyin":"mǎi","en":"to buy"},{"hanzi":"猫","pinyin":"māo","en":"cat"},{"hanzi":"没","pinyin":"méi","en":"not have; have not"},{"hanzi":"没关系","pinyin":"méi guānxi","en":"it doesn't matter"},{"hanzi":"米饭","pinyin":"mǐfàn","en":"cooked rice"},{"hanzi":"名字","pinyin":"míngzi","en":"name"},{"hanzi":"明天","pinyin":"míngtiān","en":"tomorrow"},{"hanzi":"哪","pinyin":"nǎ","en":"which"},{"hanzi":"哪儿","pinyin":"nǎr","en":"where"},{"hanzi":"那","pinyin":"nà","en":"that"},{"hanzi":"呢","pinyin":"ne","en":"modal particle"},{"hanzi":"能","pinyin":"néng","en":"can; to be able"},{"hanzi":"你","pinyin":"nǐ","en":"you"},{"hanzi":"年","pinyin":"nián","en":"year"},{"hanzi":"女儿","pinyin":"nǚ'ér","en":"daughter"},{"hanzi":"朋友","pinyin":"péngyou","en":"friend"},{"hanzi":"漂亮","pinyin":"piàoliang","en":"pretty"},{"hanzi":"苹果","pinyin":"píngguǒ","en":"apple"},{"hanzi":"七","pinyin":"qī","en":"seven"},{"hanzi":"前面","pinyin":"qiánmiàn","en":"front"},{"hanzi":"钱","pinyin":"qián","en":"money"},{"hanzi":"请","pinyin":"qǐng","en":"please"},{"hanzi":"去","pinyin":"qù","en":"to go"},{"hanzi":"热","pinyin":"rè","en":"hot"},{"hanzi":"人","pinyin":"rén","en":"person"},{"hanzi":"认识","pinyin":"rènshi","en":"to know (someone)"},{"hanzi":"日","pinyin":"rì","en":"day; sun"},{"hanzi":"三","pinyin":"sān","en":"three"},{"hanzi":"商店","pinyin":"shāngdiàn","en":"shop"},{"hanzi":"上","pinyin":"shàng","en":"on; up"},{"hanzi":"上午","pinyin":"shàngwǔ","en":"morning (before noon)"},{"hanzi":"少","pinyin":"shǎo","en":"few; little"},{"hanzi":"谁","pinyin":"shéi","en":"who"},{"hanzi":"什么","pinyin":"shénme","en":"what"},{"hanzi":"十","pinyin":"shí","en":"ten"},{"hanzi":"时候","pinyin":"shíhou","en":"time"},{"hanzi":"是","pinyin":"shì","en":"to be"},{"hanzi":"书","pinyin":"shū","en":"book"},{"hanzi":"水","pinyin":"shuǐ","en":"water"},{"hanzi":"水果","pinyin":"shuǐguǒ","en":"fruit"},{"hanzi":"睡觉","pinyin":"shuìjiào","en":"to sleep"},{"hanzi":"说","pinyin":"shuō","en":"to speak"},{"hanzi":"四","pinyin":"sì","en":"four"},{"hanzi":"岁","pinyin":"suì","en":"year (of age)"},{"hanzi":"他","pinyin":"tā","en":"he; him"},{"hanzi":"她","pinyin":"tā","en":"she; her"},{"hanzi":"太","pinyin":"tài","en":"too; very"},{"hanzi":"天气","pinyin":"tiānqì","en":"weather"},{"hanzi":"听","pinyin":"tīng","en":"to listen"},{"hanzi":"同学","pinyin":"tóngxué","en":"classmate"},{"hanzi":"喂","pinyin":"wèi","en":"hello (on phone)"},{"hanzi":"我","pinyin":"wǒ","en":"I; me"},{"hanzi":"我们","pinyin":"wǒmen","en":"we; us"},{"hanzi":"五","pinyin":"wǔ","en":"five"},{"hanzi":"喜欢","pinyin":"xǐhuan","en":"to like"},{"hanzi":"下","pinyin":"xià","en":"down; below"},{"hanzi":"下午","pinyin":"xiàwǔ","en":"afternoon"},{"hanzi":"下雨","pinyin":"xià yǔ","en":"to rain"},{"hanzi":"先生","pinyin":"xiānsheng","en":"Mr.; sir"},{"hanzi":"现在","pinyin":"xiànzài","en":"now"},{"hanzi":"想","pinyin":"xiǎng","en":"to think; to want"},{"hanzi":"小","pinyin":"xiǎo","en":"small"},{"hanzi":"些","pinyin":"xiē","en":"some; a few"},{"hanzi":"写","pinyin":"xiě","en":"to write"},{"hanzi":"谢谢","pinyin":"xièxie","en":"thank you"},{"hanzi":"星期","pinyin":"xīngqī","en":"week"},{"hanzi":"学生","pinyin":"xuéshēng","en":"student"},{"hanzi":"学习","pinyin":"xuéxí","en":"to study"},{"hanzi":"学校","pinyin":"xuéxiào","en":"school"},{"hanzi":"一","pinyin":"yī","en":"one"},{"hanzi":"一点儿","pinyin":"yīdiǎnr","en":"a little bit"},{"hanzi":"医生","pinyin":"yīshēng","en":"doctor"},{"hanzi":"医院","pinyin":"yīyuàn","en":"hospital"},{"hanzi":"衣服","pinyin":"yīfu","en":"clothes"},{"hanzi":"椅子","pinyin":"yǐzi","en":"chair"},{"hanzi":"有","pinyin":"yǒu","en":"to have"},{"hanzi":"月","pinyin":"yuè","en":"month"},{"hanzi":"再见","pinyin":"zàijiàn","en":"goodbye"},{"hanzi":"在","pinyin":"zài","en":"at; in; to be present"},{"hanzi":"怎么","pinyin":"zěnme","en":"how"},{"hanzi":"怎么样","pinyin":"zěnmeyàng","en":"how about it"},{"hanzi":"这","pinyin":"zhè","en":"this"},{"hanzi":"中国","pinyin":"Zhōngguó","en":"China"},{"hanzi":"中午","pinyin":"zhōngwǔ","en":"noon"},{"hanzi":"住","pinyin":"zhù","en":"to live; to reside"},{"hanzi":"桌子","pinyin":"zhuōzi","en":"table"},{"hanzi":"字","pinyin":"zì","en":"character"},{"hanzi":"昨天","pinyin":"zuótiān","en":"yesterday"},{"hanzi":"坐","pinyin":"zuò","en":"to sit"},{"hanzi":"做","pinyin":"zuò","en":"to do"}];
+    const grid = document.getElementById('grid');
+    const q = document.getElementById('q');
+    const meta = document.getElementById('meta');
+
+    function norm(s) {
+      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function render(filter) {
+      const f = norm(filter.trim());
+      let n = 0;
+      grid.innerHTML = '';
+      for (const row of VOCAB) {
+        const hay = norm(row.hanzi + ' ' + row.pinyin + ' ' + row.en);
+        if (f && !hay.includes(f)) continue;
+        n++;
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML =
+          '<p class="hanzi"></p><p class="pinyin"></p><p class="en"></p>';
+        el.querySelector('.hanzi').textContent = row.hanzi;
+        el.querySelector('.pinyin').textContent = row.pinyin;
+        el.querySelector('.en').textContent = row.en;
+        grid.appendChild(el);
+      }
+      meta.textContent = n + ' / ' + VOCAB.length + ' shown';
+    }
+
+    q.addEventListener('input', function () {
+      render(q.value);
+    });
+    render('');
+  </script>
+</body>
+</html>
