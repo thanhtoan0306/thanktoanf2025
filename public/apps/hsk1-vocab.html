@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HSK 1 vocabulary</title>
+  <title>HSK 1 — từ vựng</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <style>
     :root {
       --bg: #faf8f5;
@@ -13,8 +14,9 @@
       --accent: #c45c26;
       --accent-soft: rgba(196, 92, 38, 0.12);
       --border: #e8e4dc;
+      --vi: #2d5a3d;
       --font-han: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
     }
     * { box-sizing: border-box; }
     .visually-hidden {
@@ -40,6 +42,26 @@
       max-width: 960px;
       margin: 0 auto;
       padding: 1.5rem 1.25rem 3rem;
+    }
+    .page-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .page-icon {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-family: var(--font-han);
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      line-height: 1;
     }
     header {
       margin-bottom: 1.5rem;
@@ -86,7 +108,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 0.75rem;
     }
     .card {
@@ -99,6 +121,27 @@
     .card:hover {
       border-color: rgba(196, 92, 38, 0.35);
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .card-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .emoji {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      line-height: 1;
+      background: var(--accent-soft);
+      border-radius: 0.5rem;
+    }
+    .card-main {
+      flex: 1;
+      min-width: 0;
     }
     .hanzi {
       font-family: var(--font-han);
@@ -118,7 +161,12 @@
       font-size: 0.85rem;
       color: var(--muted);
     }
-    .hidden { display: none !important; }
+    .vi {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.88rem;
+      color: var(--vi);
+      font-weight: 500;
+    }
     footer {
       margin-top: 2rem;
       padding-top: 1rem;
@@ -141,21 +189,26 @@
   <div class="wrap">
     <a class="back" href="/apps/">← Apps</a>
     <header>
-      <h1>HSK 1 vocabulary</h1>
-      <p>Simplified Chinese · Pinyin · English (classic HSK 1 list). Search matches 汉字, pinyin, or English.</p>
+      <div class="page-title-row">
+        <div class="page-icon" role="img" aria-label="HSK 1">漢</div>
+        <div>
+          <h1>HSK 1 — từ vựng</h1>
+          <p>Giản thể · bính âm · English · tiếng Việt · emoji gợi nghĩa. Gõ để lọc.</p>
+        </div>
+      </div>
     </header>
     <div class="toolbar">
       <label>
-        <span class="visually-hidden">Search</span>
-        <input type="search" id="q" placeholder="Search 汉字, pinyin, or English…" autocomplete="off" spellcheck="false" />
+        <span class="visually-hidden">Tìm kiếm</span>
+        <input type="search" id="q" placeholder="Tìm: 汉字, pinyin, English, tiếng Việt…" autocomplete="off" spellcheck="false" />
       </label>
       <span class="count" id="meta"></span>
     </div>
     <div class="grid" id="grid" aria-live="polite"></div>
-    <footer>Single-file reference · HSK 汉语水平考试 level 1</footer>
+    <footer>Trang HTML một file · HSK 汉语水平考试 cấp 1</footer>
   </div>
   <script>
-    const VOCAB = [{"hanzi":"爱","pinyin":"ài","en":"to love"},{"hanzi":"八","pinyin":"bā","en":"eight"},{"hanzi":"爸爸","pinyin":"bàba","en":"father"},{"hanzi":"杯子","pinyin":"bēizi","en":"cup; glass"},{"hanzi":"北京","pinyin":"Běijīng","en":"Beijing"},{"hanzi":"本","pinyin":"běn","en":"measure word (books)"},{"hanzi":"不客气","pinyin":"bú kèqi","en":"you're welcome"},{"hanzi":"不","pinyin":"bù","en":"not"},{"hanzi":"菜","pinyin":"cài","en":"dish; vegetable"},{"hanzi":"茶","pinyin":"chá","en":"tea"},{"hanzi":"吃","pinyin":"chī","en":"to eat"},{"hanzi":"出租车","pinyin":"chūzūchē","en":"taxi"},{"hanzi":"打电话","pinyin":"dǎ diànhuà","en":"to make a phone call"},{"hanzi":"大","pinyin":"dà","en":"big"},{"hanzi":"的","pinyin":"de","en":"possessive / modifying particle"},{"hanzi":"点","pinyin":"diǎn","en":"o'clock; a bit"},{"hanzi":"电脑","pinyin":"diànnǎo","en":"computer"},{"hanzi":"电视","pinyin":"diànshì","en":"television"},{"hanzi":"电影","pinyin":"diànyǐng","en":"movie"},{"hanzi":"东西","pinyin":"dōngxi","en":"thing; stuff"},{"hanzi":"都","pinyin":"dōu","en":"all; both"},{"hanzi":"读","pinyin":"dú","en":"to read"},{"hanzi":"对不起","pinyin":"duìbuqǐ","en":"sorry"},{"hanzi":"多","pinyin":"duō","en":"many; much"},{"hanzi":"多少","pinyin":"duōshao","en":"how much; how many"},{"hanzi":"儿子","pinyin":"érzi","en":"son"},{"hanzi":"二","pinyin":"èr","en":"two"},{"hanzi":"饭店","pinyin":"fàndiàn","en":"restaurant"},{"hanzi":"飞机","pinyin":"fēijī","en":"airplane"},{"hanzi":"分钟","pinyin":"fēnzhōng","en":"minute"},{"hanzi":"高兴","pinyin":"gāoxìng","en":"happy"},{"hanzi":"个","pinyin":"gè","en":"general measure word"},{"hanzi":"工作","pinyin":"gōngzuò","en":"work; to work"},{"hanzi":"狗","pinyin":"gǒu","en":"dog"},{"hanzi":"汉语","pinyin":"Hànyǔ","en":"Chinese (language)"},{"hanzi":"好","pinyin":"hǎo","en":"good"},{"hanzi":"号","pinyin":"hào","en":"number; day of month"},{"hanzi":"喝","pinyin":"hē","en":"to drink"},{"hanzi":"和","pinyin":"hé","en":"and"},{"hanzi":"很","pinyin":"hěn","en":"very"},{"hanzi":"后面","pinyin":"hòumiàn","en":"behind; back"},{"hanzi":"回","pinyin":"huí","en":"to return"},{"hanzi":"会","pinyin":"huì","en":"can; will; to know how"},{"hanzi":"几","pinyin":"jǐ","en":"how many; several"},{"hanzi":"家","pinyin":"jiā","en":"home; family"},{"hanzi":"叫","pinyin":"jiào","en":"to be called; to call"},{"hanzi":"今天","pinyin":"jīntiān","en":"today"},{"hanzi":"九","pinyin":"jiǔ","en":"nine"},{"hanzi":"开","pinyin":"kāi","en":"to open; to drive"},{"hanzi":"看","pinyin":"kàn","en":"to look; to watch"},{"hanzi":"看见","pinyin":"kànjiàn","en":"to see"},{"hanzi":"块","pinyin":"kuài","en":"piece; yuan (colloquial)"},{"hanzi":"来","pinyin":"lái","en":"to come"},{"hanzi":"老师","pinyin":"lǎoshī","en":"teacher"},{"hanzi":"冷","pinyin":"lěng","en":"cold"},{"hanzi":"里","pinyin":"lǐ","en":"inside"},{"hanzi":"零","pinyin":"líng","en":"zero"},{"hanzi":"六","pinyin":"liù","en":"six"},{"hanzi":"妈妈","pinyin":"māma","en":"mother"},{"hanzi":"吗","pinyin":"ma","en":"question particle"},{"hanzi":"买","pinyin":"mǎi","en":"to buy"},{"hanzi":"猫","pinyin":"māo","en":"cat"},{"hanzi":"没","pinyin":"méi","en":"not have; have not"},{"hanzi":"没关系","pinyin":"méi guānxi","en":"it doesn't matter"},{"hanzi":"米饭","pinyin":"mǐfàn","en":"cooked rice"},{"hanzi":"名字","pinyin":"míngzi","en":"name"},{"hanzi":"明天","pinyin":"míngtiān","en":"tomorrow"},{"hanzi":"哪","pinyin":"nǎ","en":"which"},{"hanzi":"哪儿","pinyin":"nǎr","en":"where"},{"hanzi":"那","pinyin":"nà","en":"that"},{"hanzi":"呢","pinyin":"ne","en":"modal particle"},{"hanzi":"能","pinyin":"néng","en":"can; to be able"},{"hanzi":"你","pinyin":"nǐ","en":"you"},{"hanzi":"年","pinyin":"nián","en":"year"},{"hanzi":"女儿","pinyin":"nǚ'ér","en":"daughter"},{"hanzi":"朋友","pinyin":"péngyou","en":"friend"},{"hanzi":"漂亮","pinyin":"piàoliang","en":"pretty"},{"hanzi":"苹果","pinyin":"píngguǒ","en":"apple"},{"hanzi":"七","pinyin":"qī","en":"seven"},{"hanzi":"前面","pinyin":"qiánmiàn","en":"front"},{"hanzi":"钱","pinyin":"qián","en":"money"},{"hanzi":"请","pinyin":"qǐng","en":"please"},{"hanzi":"去","pinyin":"qù","en":"to go"},{"hanzi":"热","pinyin":"rè","en":"hot"},{"hanzi":"人","pinyin":"rén","en":"person"},{"hanzi":"认识","pinyin":"rènshi","en":"to know (someone)"},{"hanzi":"日","pinyin":"rì","en":"day; sun"},{"hanzi":"三","pinyin":"sān","en":"three"},{"hanzi":"商店","pinyin":"shāngdiàn","en":"shop"},{"hanzi":"上","pinyin":"shàng","en":"on; up"},{"hanzi":"上午","pinyin":"shàngwǔ","en":"morning (before noon)"},{"hanzi":"少","pinyin":"shǎo","en":"few; little"},{"hanzi":"谁","pinyin":"shéi","en":"who"},{"hanzi":"什么","pinyin":"shénme","en":"what"},{"hanzi":"十","pinyin":"shí","en":"ten"},{"hanzi":"时候","pinyin":"shíhou","en":"time"},{"hanzi":"是","pinyin":"shì","en":"to be"},{"hanzi":"书","pinyin":"shū","en":"book"},{"hanzi":"水","pinyin":"shuǐ","en":"water"},{"hanzi":"水果","pinyin":"shuǐguǒ","en":"fruit"},{"hanzi":"睡觉","pinyin":"shuìjiào","en":"to sleep"},{"hanzi":"说","pinyin":"shuō","en":"to speak"},{"hanzi":"四","pinyin":"sì","en":"four"},{"hanzi":"岁","pinyin":"suì","en":"year (of age)"},{"hanzi":"他","pinyin":"tā","en":"he; him"},{"hanzi":"她","pinyin":"tā","en":"she; her"},{"hanzi":"太","pinyin":"tài","en":"too; very"},{"hanzi":"天气","pinyin":"tiānqì","en":"weather"},{"hanzi":"听","pinyin":"tīng","en":"to listen"},{"hanzi":"同学","pinyin":"tóngxué","en":"classmate"},{"hanzi":"喂","pinyin":"wèi","en":"hello (on phone)"},{"hanzi":"我","pinyin":"wǒ","en":"I; me"},{"hanzi":"我们","pinyin":"wǒmen","en":"we; us"},{"hanzi":"五","pinyin":"wǔ","en":"five"},{"hanzi":"喜欢","pinyin":"xǐhuan","en":"to like"},{"hanzi":"下","pinyin":"xià","en":"down; below"},{"hanzi":"下午","pinyin":"xiàwǔ","en":"afternoon"},{"hanzi":"下雨","pinyin":"xià yǔ","en":"to rain"},{"hanzi":"先生","pinyin":"xiānsheng","en":"Mr.; sir"},{"hanzi":"现在","pinyin":"xiànzài","en":"now"},{"hanzi":"想","pinyin":"xiǎng","en":"to think; to want"},{"hanzi":"小","pinyin":"xiǎo","en":"small"},{"hanzi":"些","pinyin":"xiē","en":"some; a few"},{"hanzi":"写","pinyin":"xiě","en":"to write"},{"hanzi":"谢谢","pinyin":"xièxie","en":"thank you"},{"hanzi":"星期","pinyin":"xīngqī","en":"week"},{"hanzi":"学生","pinyin":"xuéshēng","en":"student"},{"hanzi":"学习","pinyin":"xuéxí","en":"to study"},{"hanzi":"学校","pinyin":"xuéxiào","en":"school"},{"hanzi":"一","pinyin":"yī","en":"one"},{"hanzi":"一点儿","pinyin":"yīdiǎnr","en":"a little bit"},{"hanzi":"医生","pinyin":"yīshēng","en":"doctor"},{"hanzi":"医院","pinyin":"yīyuàn","en":"hospital"},{"hanzi":"衣服","pinyin":"yīfu","en":"clothes"},{"hanzi":"椅子","pinyin":"yǐzi","en":"chair"},{"hanzi":"有","pinyin":"yǒu","en":"to have"},{"hanzi":"月","pinyin":"yuè","en":"month"},{"hanzi":"再见","pinyin":"zàijiàn","en":"goodbye"},{"hanzi":"在","pinyin":"zài","en":"at; in; to be present"},{"hanzi":"怎么","pinyin":"zěnme","en":"how"},{"hanzi":"怎么样","pinyin":"zěnmeyàng","en":"how about it"},{"hanzi":"这","pinyin":"zhè","en":"this"},{"hanzi":"中国","pinyin":"Zhōngguó","en":"China"},{"hanzi":"中午","pinyin":"zhōngwǔ","en":"noon"},{"hanzi":"住","pinyin":"zhù","en":"to live; to reside"},{"hanzi":"桌子","pinyin":"zhuōzi","en":"table"},{"hanzi":"字","pinyin":"zì","en":"character"},{"hanzi":"昨天","pinyin":"zuótiān","en":"yesterday"},{"hanzi":"坐","pinyin":"zuò","en":"to sit"},{"hanzi":"做","pinyin":"zuò","en":"to do"}];
+    const VOCAB = [{"hanzi":"爱","pinyin":"ài","en":"to love","vi":"yêu; thương","emoji":"❤️"},{"hanzi":"八","pinyin":"bā","en":"eight","vi":"tám","emoji":"8️⃣"},{"hanzi":"爸爸","pinyin":"bàba","en":"father","vi":"bố; cha","emoji":"👨"},{"hanzi":"杯子","pinyin":"bēizi","en":"cup; glass","vi":"cốc; ly","emoji":"🥤"},{"hanzi":"北京","pinyin":"Běijīng","en":"Beijing","vi":"Bắc Kinh","emoji":"🏙️"},{"hanzi":"本","pinyin":"běn","en":"measure word (books)","vi":"quyển; cuốn (lượng từ)","emoji":"📓"},{"hanzi":"不客气","pinyin":"bú kèqi","en":"you're welcome","vi":"không khách sáo; không có chi","emoji":"🤗"},{"hanzi":"不","pinyin":"bù","en":"not","vi":"không","emoji":"🚫"},{"hanzi":"菜","pinyin":"cài","en":"dish; vegetable","vi":"món ăn; rau","emoji":"🥗"},{"hanzi":"茶","pinyin":"chá","en":"tea","vi":"trà","emoji":"🍵"},{"hanzi":"吃","pinyin":"chī","en":"to eat","vi":"ăn","emoji":"🍽️"},{"hanzi":"出租车","pinyin":"chūzūchē","en":"taxi","vi":"taxi; xe ôm công nghệ","emoji":"🚕"},{"hanzi":"打电话","pinyin":"dǎ diànhuà","en":"to make a phone call","vi":"gọi điện","emoji":"📞"},{"hanzi":"大","pinyin":"dà","en":"big","vi":"lớn; to","emoji":"🐘"},{"hanzi":"的","pinyin":"de","en":"possessive / modifying particle","vi":"của; trợ từ","emoji":"🔗"},{"hanzi":"点","pinyin":"diǎn","en":"o'clock; a bit","vi":"giờ; một chút","emoji":"🕐"},{"hanzi":"电脑","pinyin":"diànnǎo","en":"computer","vi":"máy tính","emoji":"💻"},{"hanzi":"电视","pinyin":"diànshì","en":"television","vi":"ti vi","emoji":"📺"},{"hanzi":"电影","pinyin":"diànyǐng","en":"movie","vi":"phim","emoji":"🎬"},{"hanzi":"东西","pinyin":"dōngxi","en":"thing; stuff","vi":"đồ đạc; thứ","emoji":"📦"},{"hanzi":"都","pinyin":"dōu","en":"all; both","vi":"đều; cả","emoji":"🌐"},{"hanzi":"读","pinyin":"dú","en":"to read","vi":"đọc","emoji":"📖"},{"hanzi":"对不起","pinyin":"duìbuqǐ","en":"sorry","vi":"xin lỗi","emoji":"🙇"},{"hanzi":"多","pinyin":"duō","en":"many; much","vi":"nhiều","emoji":"➕"},{"hanzi":"多少","pinyin":"duōshao","en":"how much; how many","vi":"bao nhiêu","emoji":"❔"},{"hanzi":"儿子","pinyin":"érzi","en":"son","vi":"con trai","emoji":"👦"},{"hanzi":"二","pinyin":"èr","en":"two","vi":"hai","emoji":"2️⃣"},{"hanzi":"饭店","pinyin":"fàndiàn","en":"restaurant","vi":"nhà hàng; quán ăn","emoji":"🍽️"},{"hanzi":"飞机","pinyin":"fēijī","en":"airplane","vi":"máy bay","emoji":"✈️"},{"hanzi":"分钟","pinyin":"fēnzhōng","en":"minute","vi":"phút","emoji":"⏱️"},{"hanzi":"高兴","pinyin":"gāoxìng","en":"happy","vi":"vui; hài lòng","emoji":"😄"},{"hanzi":"个","pinyin":"gè","en":"general measure word","vi":"cái; con (lượng từ)","emoji":"📌"},{"hanzi":"工作","pinyin":"gōngzuò","en":"work; to work","vi":"công việc; làm việc","emoji":"💼"},{"hanzi":"狗","pinyin":"gǒu","en":"dog","vi":"chó","emoji":"🐕"},{"hanzi":"汉语","pinyin":"Hànyǔ","en":"Chinese (language)","vi":"tiếng Trung (Hán ngữ)","emoji":"📚"},{"hanzi":"好","pinyin":"hǎo","en":"good","vi":"tốt; hay","emoji":"👍"},{"hanzi":"号","pinyin":"hào","en":"number; day of month","vi":"số; ngày (trong tháng)","emoji":"🔢"},{"hanzi":"喝","pinyin":"hē","en":"to drink","vi":"uống","emoji":"🥤"},{"hanzi":"和","pinyin":"hé","en":"and","vi":"và","emoji":"➕"},{"hanzi":"很","pinyin":"hěn","en":"very","vi":"rất","emoji":"⭐"},{"hanzi":"后面","pinyin":"hòumiàn","en":"behind; back","vi":"phía sau; đằng sau","emoji":"🔙"},{"hanzi":"回","pinyin":"huí","en":"to return","vi":"về; quay lại","emoji":"↩️"},{"hanzi":"会","pinyin":"huì","en":"can; will; to know how","vi":"biết; có thể; sẽ","emoji":"🎯"},{"hanzi":"几","pinyin":"jǐ","en":"how many; several","vi":"mấy; vài","emoji":"🔢"},{"hanzi":"家","pinyin":"jiā","en":"home; family","vi":"nhà; gia đình","emoji":"🏠"},{"hanzi":"叫","pinyin":"jiào","en":"to be called; to call","vi":"gọi; tên là","emoji":"📢"},{"hanzi":"今天","pinyin":"jīntiān","en":"today","vi":"hôm nay","emoji":"📅"},{"hanzi":"九","pinyin":"jiǔ","en":"nine","vi":"chín","emoji":"9️⃣"},{"hanzi":"开","pinyin":"kāi","en":"to open; to drive","vi":"mở; lái (xe)","emoji":"🚗"},{"hanzi":"看","pinyin":"kàn","en":"to look; to watch","vi":"xem; nhìn","emoji":"👀"},{"hanzi":"看见","pinyin":"kànjiàn","en":"to see","vi":"thấy; nhìn thấy","emoji":"👁️"},{"hanzi":"块","pinyin":"kuài","en":"piece; yuan (colloquial)","vi":"đồng (tiền); miếng","emoji":"🧱"},{"hanzi":"来","pinyin":"lái","en":"to come","vi":"đến; lại","emoji":"➡️"},{"hanzi":"老师","pinyin":"lǎoshī","en":"teacher","vi":"thầy cô; giáo viên","emoji":"👩‍🏫"},{"hanzi":"冷","pinyin":"lěng","en":"cold","vi":"lạnh","emoji":"🥶"},{"hanzi":"里","pinyin":"lǐ","en":"inside","vi":"trong; bên trong","emoji":"📦"},{"hanzi":"零","pinyin":"líng","en":"zero","vi":"không (số 0)","emoji":"0️⃣"},{"hanzi":"六","pinyin":"liù","en":"six","vi":"sáu","emoji":"6️⃣"},{"hanzi":"妈妈","pinyin":"māma","en":"mother","vi":"mẹ; má","emoji":"👩"},{"hanzi":"吗","pinyin":"ma","en":"question particle","vi":"không? (cuối câu hỏi)","emoji":"❓"},{"hanzi":"买","pinyin":"mǎi","en":"to buy","vi":"mua","emoji":"🛒"},{"hanzi":"猫","pinyin":"māo","en":"cat","vi":"mèo","emoji":"🐱"},{"hanzi":"没","pinyin":"méi","en":"not have; have not","vi":"không có; chưa","emoji":"❌"},{"hanzi":"没关系","pinyin":"méi guānxi","en":"it doesn't matter","vi":"không sao; không có gì","emoji":"👌"},{"hanzi":"米饭","pinyin":"mǐfàn","en":"cooked rice","vi":"cơm","emoji":"🍚"},{"hanzi":"名字","pinyin":"míngzi","en":"name","vi":"tên","emoji":"🏷️"},{"hanzi":"明天","pinyin":"míngtiān","en":"tomorrow","vi":"ngày mai","emoji":"🗓️"},{"hanzi":"哪","pinyin":"nǎ","en":"which","vi":"cái nào; nào","emoji":"🤔"},{"hanzi":"哪儿","pinyin":"nǎr","en":"where","vi":"ở đâu","emoji":"📍"},{"hanzi":"那","pinyin":"nà","en":"that","vi":"cái đó; đó","emoji":"👉"},{"hanzi":"呢","pinyin":"ne","en":"modal particle","vi":"thì; nhỉ (trợ từ)","emoji":"💬"},{"hanzi":"能","pinyin":"néng","en":"can; to be able","vi":"có thể","emoji":"💪"},{"hanzi":"你","pinyin":"nǐ","en":"you","vi":"bạn; anh/chị; cậu","emoji":"🫵"},{"hanzi":"年","pinyin":"nián","en":"year","vi":"năm","emoji":"📆"},{"hanzi":"女儿","pinyin":"nǚ'ér","en":"daughter","vi":"con gái","emoji":"👧"},{"hanzi":"朋友","pinyin":"péngyou","en":"friend","vi":"bạn bè","emoji":"🤝"},{"hanzi":"漂亮","pinyin":"piàoliang","en":"pretty","vi":"đẹp; xinh","emoji":"✨"},{"hanzi":"苹果","pinyin":"píngguǒ","en":"apple","vi":"táo","emoji":"🍎"},{"hanzi":"七","pinyin":"qī","en":"seven","vi":"bảy","emoji":"7️⃣"},{"hanzi":"前面","pinyin":"qiánmiàn","en":"front","vi":"phía trước; đằng trước","emoji":"⏩"},{"hanzi":"钱","pinyin":"qián","en":"money","vi":"tiền","emoji":"💰"},{"hanzi":"请","pinyin":"qǐng","en":"please","vi":"xin mời; làm ơn","emoji":"🙏"},{"hanzi":"去","pinyin":"qù","en":"to go","vi":"đi","emoji":"🚶"},{"hanzi":"热","pinyin":"rè","en":"hot","vi":"nóng","emoji":"🥵"},{"hanzi":"人","pinyin":"rén","en":"person","vi":"người","emoji":"🧑"},{"hanzi":"认识","pinyin":"rènshi","en":"to know (someone)","vi":"quen biết","emoji":"🤝"},{"hanzi":"日","pinyin":"rì","en":"day; sun","vi":"ngày; mặt trời","emoji":"☀️"},{"hanzi":"三","pinyin":"sān","en":"three","vi":"ba","emoji":"3️⃣"},{"hanzi":"商店","pinyin":"shāngdiàn","en":"shop","vi":"cửa hàng","emoji":"🏪"},{"hanzi":"上","pinyin":"shàng","en":"on; up","vi":"trên; lên","emoji":"⬆️"},{"hanzi":"上午","pinyin":"shàngwǔ","en":"morning (before noon)","vi":"buổi sáng","emoji":"🌅"},{"hanzi":"少","pinyin":"shǎo","en":"few; little","vi":"ít","emoji":"📉"},{"hanzi":"谁","pinyin":"shéi","en":"who","vi":"ai","emoji":"🙋"},{"hanzi":"什么","pinyin":"shénme","en":"what","vi":"cái gì","emoji":"❓"},{"hanzi":"十","pinyin":"shí","en":"ten","vi":"mười","emoji":"🔟"},{"hanzi":"时候","pinyin":"shíhou","en":"time","vi":"lúc; khi","emoji":"⏰"},{"hanzi":"是","pinyin":"shì","en":"to be","vi":"là; phải","emoji":"✅"},{"hanzi":"书","pinyin":"shū","en":"book","vi":"sách","emoji":"📚"},{"hanzi":"水","pinyin":"shuǐ","en":"water","vi":"nước","emoji":"💧"},{"hanzi":"水果","pinyin":"shuǐguǒ","en":"fruit","vi":"hoa quả; trái cây","emoji":"🍊"},{"hanzi":"睡觉","pinyin":"shuìjiào","en":"to sleep","vi":"ngủ","emoji":"😴"},{"hanzi":"说","pinyin":"shuō","en":"to speak","vi":"nói","emoji":"🗣️"},{"hanzi":"四","pinyin":"sì","en":"four","vi":"bốn","emoji":"4️⃣"},{"hanzi":"岁","pinyin":"suì","en":"year (of age)","vi":"tuổi","emoji":"🎂"},{"hanzi":"他","pinyin":"tā","en":"he; him","vi":"anh ấy; cậu ấy (nam)","emoji":"👨"},{"hanzi":"她","pinyin":"tā","en":"she; her","vi":"cô ấy; cậu ấy (nữ)","emoji":"👩"},{"hanzi":"太","pinyin":"tài","en":"too; very","vi":"quá","emoji":"⚠️"},{"hanzi":"天气","pinyin":"tiānqì","en":"weather","vi":"thời tiết","emoji":"🌤️"},{"hanzi":"听","pinyin":"tīng","en":"to listen","vi":"nghe","emoji":"👂"},{"hanzi":"同学","pinyin":"tóngxué","en":"classmate","vi":"bạn học","emoji":"🎒"},{"hanzi":"喂","pinyin":"wèi","en":"hello (on phone)","vi":"a lô; này","emoji":"📲"},{"hanzi":"我","pinyin":"wǒ","en":"I; me","vi":"tôi; mình","emoji":"🙋"},{"hanzi":"我们","pinyin":"wǒmen","en":"we; us","vi":"chúng tôi; chúng ta","emoji":"👥"},{"hanzi":"五","pinyin":"wǔ","en":"five","vi":"năm","emoji":"5️⃣"},{"hanzi":"喜欢","pinyin":"xǐhuan","en":"to like","vi":"thích","emoji":"😍"},{"hanzi":"下","pinyin":"xià","en":"down; below","vi":"dưới; xuống","emoji":"⬇️"},{"hanzi":"下午","pinyin":"xiàwǔ","en":"afternoon","vi":"buổi chiều","emoji":"🌇"},{"hanzi":"下雨","pinyin":"xià yǔ","en":"to rain","vi":"trời mưa","emoji":"🌧️"},{"hanzi":"先生","pinyin":"xiānsheng","en":"Mr.; sir","vi":"ông; tiên sinh","emoji":"🎩"},{"hanzi":"现在","pinyin":"xiànzài","en":"now","vi":"bây giờ; hiện tại","emoji":"⏲️"},{"hanzi":"想","pinyin":"xiǎng","en":"to think; to want","vi":"nghĩ; muốn","emoji":"💭"},{"hanzi":"小","pinyin":"xiǎo","en":"small","vi":"nhỏ; bé","emoji":"🐜"},{"hanzi":"些","pinyin":"xiē","en":"some; a few","vi":"một số; vài","emoji":"📎"},{"hanzi":"写","pinyin":"xiě","en":"to write","vi":"viết","emoji":"✍️"},{"hanzi":"谢谢","pinyin":"xièxie","en":"thank you","vi":"cảm ơn","emoji":"🙏"},{"hanzi":"星期","pinyin":"xīngqī","en":"week","vi":"tuần","emoji":"🗓️"},{"hanzi":"学生","pinyin":"xuéshēng","en":"student","vi":"học sinh; sinh viên","emoji":"🎓"},{"hanzi":"学习","pinyin":"xuéxí","en":"to study","vi":"học; học tập","emoji":"📖"},{"hanzi":"学校","pinyin":"xuéxiào","en":"school","vi":"trường học","emoji":"🏫"},{"hanzi":"一","pinyin":"yī","en":"one","vi":"một","emoji":"1️⃣"},{"hanzi":"一点儿","pinyin":"yīdiǎnr","en":"a little bit","vi":"một chút","emoji":"🤏"},{"hanzi":"医生","pinyin":"yīshēng","en":"doctor","vi":"bác sĩ","emoji":"⚕️"},{"hanzi":"医院","pinyin":"yīyuàn","en":"hospital","vi":"bệnh viện","emoji":"🏥"},{"hanzi":"衣服","pinyin":"yīfu","en":"clothes","vi":"quần áo","emoji":"👕"},{"hanzi":"椅子","pinyin":"yǐzi","en":"chair","vi":"ghế","emoji":"🪑"},{"hanzi":"有","pinyin":"yǒu","en":"to have","vi":"có","emoji":"🤲"},{"hanzi":"月","pinyin":"yuè","en":"month","vi":"tháng","emoji":"🌙"},{"hanzi":"再见","pinyin":"zàijiàn","en":"goodbye","vi":"tạm biệt; hẹn gặp lại","emoji":"👋"},{"hanzi":"在","pinyin":"zài","en":"at; in; to be present","vi":"ở; tại; đang","emoji":"📍"},{"hanzi":"怎么","pinyin":"zěnme","en":"how","vi":"thế nào; sao","emoji":"🤷"},{"hanzi":"怎么样","pinyin":"zěnmeyàng","en":"how about it","vi":"thế nào; ra sao","emoji":"😬"},{"hanzi":"这","pinyin":"zhè","en":"this","vi":"cái này; này","emoji":"☝️"},{"hanzi":"中国","pinyin":"Zhōngguó","en":"China","vi":"Trung Quốc","emoji":"🇨🇳"},{"hanzi":"中午","pinyin":"zhōngwǔ","en":"noon","vi":"buổi trưa","emoji":"🍱"},{"hanzi":"住","pinyin":"zhù","en":"to live; to reside","vi":"ở; sống","emoji":"🏘️"},{"hanzi":"桌子","pinyin":"zhuōzi","en":"table","vi":"cái bàn","emoji":"🪑"},{"hanzi":"字","pinyin":"zì","en":"character","vi":"chữ; tự","emoji":"🔤"},{"hanzi":"昨天","pinyin":"zuótiān","en":"yesterday","vi":"hôm qua","emoji":"📆"},{"hanzi":"坐","pinyin":"zuò","en":"to sit","vi":"ngồi","emoji":"🧘"},{"hanzi":"做","pinyin":"zuò","en":"to do","vi":"làm","emoji":"🔨"}];
     const grid = document.getElementById('grid');
     const q = document.getElementById('q');
     const meta = document.getElementById('meta');
@@ -169,19 +222,25 @@
       let n = 0;
       grid.innerHTML = '';
       for (const row of VOCAB) {
-        const hay = norm(row.hanzi + ' ' + row.pinyin + ' ' + row.en);
+        const hay = norm(row.hanzi + ' ' + row.pinyin + ' ' + row.en + ' ' + row.vi + ' ' + (row.emoji || ''));
         if (f && !hay.includes(f)) continue;
         n++;
         const el = document.createElement('article');
         el.className = 'card';
         el.innerHTML =
-          '<p class="hanzi"></p><p class="pinyin"></p><p class="en"></p>';
+          '<div class="card-row">' +
+          '<div class="emoji" aria-hidden="true"></div>' +
+          '<div class="card-main">' +
+          '<p class="hanzi"></p><p class="pinyin"></p><p class="vi"></p><p class="en"></p>' +
+          '</div></div>';
+        el.querySelector('.emoji').textContent = row.emoji || '📌';
         el.querySelector('.hanzi').textContent = row.hanzi;
         el.querySelector('.pinyin').textContent = row.pinyin;
+        el.querySelector('.vi').textContent = row.vi;
         el.querySelector('.en').textContent = row.en;
         grid.appendChild(el);
       }
-      meta.textContent = n + ' / ' + VOCAB.length + ' shown';
+      meta.textContent = n + ' / ' + VOCAB.length + ' mục';
     }
 
     q.addEventListener('input', function () {
