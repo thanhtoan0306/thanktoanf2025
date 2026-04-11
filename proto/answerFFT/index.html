@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFT in E. coli — Interactive Demo</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-elev: #161b22;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #3fb950;
+      --accent-dim: #56d364;
+      --cyan: #58a6ff;
+      --highlight: #ffa657;
+      --border: #30363d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .slide {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35em;
+      background: linear-gradient(135deg, var(--accent-dim), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin: 0 0 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      color: var(--text);
+    }
+
+    p.lead, .bullets {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 640px;
+    }
+
+    .bullets {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .bullets li {
+      margin: 0.35rem 0;
+    }
+
+    .canvas-wrap {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1rem 0.5rem;
+      margin: 1rem 0 0;
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .axis-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.35rem;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 700px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-title {
+      font-size: 0.85rem;
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 1.25rem 0 0;
+      align-items: center;
+    }
+
+    .control {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .control label span.val {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      max-width: 220px;
+    }
+
+    #tooltip.visible {
+      opacity: 1;
+    }
+
+    .insight-box {
+      background: linear-gradient(145deg, rgba(63, 185, 80, 0.08), rgba(88, 166, 255, 0.06));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .insight-box .bullets {
+      color: var(--text);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      padding: 2rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <main>
+    <section class="slide">
+      <h1>FFT in E. coli</h1>
+      <p class="subtitle">From noisy signals to frequency understanding</p>
+
+      <h2>Intuition</h2>
+      <p class="lead">E. coli receives signals over time — but patterns are hard to see directly.</p>
+      <div class="canvas-wrap">
+        <canvas id="intuitionCanvas" width="860" height="220"></canvas>
+        <div class="axis-label">time →</div>
+        <div class="axis-label" style="position:absolute; left:0.5rem; top:50%; transform:rotate(-90deg); transform-origin:center; margin-top:-2rem;">signal strength</div>
+      </div>
+
+      <h2>Time → frequency</h2>
+      <p class="lead">FFT converts time into frequency. Each bar is how strong a rhythm is in the signal.</p>
+      <div class="row-2">
+        <div>
+          <div class="panel-title">Time domain</div>
+          <div class="canvas-wrap" style="margin:0">
+            <canvas id="transformTimeCanvas" width="420" height="200"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="panel-title">Frequency domain</div>
+          <div class="canvas-wrap" style="margin:0; position:relative">
+            <canvas id="transformFreqCanvas" width="420" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <h2>Try it</h2>
+      <p class="lead">Adjust noise and rhythm. Watch the spectrum respond — that is what frequency means for a living sensor.</p>
+      <div class="controls">
+        <div class="control">
+          <label>Noise level <span class="val" id="noiseVal">0.25</span></label>
+          <input type="range" id="noiseSlider" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+        <div class="control">
+          <label>Signal frequency <span class="val" id="freqVal">3.0</span></label>
+          <input type="range" id="freqSlider" min="0.5" max="12" step="0.1" value="3" />
+        </div>
+      </div>
+      <div class="row-2">
+        <div>
+          <div class="panel-title">Time (noise + pattern)</div>
+          <div class="canvas-wrap" style="margin:0">
+            <canvas id="interactiveTimeCanvas" width="420" height="200"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="panel-title">Spectrum (hover bars for detail)</div>
+          <div class="canvas-wrap" style="margin:0">
+            <canvas id="interactiveFreqCanvas" width="420" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <h2>Why it matters for E. coli</h2>
+      <p class="lead">
+        Cells do not store every wiggle of the world. They look for <strong style="color:var(--accent-dim)">repeating structure</strong> —
+        nutrients that pulse, gradients that cycle, rhythms imposed by day and environment.
+      </p>
+      <p class="lead">
+        A <strong style="color:var(--cyan)">frequency</strong> is a shorthand for “this pattern keeps coming back.”
+        Sensing in the frequency domain helps filter random noise and supports decisions: move, consume, or reprogram metabolism.
+      </p>
+
+      <h2>Key insight</h2>
+      <div class="insight-box">
+        <ul class="bullets">
+          <li><strong>Time domain</strong> — what happens, moment by moment.</li>
+          <li><strong>Frequency domain</strong> — what repeats, and how strongly.</li>
+          <li><strong>FFT</strong> — the bridge between those two views.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>Pure HTML canvas demo — no external libraries.</footer>
+
+  <script>
+(function () {
+  var N = 256;
+  var PI2 = Math.PI * 2;
+
+  /** In-place Cooley–Tukey FFT; re, im length must be power of 2 */
+  function fft(re, im) {
+    var n = re.length;
+    var i, j, tmp;
+    j = 0;
+    for (i = 0; i < n - 1; i++) {
+      if (i < j) {
+        tmp = re[i]; re[i] = re[j]; re[j] = tmp;
+        tmp = im[i]; im[i] = im[j]; im[j] = tmp;
+      }
+      var k = n >> 1;
+      while (k <= j) {
+        j -= k;
+        k >>= 1;
+      }
+      j += k;
+    }
+    var len, half, ang, wlenRe, wlenIm, uRe, uIm, vRe, vIm;
+    for (len = 2; len <= n; len <<= 1) {
+      half = len >> 1;
+      ang = -PI2 / len;
+      wlenRe = Math.cos(ang);
+      wlenIm = Math.sin(ang);
+      for (i = 0; i < n; i += len) {
+        var wRe = 1;
+        var wIm = 0;
+        for (j = 0; j < half; j++) {
+          uRe = re[i + j];
+          uIm = im[i + j];
+          vRe = re[i + j + half] * wRe - im[i + j + half] * wIm;
+          vIm = re[i + j + half] * wIm + im[i + j + half] * wRe;
+          re[i + j] = uRe + vRe;
+          im[i + j] = uIm + vIm;
+          re[i + j + half] = uRe - vRe;
+          im[i + j + half] = uIm - vIm;
+          tmp = wRe * wlenRe - wIm * wlenIm;
+          wIm = wRe * wlenIm + wIm * wlenRe;
+          wRe = tmp;
+        }
+      }
+    }
+  }
+
+  function magnitudes(re, im) {
+    var n = re.length;
+    var m = new Float32Array(n / 2);
+    var k;
+    for (k = 0; k < n / 2; k++) {
+      m[k] = Math.sqrt(re[k] * re[k] + im[k] * im[k]);
+    }
+    return m;
+  }
+
+  function buildSignal(array, freq, noiseAmp, phase, seed) {
+    var i;
+    var t;
+    var rnd = seed >>> 0;
+    function rndNext() {
+      if (seed == null) return Math.random() - 0.5;
+      rnd = (rnd * 1664525 + 1013904223) >>> 0;
+      return (rnd & 268435455) / 268435456 - 0.5;
+    }
+    for (i = 0; i < array.length; i++) {
+      t = (i / array.length) * PI2 * 4;
+      array[i] = Math.sin(freq * t + phase) + noiseAmp * rndNext() * 2;
+    }
+  }
+
+  function drawTimeSeries(ctx, w, h, data, color, lineWidth) {
+    var padL = 8;
+    var padR = 8;
+    var padT = 12;
+    var padB = 18;
+    var gw = w - padL - padR;
+    var gh = h - padT - padB;
+    var i;
+    var minV = data[0];
+    var maxV = data[0];
+    for (i = 1; i < data.length; i++) {
+      if (data[i] < minV) minV = data[i];
+      if (data[i] > maxV) maxV = data[i];
+    }
+    var span = maxV - minV || 1e-6;
+    var mid = (minV + maxV) * 0.5;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "rgba(22, 27, 34, 0.6)";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "rgba(48, 54, 61, 0.8)";
+    ctx.lineWidth = 1;
+    var y0 = padT + gh * (0.5 + (0 - mid) / span * 0.9);
+    ctx.beginPath();
+    ctx.moveTo(padL, y0);
+    ctx.lineTo(padL + gw, y0);
+    ctx.strokeStyle = "rgba(139, 148, 158, 0.35)";
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth || 2;
+    for (i = 0; i < data.length; i++) {
+      var x = padL + (i / (data.length - 1)) * gw;
+      var y = padT + gh * (0.5 + (data[i] - mid) / span * 0.9);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  function drawSpectrum(ctx, w, h, mags, dominantK, morph) {
+    morph = morph == null ? 1 : morph;
+    var padL = 8;
+    var padR = 8;
+    var padT = 12;
+    var padB = 6;
+    var gw = w - padL - padR;
+    var gh = h - padT - padB;
+    var n = mags.length;
+    var i;
+    var maxM = 1e-9;
+    for (i = 1; i < n; i++) {
+      if (mags[i] > maxM) maxM = mags[i];
+    }
+    var barW = gw / n;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "rgba(22, 27, 34, 0.6)";
+    ctx.fillRect(0, 0, w, h);
+    for (i = 1; i < n; i++) {
+      var bh = (mags[i] / maxM) * gh * morph;
+      var x = padL + i * barW;
+      var isDom = dominantK === i;
+      ctx.fillStyle = isDom ? "rgba(255, 166, 87, 0.95)" : "rgba(63, 185, 80, 0.72)";
+      ctx.fillRect(x - barW * 0.85 + barW * 0.1, padT + gh - bh, barW * 0.72, bh);
+    }
+  }
+
+  function dominantBin(mags) {
+    var k;
+    var best = 1;
+    var bestV = mags[1] || 0;
+    for (k = 2; k < mags.length; k++) {
+      if (mags[k] > bestV) {
+        bestV = mags[k];
+        best = k;
+      }
+    }
+    return best;
+  }
+
+  var re = new Float32Array(N);
+  var im = new Float32Array(N);
+  var scratch = new Float32Array(N);
+
+  function computeSpectrum(sample) {
+    var i;
+    for (i = 0; i < N; i++) {
+      re[i] = sample[i];
+      im[i] = 0;
+    }
+    fft(re, im);
+    return magnitudes(re, im);
+  }
+
+  /* ----- Intuition: scrolling noisy wave ----- */
+  var introPhase = 0;
+  var introCanvas = document.getElementById("intuitionCanvas");
+  var introCtx = introCanvas.getContext("2d");
+
+  function introFrame() {
+    buildSignal(scratch, 2.2, 0.35, introPhase, 12345);
+    drawTimeSeries(introCtx, introCanvas.width, introCanvas.height, scratch, "#58a6ff", 2);
+    introPhase += 0.04;
+    requestAnimationFrame(introFrame);
+  }
+
+  /* ----- Transform demo: morph animation ----- */
+  var tt = document.getElementById("transformTimeCanvas");
+  var tf = document.getElementById("transformFreqCanvas");
+  var ttCtx = tt.getContext("2d");
+  var tfCtx = tf.getContext("2d");
+  var transformPhase = 0;
+  var morphT = 0;
+
+  function transformFrame() {
+    buildSignal(scratch, 4, 0.2, transformPhase, 999);
+    drawTimeSeries(ttCtx, tt.width, tt.height, scratch, "#3fb950", 2);
+    var spec = computeSpectrum(scratch);
+    morphT += 0.05;
+    var morph = 0.75 + 0.25 * Math.sin(morphT);
+    drawSpectrum(tfCtx, tf.width, tf.height, spec, dominantBin(spec), morph);
+    transformPhase += 0.025;
+    requestAnimationFrame(transformFrame);
+  }
+
+  /* ----- Interactive ----- */
+  var it = document.getElementById("interactiveTimeCanvas");
+  var iff = document.getElementById("interactiveFreqCanvas");
+  var itCtx = it.getContext("2d");
+  var ifCtx = iff.getContext("2d");
+  var noiseSlider = document.getElementById("noiseSlider");
+  var freqSlider = document.getElementById("freqSlider");
+  var noiseVal = document.getElementById("noiseVal");
+  var freqVal = document.getElementById("freqVal");
+  var tooltip = document.getElementById("tooltip");
+  var lastInteractiveSpec = null;
+  var lastDomK = 0;
+
+  function interactiveRedraw() {
+    var noise = parseFloat(noiseSlider.value, 10);
+    var freq = parseFloat(freqSlider.value, 10);
+    noiseVal.textContent = noise.toFixed(2);
+    freqVal.textContent = freq.toFixed(1);
+    buildSignal(scratch, freq, noise, 0, null);
+    drawTimeSeries(itCtx, it.width, it.height, scratch, "#56d364", 2);
+    lastInteractiveSpec = computeSpectrum(scratch);
+    lastDomK = dominantBin(lastInteractiveSpec);
+    drawSpectrum(ifCtx, iff.width, iff.height, lastInteractiveSpec, lastDomK, 1);
+  }
+
+  noiseSlider.addEventListener("input", interactiveRedraw);
+  freqSlider.addEventListener("input", interactiveRedraw);
+
+  function freqCanvasHover(e, canvas, spec, dominant) {
+    var rect = canvas.getBoundingClientRect();
+    var x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    var padL = 8;
+    var gw = canvas.width - 16;
+    var n = spec.length;
+    var barW = gw / n;
+    var i = Math.floor((x - padL) / barW);
+    if (i < 1 || i >= n) {
+      tooltip.classList.remove("visible");
+      return;
+    }
+    var mag = spec[i];
+    var label = i === dominant ? " (strongest peak)" : "";
+    tooltip.innerHTML =
+      "Bin <strong>" +
+      i +
+      "</strong><br/>Strength: " +
+      mag.toFixed(2) +
+      "<br/><span style=color:#8b949e>Relative to rhythm in the window</span>" +
+      label;
+    tooltip.style.left = e.clientX + 12 + "px";
+    tooltip.style.top = e.clientY + 12 + "px";
+    tooltip.classList.add("visible");
+    tooltip.setAttribute("aria-hidden", "false");
+  }
+
+  iff.addEventListener("mousemove", function (e) {
+    if (lastInteractiveSpec) freqCanvasHover(e, iff, lastInteractiveSpec, lastDomK);
+  });
+  iff.addEventListener("mouseleave", function () {
+    tooltip.classList.remove("visible");
+    tooltip.setAttribute("aria-hidden", "true");
+  });
+
+  introFrame();
+  transformFrame();
+  interactiveRedraw();
+})();
+  </script>
+</body>
+</html>

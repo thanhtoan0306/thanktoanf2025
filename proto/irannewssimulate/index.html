@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iran news map — timeline prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="intro">
+      <h1>Iran map — placeholder timeline</h1>
+      <p>
+        Demo data only (not real news). Fixed window <strong>2026-02-29 → 2026-04-07</strong>. You can’t drag or scroll-zoom; the view <strong>auto-flies</strong> to visible event regions. Use the day slider or click an event to refocus.
+        Serve locally for <code>data/events.json</code>; embedded JSON is a fallback.
+      </p>
+    </header>
+
+    <p id="window-note" class="window-note" aria-live="polite"></p>
+
+    <div class="toolbar" role="group" aria-label="Timeline controls">
+      <label>
+        Day
+        <input id="day-slider" type="range" min="0" max="100" value="0" />
+      </label>
+      <span id="date-readout" class="meta date-readout"></span>
+      <button type="button" id="btnPlay" aria-pressed="false">Play</button>
+      <button type="button" id="btnReset">Reset</button>
+      <span class="window-line">Window: <span id="window-readout"></span></span>
+      <label><input type="radio" name="display-mode" id="mode-cumulative" checked /> Cumulative (≤ date)</label>
+      <label><input type="radio" name="display-mode" id="mode-exact" /> This day only</label>
+    </div>
+    <div class="map-wrap">
+      <div id="map" role="application" aria-label="Map of Iran with event regions (view is fixed)"></div>
+    </div>
+
+    <div class="lower">
+      <div class="list-wrap panel">
+        <h2>Events in view</h2>
+        <fieldset class="filters">
+          <legend>Tags</legend>
+          <div class="filter-grid">
+            <label><input type="checkbox" data-tag="politics" checked /> politics</label>
+            <label><input type="checkbox" data-tag="economy" checked /> economy</label>
+            <label><input type="checkbox" data-tag="protests" checked /> protests</label>
+            <label><input type="checkbox" data-tag="diplomacy" checked /> diplomacy</label>
+            <label><input type="checkbox" data-tag="other" checked /> other</label>
+          </div>
+        </fieldset>
+        <ul id="event-list" aria-label="Event list for screen readers"></ul>
+        <p id="aria-live" class="sr" aria-live="polite"></p>
+        <p class="attribution">
+          Map tiles © <a href="https://www.openstreetmap.org/copyright" rel="noreferrer">OpenStreetMap</a> contributors.
+          <strong>Share:</strong> <code>?date=YYYY-MM-DD</code>
+        </p>
+      </div>
+      <aside class="panel" id="detail" aria-live="polite">
+        <h2 class="detail-heading">Selected</h2>
+        <p class="placeholder">Choose an event from the list or a region on the map.</p>
+      </aside>
+    </div>
+  </div>
+
+  <script type="application/json" id="seed-events">
+[
+  {"id":"s01","date":"2026-02-28","lat":35.6892,"lng":51.389,"title":"Sample A — Tehran (placeholder)","region":"Tehran","tags":["other"],"notes":"Demo only; not real news."},
+  {"id":"s02","date":"2026-03-05","lat":36.2605,"lng":59.6168,"title":"Sample B — Mashhad (placeholder)","region":"Mashhad","tags":["economy"],"sourceUrl":"https://example.com/demo-source-b"},
+  {"id":"s03","date":"2026-03-12","lat":32.6546,"lng":51.668,"title":"Sample C — Isfahan (placeholder)","region":"Isfahan","tags":["diplomacy","politics"]},
+  {"id":"s04","date":"2026-03-18","lat":29.5918,"lng":52.5836,"title":"Sample D — Shiraz (placeholder)","region":"Shiraz","tags":["economy","other"]},
+  {"id":"s05","date":"2026-03-24","lat":38.0962,"lng":46.2738,"title":"Sample E — Tabriz (placeholder)","region":"Tabriz","tags":["politics"]},
+  {"id":"s06","date":"2026-03-29","lat":27.1832,"lng":56.2666,"title":"Sample F — Bandar Abbas (placeholder)","region":"Bandar Abbas","tags":["economy"]},
+  {"id":"s07","date":"2026-04-02","lat":35.7152,"lng":51.4043,"title":"Sample G — Tehran east (placeholder)","region":"Tehran","tags":["politics","protests"]},
+  {"id":"s08","date":"2026-04-07","lat":37.2809,"lng":49.5832,"title":"Sample H — Rasht (placeholder)","region":"Rasht","tags":["diplomacy","other"]}
+]
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>
