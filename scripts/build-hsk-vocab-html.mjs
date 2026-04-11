@@ -1,6 +1,9 @@
 /**
  * Regenerates public/apps/hsk1-vocab.html with HSK 1 (hand-curated VI+emoji) + HSK 2/3
  * from scripts/data/hsk-old-*-exclusive.json (MIT: drkameleon/complete-hsk-vocabulary).
+ *
+ * Short English (first popular sense) + Vietnamese: VI for HSK2/3 via MyMemory API,
+ * cached in scripts/data/en-vi-cache.json (run build with network to refresh missing keys).
  */
 import fs from 'fs';
 import path from 'path';
@@ -8,6 +11,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
+
+const CACHE_PATH = path.join(root, 'scripts/data/en-vi-cache.json');
+const TRANSLATE_DELAY_MS = 85;
 
 const EMOJI_POOL = [
 	'📌', '📚', '🎯', '✨', '🔹', '🌿', '🎵', '🍀', '⭐', '💠', '🍂', '🌸', '🌟', '📎', '🔖', '🏷️', '💡', '📝', '🎨', '🧩',
@@ -19,22 +25,83 @@ function pickEmoji(hanzi) {
 	return EMOJI_POOL[h % EMOJI_POOL.length];
 }
 
-function compactEntry(e) {
-	const hanzi = e.simplified;
-	const seen = new Set();
-	const meanings = [];
+/** One short gloss: first segment before ; or /, trimmed, length-capped. */
+function shortGloss(str, maxLen = 72) {
+	if (!str || typeof str !== 'string') return '';
+	let s = str
+		.split(';')[0]
+		.split('/')[0]
+		.replace(/\s+/g, ' ')
+		.trim();
+	if (/^\(modal particle/i.test(s)) s = 'modal particle';
+	if (s.length > maxLen) s = s.slice(0, maxLen - 1) + '…';
+	return s;
+}
+
+function isLowValueSense(m) {
+	const s = m.trim();
+	if (/^surname /i.test(s) || /^\.\.\./.test(s) || /^abbr\./i.test(s)) return true;
+	if (/euphemistic|vulgar|屄/i.test(s)) return true;
+	if (/^(Belgium|Belgian|Netherlands|Thailand|Norway|Sweden)$/i.test(s)) return true;
+	return false;
+}
+
+function loadEnViCache() {
+	try {
+		const raw = fs.readFileSync(CACHE_PATH, 'utf8');
+		return JSON.parse(raw);
+	} catch {
+		return {};
+	}
+}
+
+function saveEnViCache(cache) {
+	fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, '\t'), 'utf8');
+}
+
+function cleanViGloss(s) {
+	return s.replace(/\s+/g, ' ').replace(/\.$/, '').trim();
+}
+
+function collectAllMeaningsFlat(e) {
+	const out = [];
 	for (const f of e.forms || []) {
 		for (const m of f.meanings || []) {
 			const t = m.trim();
-			if (t && !seen.has(t)) {
-				seen.add(t);
-				meanings.push(t);
-				if (meanings.length >= 6) break;
-			}
+			if (t) out.push(t);
 		}
-		if (meanings.length >= 6) break;
 	}
-	const en = meanings.join('; ') || '(no gloss)';
+	return out;
+}
+
+/**
+ * One short English gloss: (1) modal/particle anywhere (e.g. 吧),
+ * (2) else first pronunciation block with a non-surname sense, shortest gloss (e.g. 白 → white).
+ */
+function pickBestEnglishGloss(e) {
+	const all = collectAllMeaningsFlat(e);
+	if (!all.length) return '—';
+
+	const modal = all.find((m) => /\bparticle\b|modal/i.test(m));
+	if (modal) return shortGloss(modal.split(';')[0], 56);
+
+	for (const f of e.forms || []) {
+		const line = (f.meanings || []).map((m) => m.trim()).filter(Boolean);
+		const good = line.filter((m) => !/^surname /i.test(m) && !/^\.\.\./.test(m) && !isLowValueSense(m));
+		if (!good.length) continue;
+		good.sort((a, b) => a.length - b.length);
+		let pick = good[0];
+		if (pick.length < 5 && good.length > 1) pick = good.find((m) => m.length >= 5) || pick;
+		return shortGloss(pick.split(';')[0], 56);
+	}
+
+	const fallback = all.filter((m) => !/^\.\.\./.test(m));
+	return shortGloss((fallback[0] || '—').split(';')[0], 56);
+}
+
+function compactEntry(e) {
+	const hanzi = e.simplified;
+	const en = pickBestEnglishGloss(e);
 	const form0 = e.forms?.[0];
 	const pinyin = form0?.transcriptions?.pinyin || '';
 	return {
@@ -43,6 +110,51 @@ function compactEntry(e) {
 		en,
 		vi: '',
 		emoji: pickEmoji(hanzi),
+	};
+}
+
+async function translateUniqueEnToVi(uniqueEnSet, cache) {
+	const list = [...uniqueEnSet].sort();
+	let n = 0;
+	for (const en of list) {
+		if (!en || en === '—') continue;
+		if (cache[en]) continue;
+		await new Promise((r) => setTimeout(r, TRANSLATE_DELAY_MS));
+		const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(en)}&langpair=en|vi`;
+		try {
+			const ac = new AbortController();
+			const to = setTimeout(() => ac.abort(), 15000);
+			const res = await fetch(url, { signal: ac.signal });
+			clearTimeout(to);
+			const data = await res.json();
+			let vi = data.responseData?.translatedText?.trim() || '';
+			if (!vi || data.responseStatus === 403 || data.responseStatus === 429) {
+				vi = `(${en})`;
+			} else {
+				vi = cleanViGloss(vi);
+			}
+			cache[en] = vi;
+		} catch {
+			cache[en] = `(${en})`;
+		}
+		n++;
+		if (n % 25 === 0) saveEnViCache(cache);
+	}
+	saveEnViCache(cache);
+}
+
+function applyViFromCache(rows, cache) {
+	for (const row of rows) {
+		if (row.vi) continue;
+		row.vi = cache[row.en] ? shortGloss(cache[row.en], 90) : shortGloss(row.en, 90);
+	}
+}
+
+function shortenHsk1(row) {
+	return {
+		...row,
+		en: shortGloss(row.en, 80),
+		vi: shortGloss(row.vi, 90),
 	};
 }
 
@@ -274,7 +386,7 @@ function buildHtml({ vocab1, vocab2, vocab3 }) {
         <div class="page-icon" role="img" aria-label="HSK">漢</div>
         <div>
           <h1>HSK 1–3 — từ vựng</h1>
-          <p>HSK 1: có tiếng Việt. HSK 2–3: nghĩa English (bộ từ loại trừ theo cấp HSK 2.0). Gõ để lọc.</p>
+          <p>Mỗi mục: một nghĩa English ngắn + tiếng Việt. HSK 2.0 (old), từ loại trừ theo cấp. Gõ để lọc.</p>
         </div>
       </div>
     </header>
@@ -337,8 +449,8 @@ function buildHtml({ vocab1, vocab2, vocab3 }) {
         el.querySelector('.hanzi').textContent = row.hanzi;
         el.querySelector('.pinyin').textContent = row.pinyin;
         const viEl = el.querySelector('.vi');
-        if (row.vi) viEl.textContent = row.vi;
-        else viEl.remove();
+        viEl.textContent = row.vi || '';
+        if (!row.vi) viEl.remove();
         el.querySelector('.en').textContent = row.en;
         grid.appendChild(el);
       }
@@ -369,17 +481,37 @@ function buildHtml({ vocab1, vocab2, vocab3 }) {
 }
 
 const htmlPath = path.join(root, 'public/apps/hsk1-vocab.html');
-const vocab1 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk1-curated.json'), 'utf8'));
 
-const raw2 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk-old-2-exclusive.json'), 'utf8'));
-const raw3 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk-old-3-exclusive.json'), 'utf8'));
-const vocab2 = raw2.map(compactEntry);
-const vocab3 = raw3.map(compactEntry);
+async function main() {
+	const vocab1 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk1-curated.json'), 'utf8')).map(shortenHsk1);
 
-const out = buildHtml({ vocab1, vocab2, vocab3 });
-fs.writeFileSync(htmlPath, out, 'utf8');
-console.log('Wrote', htmlPath, {
-	hsk1: vocab1.length,
-	hsk2: vocab2.length,
-	hsk3: vocab3.length,
-});
+	const raw2 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk-old-2-exclusive.json'), 'utf8'));
+	const raw3 = JSON.parse(fs.readFileSync(path.join(root, 'scripts/data/hsk-old-3-exclusive.json'), 'utf8'));
+	const vocab2 = raw2.map(compactEntry);
+	const vocab3 = raw3.map(compactEntry);
+
+	const cache = loadEnViCache();
+	const uniqueEn = new Set();
+	for (const r of vocab2) uniqueEn.add(r.en);
+	for (const r of vocab3) uniqueEn.add(r.en);
+
+	const missing = [...uniqueEn].filter((en) => en && en !== '—' && !cache[en]);
+	if (missing.length) {
+		console.log('Translating', missing.length, 'unique English glosses to Vietnamese (cached in en-vi-cache.json)…');
+		await translateUniqueEnToVi(uniqueEn, cache);
+	}
+
+	applyViFromCache(vocab2, cache);
+	applyViFromCache(vocab3, cache);
+
+	const out = buildHtml({ vocab1, vocab2, vocab3 });
+	fs.writeFileSync(htmlPath, out, 'utf8');
+	console.log('Wrote', htmlPath, {
+		hsk1: vocab1.length,
+		hsk2: vocab2.length,
+		hsk3: vocab3.length,
+		cacheKeys: Object.keys(cache).length,
+	});
+}
+
+await main();
