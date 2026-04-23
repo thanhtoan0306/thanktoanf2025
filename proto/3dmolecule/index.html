@@ -110,6 +110,9 @@
         <div class="links">
           <a href="./index.html?mol=h2o"><span>H2O</span><span>→</span></a>
           <a href="./index.html?mol=co2"><span>CO2</span><span>→</span></a>
+          <a href="./index.html?mol=ribose"><span>Ribose</span><span>→</span></a>
+          <a href="./index.html?mol=benzene"><span>Benzene</span><span>→</span></a>
+          <a href="./index.html?mol=nucleotide"><span>Nucleotide</span><span>→</span></a>
           <a href="./index.html?mol=both"><span>H2O + CO2</span><span>→</span></a>
         </div>
 
@@ -261,6 +264,9 @@
           let module;
           if (mol === "h2o") module = await import("./h2o.js");
           else if (mol === "co2") module = await import("./co2.js");
+          else if (mol === "ribose") module = await import("./ribose.js");
+          else if (mol === "benzene") module = await import("./benzene.js");
+          else if (mol === "nucleotide") module = await import("./nucleotide.js");
           else throw new Error(`Unknown mol: ${mol}`);
 
           startViewer({
