@@ -8,6 +8,18 @@ import PageLayout from '../../layouts/PageLayout.astro';
 		<p class="lead">Private admin area. Only visible after login.</p>
 	</section>
 
+	<script>
+		const DASHBOARD_ACCESS_KEY = 'dashboardAccess';
+		const hasAccess =
+			typeof window !== 'undefined' &&
+			window.localStorage.getItem(DASHBOARD_ACCESS_KEY) === 'true';
+
+		if (!hasAccess) {
+			const next = encodeURIComponent('/admin');
+			window.location.replace(`/login?next=${next}`);
+		}
+	</script>
+
 	<style>
 		.dashboard {
 			max-width: 720px;

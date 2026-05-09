@@ -133,6 +133,19 @@ import PageLayout from '../layouts/PageLayout.astro';
 		const userAvatarPlaceholder = document.getElementById('user-avatar-placeholder') as HTMLDivElement | null;
 		const loginMethodEl = document.getElementById('login-method') as HTMLSpanElement | null;
 
+		function redirectToNextIfAllowed() {
+			const nextParam = new URLSearchParams(window.location.search).get('next');
+			if (!nextParam) return;
+			if (window.localStorage.getItem(DASHBOARD_ACCESS_KEY) !== 'true') return;
+			try {
+				const nextUrl = new URL(nextParam, window.location.origin);
+				if (nextUrl.origin !== window.location.origin) return;
+				window.location.replace(nextUrl.pathname + nextUrl.search + nextUrl.hash);
+			} catch {
+				// ignore invalid next param
+			}
+		}
+
 		// Check if should initialize Google Sign-In
 		const shouldInitGoogle = () => {
 			const isLoggedIn = window.localStorage.getItem(STORAGE_KEY) === 'true';
@@ -198,6 +211,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 			
 			if (isLoggedIn || googleUser) {
 				showUserProfile();
+				redirectToNextIfAllowed();
 			} else {
 				// Show login form, hide user profile
 				if (form) {
@@ -289,6 +303,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 				}
 				
 				showUserProfile();
+				redirectToNextIfAllowed();
 			} catch (error) {
 				console.error('Error processing Google sign-in:', error);
 				if (messageEl) {
@@ -326,6 +341,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 				// Admin account via form login also has dashboard access
 				window.localStorage.setItem(DASHBOARD_ACCESS_KEY, 'true');
 				showUserProfile();
+				redirectToNextIfAllowed();
 			} else {
 				if (messageEl) {
 					messageEl.textContent = 'Incorrect username or password. Please try again.';
