@@ -12,10 +12,15 @@
 		</a>
 	</header>
 
-	<main class="aibot__main">
-		<div class="aibot__center" id="aibot-home">
-			<h1 class="aibot__title">Ready when you are</h1>
+	<div class="aibot__body">
+		<main class="aibot__scroll" id="aibot-scroll">
+			<div class="aibot__home" id="aibot-home">
+				<h1 class="aibot__title">Ready when you are</h1>
+			</div>
+			<div class="aibot__chat" id="aibot-chat" hidden></div>
+		</main>
 
+		<footer class="aibot__footer">
 			<form class="aibot__composer" id="aibot-form">
 				<button type="button" class="aibot__composer-btn" aria-label="Add">
 					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -46,10 +51,8 @@
 					</button>
 				</div>
 			</form>
-		</div>
-
-		<div class="aibot__chat" id="aibot-chat" hidden></div>
-	</main>
+		</footer>
+	</div>
 </div>
 
 <script>
@@ -57,6 +60,7 @@
 	const input = document.getElementById('aibot-input') as HTMLInputElement | null;
 	const home = document.getElementById('aibot-home');
 	const chat = document.getElementById('aibot-chat');
+	const scroll = document.getElementById('aibot-scroll');
 
 	form?.addEventListener('submit', (e) => {
 		e.preventDefault();
@@ -76,7 +80,7 @@
 		bot.textContent = 'UI demo only — no AI connected yet.';
 		chat.appendChild(bot);
 
-		chat.scrollTop = chat.scrollHeight;
+		scroll?.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' });
 		if (input) input.value = '';
 	});
 </script>
@@ -87,7 +91,6 @@
 		--muted: #5f6368;
 		--composer-bg: #fff;
 		--composer-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.08);
-		position: relative;
 		height: 100dvh;
 		display: flex;
 		flex-direction: column;
@@ -104,37 +107,10 @@
 		background: #131314;
 	}
 
-	/* Soft blue glow behind center */
-	.aibot::before {
-		content: '';
-		position: absolute;
-		left: 50%;
-		top: 42%;
-		transform: translate(-50%, -50%);
-		width: min(90vw, 720px);
-		height: min(70vh, 520px);
-		background: radial-gradient(
-			ellipse at center,
-			rgba(66, 133, 244, 0.14) 0%,
-			rgba(147, 197, 253, 0.08) 40%,
-			transparent 70%
-		);
-		pointer-events: none;
-	}
-	:global(:root.dark) .aibot::before {
-		background: radial-gradient(
-			ellipse at center,
-			rgba(66, 133, 244, 0.12) 0%,
-			rgba(30, 58, 95, 0.2) 45%,
-			transparent 70%
-		);
-	}
-
 	.aibot__header {
-		position: relative;
-		z-index: 1;
-		padding: 1rem 1.25rem;
 		flex-shrink: 0;
+		padding: 1rem 1.25rem;
+		z-index: 2;
 	}
 
 	.aibot__logo {
@@ -147,39 +123,121 @@
 		font-weight: 500;
 	}
 
-	.aibot__main {
+	.aibot__body {
 		position: relative;
-		z-index: 1;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 1rem 1.25rem 2rem;
+		min-height: 0;
+	}
+
+	/* Glow in content area above input */
+	.aibot__body::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 45%;
+		transform: translate(-50%, -50%);
+		width: min(90vw, 720px);
+		height: min(60vh, 480px);
+		background: radial-gradient(
+			ellipse at center,
+			rgba(66, 133, 244, 0.14) 0%,
+			rgba(147, 197, 253, 0.08) 40%,
+			transparent 70%
+		);
+		pointer-events: none;
+		z-index: 0;
+	}
+	:global(:root.dark) .aibot__body::before {
+		background: radial-gradient(
+			ellipse at center,
+			rgba(66, 133, 244, 0.12) 0%,
+			rgba(30, 58, 95, 0.2) 45%,
+			transparent 70%
+		);
+	}
+
+	.aibot__scroll {
+		position: relative;
+		z-index: 1;
+		flex: 1;
 		overflow-y: auto;
-	}
-
-	.aibot__main:has(.aibot__chat:not([hidden])) {
-		justify-content: flex-start;
-		padding-top: 2rem;
-	}
-
-	.aibot__center {
-		width: 100%;
-		max-width: 720px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 2rem;
+		padding: 1rem 1.25rem;
+		min-height: 0;
+	}
+
+	.aibot__home {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		max-width: 720px;
+		min-height: min(50vh, 400px);
+	}
+
+	.aibot__home[hidden] {
+		display: none !important;
 	}
 
 	.aibot__title {
 		margin: 0;
 		font-size: clamp(1.75rem, 4vw, 2.25rem);
 		font-weight: 400;
-		color: var(--text);
 		text-align: center;
 		letter-spacing: -0.02em;
+	}
+
+	.aibot__chat {
+		width: 100%;
+		max-width: 720px;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		padding: 0.5rem 0 1rem;
+		flex: 1;
+	}
+	.aibot__chat[hidden] {
+		display: none !important;
+	}
+
+	:global(.aibot-msg) {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.6;
+	}
+	:global(.aibot-msg--user) {
+		align-self: flex-end;
+		max-width: 85%;
+		padding: 0.75rem 1rem;
+		border-radius: 1.25rem;
+		background: #f0f4f9;
+		color: var(--text);
+	}
+	:global(:root.dark .aibot-msg--user) {
+		background: #282a2c;
+	}
+	:global(.aibot-msg--bot) {
+		align-self: flex-start;
+		max-width: 90%;
+		color: var(--text);
+	}
+
+	.aibot__footer {
+		position: relative;
+		z-index: 2;
+		flex-shrink: 0;
+		padding: 0.75rem 1.25rem 1.25rem;
+		display: flex;
+		justify-content: center;
+		background: linear-gradient(to top, #fff 70%, transparent);
+	}
+	:global(:root.dark) .aibot__footer {
+		background: linear-gradient(to top, #131314 70%, transparent);
 	}
 
 	.aibot__composer {
@@ -261,38 +319,4 @@
 	:global(:root.dark) .aibot__model:hover {
 		background: rgba(255, 255, 255, 0.08);
 	}
-
-	.aibot__chat {
-		width: 100%;
-		max-width: 720px;
-		display: flex;
-		flex-direction: column;
-		gap: 1.25rem;
-		padding-bottom: 2rem;
-	}
-	.aibot__chat[hidden] {
-		display: none !important;
-	}
-
-	:global(.aibot-msg) {
-		margin: 0;
-		font-size: 1rem;
-		line-height: 1.6;
-		color: var(--text);
-	}
-	:global(.aibot-msg--user) {
-		align-self: flex-end;
-		max-width: 85%;
-		padding: 0.75rem 1rem;
-		border-radius: 1.25rem;
-		background: #f0f4f9;
-	}
-	:global(:root.dark .aibot-msg--user) {
-		background: #282a2c;
-	}
-	:global(.aibot-msg--bot) {
-		align-self: flex-start;
-		max-width: 90%;
-	}
-
 </style>
