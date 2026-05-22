@@ -16,6 +16,7 @@
 	}
 
 	body:has(.neu-page) header {
+		padding: 0.85rem 1.25rem;
 		background: rgba(232, 237, 244, 0.75);
 		backdrop-filter: blur(12px);
 		box-shadow:
@@ -24,27 +25,52 @@
 		border-bottom: none;
 	}
 
+	body:has(.neu-page) header nav {
+		min-height: 2.75rem;
+		align-items: center;
+	}
+
 	:root.dark body:has(.neu-page) header {
 		background: rgba(20, 26, 36, 0.85);
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 	}
 
-	body:has(.neu-page) header nav a {
-		border-bottom: none;
-		border-radius: 999px;
-		padding: 0.5em 0.85em;
-		transition: box-shadow 0.15s ease, background 0.15s ease;
+	/* Nav links only — not theme/login controls */
+	body:has(.neu-page) header nav .internal-links {
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
 	}
 
-	body:has(.neu-page) header nav a.active {
+	body:has(.neu-page) header nav .internal-links a,
+	body:has(.neu-page) header nav h2 a {
+		border-bottom: none !important;
+		text-decoration: none !important;
+		border-radius: 999px;
+		padding: 0.55rem 0.9rem;
+		line-height: 1.25;
+		display: inline-flex;
+		align-items: center;
+		transition: box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+	}
+
+	body:has(.neu-page) .header-right {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		align-self: center;
+	}
+
+	body:has(.neu-page) header nav .internal-links a.active {
 		background: #e8edf4;
 		box-shadow:
 			inset 3px 3px 8px #b8c3d6,
 			inset -3px -3px 8px #ffffff;
 		color: var(--accent);
+		font-weight: 600;
 	}
 
-	:root.dark body:has(.neu-page) header nav a.active {
+	:root.dark body:has(.neu-page) header nav .internal-links a.active {
 		background: #1a2230;
 		box-shadow:
 			inset 3px 3px 8px #0c1018,
@@ -56,22 +82,48 @@
 		letter-spacing: -0.02em;
 	}
 
-	body:has(.neu-page) .header-right .theme-switcher,
-	body:has(.neu-page) .social-links a {
+	/* Theme + login: single clean circle, no double wrapper */
+	body:has(.neu-page) .header-right .theme-switcher {
+		margin-left: 0;
+		padding: 0;
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	body:has(.neu-page) .header-right .theme-button,
+	body:has(.neu-page) .header-right .login-icon-link {
+		width: 40px;
+		height: 40px;
+		padding: 0;
 		border-radius: 50%;
-		padding: 0.35rem;
+		border: none;
+		background: #e8edf4;
 		box-shadow:
 			4px 4px 10px #b8c3d6,
 			-4px -4px 10px #ffffff;
-		background: #e8edf4;
 	}
 
-	:root.dark body:has(.neu-page) .header-right .theme-switcher,
-	:root.dark body:has(.neu-page) .social-links a {
+	body:has(.neu-page) .header-right .theme-button:hover,
+	body:has(.neu-page) .header-right .login-icon-link:hover {
+		background: #e8edf4;
+		border: none;
+		box-shadow:
+			5px 5px 12px #b8c3d6,
+			-5px -5px 12px #ffffff;
+	}
+
+	:root.dark body:has(.neu-page) .header-right .theme-button,
+	:root.dark body:has(.neu-page) .header-right .login-icon-link {
 		background: #1a2230;
 		box-shadow:
 			4px 4px 10px #0c1018,
 			-4px -4px 10px #243044;
+	}
+
+	:root.dark body:has(.neu-page) .header-right .theme-button:hover,
+	:root.dark body:has(.neu-page) .header-right .login-icon-link:hover {
+		background: #1a2230;
 	}
 
 	body:has(.neu-page) footer {

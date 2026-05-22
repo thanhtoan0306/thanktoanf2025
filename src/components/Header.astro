@@ -126,7 +126,7 @@ import ThemeSwitcher from './ThemeSwitcher.astro';
 <style>
 header {
 	margin: 0;
-	padding: 0 1em;
+	padding: 0.75rem 1em;
 	background: var(--bg-primary);
 	box-shadow: 0 2px 8px rgba(var(--black), 5%);
 	transition: background-color 0.3s ease;
@@ -134,6 +134,8 @@ header {
 	h2 {
 		margin: 0;
 		font-size: 1em;
+		display: flex;
+		align-items: center;
 	}
 
 	h2 a,
@@ -144,15 +146,23 @@ header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		min-height: 3rem;
+		gap: 0.5rem;
+	}
+	.internal-links {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.15rem;
 	}
 	nav a {
-		padding: 1em 0.5em;
+		padding: 0.55rem 0.65rem;
 		color: var(--text-primary);
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
 		transition: color 0.3s ease;
 	}
-	nav a.active {
+	nav .internal-links a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
