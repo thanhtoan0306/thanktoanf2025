@@ -1,0 +1,368 @@
+---
+/** Floating AI Bot launcher + corner chat popup (UI demo). */
+---
+
+<div class="aibot-widget" id="aibot-widget">
+	<div class="aibot-widget__popup" id="aibot-widget-popup" hidden role="dialog" aria-label="AI Bot chat" aria-modal="false">
+		<header class="aibot-widget__head">
+			<div class="aibot-widget__head-left">
+				<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+					<path fill="#4285F4" d="M12 2l2.2 6.8H21l-5.5 4.2 2.1 6.5L12 15.5 6.4 19.5l2.1-6.5L3 8.8h6.8z"/>
+				</svg>
+				<span>AI Bot</span>
+			</div>
+			<div class="aibot-widget__head-actions">
+				<a href="/ai-bot" class="aibot-widget__icon-btn" title="Open full page" aria-label="Open full page">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+					</svg>
+				</a>
+				<button type="button" class="aibot-widget__icon-btn" id="aibot-widget-close" aria-label="Close chat">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+					</svg>
+				</button>
+			</div>
+		</header>
+
+		<div class="aibot-widget__messages" id="aibot-widget-messages">
+			<p class="aibot-widget__welcome">Hi! Ask me anything — UI demo only.</p>
+		</div>
+
+		<form class="aibot-widget__form" id="aibot-widget-form">
+			<input
+				type="text"
+				id="aibot-widget-input"
+				class="aibot-widget__input"
+				placeholder="Ask AI Bot"
+				autocomplete="off"
+				aria-label="Message"
+			/>
+			<button type="submit" class="aibot-widget__send" aria-label="Send">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+				</svg>
+			</button>
+		</form>
+	</div>
+
+	<button
+		type="button"
+		class="aibot-widget__fab"
+		id="aibot-widget-fab"
+		aria-label="Open AI Bot chat"
+		aria-expanded="false"
+		aria-controls="aibot-widget-popup"
+	>
+		<svg class="aibot-widget__fab-icon aibot-widget__fab-icon--open" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+			<path fill="#fff" d="M12 2l2.2 6.8H21l-5.5 4.2 2.1 6.5L12 15.5 6.4 19.5l2.1-6.5L3 8.8h6.8z"/>
+		</svg>
+		<svg class="aibot-widget__fab-icon aibot-widget__fab-icon--close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" aria-hidden="true">
+			<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+		</svg>
+	</button>
+</div>
+
+<script>
+	const widget = document.getElementById('aibot-widget');
+	const popup = document.getElementById('aibot-widget-popup');
+	const fab = document.getElementById('aibot-widget-fab');
+	const closeBtn = document.getElementById('aibot-widget-close');
+	const form = document.getElementById('aibot-widget-form');
+	const input = document.getElementById('aibot-widget-input') as HTMLInputElement | null;
+	const messages = document.getElementById('aibot-widget-messages');
+
+	function setOpen(open: boolean) {
+		if (!popup || !fab) return;
+		popup.hidden = !open;
+		fab.setAttribute('aria-expanded', String(open));
+		fab.classList.toggle('is-open', open);
+		if (open) {
+			setTimeout(() => input?.focus(), 80);
+		}
+	}
+
+	fab?.addEventListener('click', () => {
+		const isOpen = fab.getAttribute('aria-expanded') === 'true';
+		setOpen(!isOpen);
+	});
+
+	closeBtn?.addEventListener('click', () => setOpen(false));
+
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && fab?.getAttribute('aria-expanded') === 'true') {
+			setOpen(false);
+		}
+	});
+
+	form?.addEventListener('submit', (e) => {
+		e.preventDefault();
+		const text = input?.value.trim();
+		if (!text || !messages) return;
+
+		const welcome = messages.querySelector('.aibot-widget__welcome');
+		if (welcome) welcome.remove();
+
+		const user = document.createElement('p');
+		user.className = 'aibot-widget__msg aibot-widget__msg--user';
+		user.textContent = text;
+		messages.appendChild(user);
+
+		const bot = document.createElement('p');
+		bot.className = 'aibot-widget__msg aibot-widget__msg--bot';
+		bot.textContent = 'Thanks! This is a UI demo — connect a real API on /ai-bot later.';
+		messages.appendChild(bot);
+
+		messages.scrollTop = messages.scrollHeight;
+		if (input) input.value = '';
+	});
+</script>
+
+<style>
+	.aibot-widget {
+		position: fixed;
+		right: 1.25rem;
+		bottom: 1.25rem;
+		z-index: 9999;
+		font-family: 'Inter', system-ui, sans-serif;
+	}
+
+	.aibot-widget__fab {
+		width: 56px;
+		height: 56px;
+		border: none;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #4285f4 0%, #7c5cbf 50%, #d96570 100%);
+		box-shadow:
+			0 4px 14px rgba(66, 133, 244, 0.45),
+			0 8px 24px rgba(0, 0, 0, 0.12);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+	.aibot-widget__fab:hover {
+		transform: scale(1.06);
+		box-shadow:
+			0 6px 20px rgba(66, 133, 244, 0.5),
+			0 10px 28px rgba(0, 0, 0, 0.14);
+	}
+	.aibot-widget__fab.is-open {
+		background: #5f6368;
+	}
+	.aibot-widget__fab-icon--close {
+		display: none;
+	}
+	.aibot-widget__fab.is-open .aibot-widget__fab-icon--open {
+		display: none;
+	}
+	.aibot-widget__fab.is-open .aibot-widget__fab-icon--close {
+		display: block;
+	}
+
+	.aibot-widget__popup {
+		position: absolute;
+		right: 0;
+		bottom: calc(56px + 0.75rem);
+		width: min(380px, calc(100vw - 2rem));
+		height: min(480px, calc(100dvh - 8rem));
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		border-radius: 1.25rem;
+		box-shadow:
+			0 8px 32px rgba(0, 0, 0, 0.12),
+			0 2px 8px rgba(0, 0, 0, 0.06);
+		border: 1px solid rgba(0, 0, 0, 0.06);
+		overflow: hidden;
+		animation: aibot-widget-in 0.22s ease;
+	}
+	.aibot-widget__popup[hidden] {
+		display: none !important;
+	}
+
+	@keyframes aibot-widget-in {
+		from {
+			opacity: 0;
+			transform: translateY(12px) scale(0.96);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	:global(:root.dark) .aibot-widget__popup {
+		background: #1e1f20;
+		border-color: rgba(255, 255, 255, 0.1);
+		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+	}
+
+	.aibot-widget__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.85rem 1rem;
+		border-bottom: 1px solid #e8eaed;
+		flex-shrink: 0;
+		background: #f8fafc;
+	}
+	:global(:root.dark) .aibot-widget__head {
+		background: #282a2c;
+		border-bottom-color: #3c4043;
+	}
+
+	.aibot-widget__head-left {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: #1f1f1f;
+	}
+	:global(:root.dark) .aibot-widget__head-left {
+		color: #e3e3e3;
+	}
+
+	.aibot-widget__head-actions {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.aibot-widget__icon-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: #5f6368;
+		cursor: pointer;
+		text-decoration: none;
+		transition: background 0.15s ease;
+	}
+	.aibot-widget__icon-btn:hover {
+		background: rgba(0, 0, 0, 0.06);
+	}
+	:global(:root.dark) .aibot-widget__icon-btn {
+		color: #9aa0a6;
+	}
+	:global(:root.dark) .aibot-widget__icon-btn:hover {
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.aibot-widget__messages {
+		flex: 1;
+		overflow-y: auto;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		min-height: 0;
+	}
+
+	.aibot-widget__welcome {
+		margin: auto 0;
+		text-align: center;
+		font-size: 0.9rem;
+		color: #5f6368;
+		line-height: 1.5;
+	}
+	:global(:root.dark) .aibot-widget__welcome {
+		color: #9aa0a6;
+	}
+
+	:global(.aibot-widget__msg) {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.5;
+		max-width: 88%;
+	}
+	:global(.aibot-widget__msg--user) {
+		align-self: flex-end;
+		padding: 0.6rem 0.85rem;
+		border-radius: 1.1rem 1.1rem 0.25rem 1.1rem;
+		background: #e8f0fe;
+		color: #1f1f1f;
+	}
+	:global(:root.dark .aibot-widget__msg--user) {
+		background: #394457;
+		color: #e3e3e3;
+	}
+	:global(.aibot-widget__msg--bot) {
+		align-self: flex-start;
+		color: #1f1f1f;
+	}
+	:global(:root.dark .aibot-widget__msg--bot) {
+		color: #e3e3e3;
+	}
+
+	.aibot-widget__form {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		border-top: 1px solid #e8eaed;
+		flex-shrink: 0;
+		background: #fff;
+	}
+	:global(:root.dark) .aibot-widget__form {
+		background: #1e1f20;
+		border-top-color: #3c4043;
+	}
+
+	.aibot-widget__input {
+		flex: 1;
+		min-width: 0;
+		padding: 0.65rem 1rem;
+		border: none;
+		border-radius: 1.5rem;
+		background: #f0f4f9;
+		font: inherit;
+		font-size: 0.9rem;
+		color: #1f1f1f;
+	}
+	:global(:root.dark) .aibot-widget__input {
+		background: #282a2c;
+		color: #e3e3e3;
+	}
+	.aibot-widget__input:focus {
+		outline: 2px solid #4285f4;
+		outline-offset: 0;
+	}
+	.aibot-widget__input::placeholder {
+		color: #5f6368;
+	}
+
+	.aibot-widget__send {
+		width: 40px;
+		height: 40px;
+		flex-shrink: 0;
+		border: none;
+		border-radius: 50%;
+		background: #4285f4;
+		color: #fff;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.15s ease;
+	}
+	.aibot-widget__send:hover {
+		background: #3367d6;
+	}
+
+	@media (max-width: 480px) {
+		.aibot-widget {
+			right: 0.75rem;
+			bottom: 0.75rem;
+		}
+		.aibot-widget__popup {
+			width: calc(100vw - 1.5rem);
+			height: min(70dvh, 520px);
+		}
+	}
+</style>
