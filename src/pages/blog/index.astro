@@ -34,8 +34,8 @@ function toTitleFromSlug(slug: string): string {
 }
 
 async function getHtmlBlogCards(): Promise<HtmlBlogCard[]> {
-	const publicDir = new URL('../../../public/', import.meta.url);
-	const htmlBlogDir = new URL('./htmlblog/', publicDir);
+	// Use project root (reliable on Vercel/CI). import.meta.url relative paths often fail at build time.
+	const htmlBlogDir = path.join(process.cwd(), 'public', 'htmlblog');
 
 	let filenames: string[] = [];
 	try {
@@ -49,12 +49,12 @@ async function getHtmlBlogCards(): Promise<HtmlBlogCard[]> {
 		htmlFiles.map(async (filename) => {
 			const slug = path.basename(filename, path.extname(filename));
 			const href = `/htmlblog/${filename}`;
-			const fileUrl = new URL(`./${filename}`, htmlBlogDir);
+			const filePath = path.join(htmlBlogDir, filename);
 
 			let title: string | undefined;
 			let description: string | undefined;
 			try {
-				const html = await fs.readFile(fileUrl, 'utf-8');
+				const html = await fs.readFile(filePath, 'utf-8');
 				title = extractFirstMatch(html, /<title>([\s\S]*?)<\/title>/i);
 				description =
 					extractFirstMatch(
