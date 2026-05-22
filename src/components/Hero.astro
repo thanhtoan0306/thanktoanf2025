@@ -5,10 +5,15 @@ const {
 	primaryCta,
 	secondaryCta,
 	eyebrow = 'Personal dev blog',
+	variant = 'default',
+	align = 'center',
 } = Astro.props;
+
+const isNeu = variant === 'neumorphic';
+const isLeft = align === 'left';
 ---
 
-<section class="hero">
+<section class:list={['hero', isNeu && 'hero--neumorphic', isNeu && isLeft && 'hero--neu-left']}>
 	<p class="eyebrow">{eyebrow}</p>
 	<h1>{title}</h1>
 	<p class="subtitle">{subtitle}</p>
@@ -84,10 +89,134 @@ const {
 		box-shadow: 0 10px 24px rgba(var(--gray), 15%);
 	}
 
+	/* Neumorphic / soft UI */
+	.hero--neumorphic {
+		--neu-surface: #e8edf4;
+		--neu-shadow-dark: #b8c3d6;
+		--neu-shadow-light: #ffffff;
+		position: relative;
+		z-index: 1;
+		width: min(100%, 40rem);
+		max-width: 40rem;
+		margin: 0 auto;
+		padding: 2.5rem 2.75rem 2.75rem;
+		text-align: center;
+		justify-items: center;
+		border-radius: 2rem;
+		background: var(--neu-surface);
+		border: 1px solid rgba(255, 255, 255, 0.55);
+		box-shadow:
+			16px 16px 32px var(--neu-shadow-dark),
+			-16px -16px 32px var(--neu-shadow-light);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	}
+	.hero--neu-left {
+		text-align: left;
+		justify-items: start;
+	}
+	.hero--neu-left .actions {
+		justify-content: flex-start;
+	}
+	.hero--neu-left .subtitle {
+		margin-inline: 0;
+	}
+	.hero--neumorphic .eyebrow {
+		letter-spacing: 0.16em;
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: #8b9ab5;
+	}
+	.hero--neumorphic h1 {
+		font-size: clamp(2rem, 5vw, 2.75rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: #2d3748;
+	}
+	.hero--neumorphic .subtitle {
+		font-size: 1.05rem;
+		line-height: 1.65;
+		color: #6b7c93;
+		max-width: 28rem;
+	}
+	.hero--neumorphic .actions {
+		justify-content: center;
+		margin-top: 0.5rem;
+		gap: 1rem;
+	}
+	.hero--neumorphic .btn {
+		padding: 0.9rem 1.6rem;
+		border-radius: 999px;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.hero--neumorphic .btn.primary {
+		background: linear-gradient(145deg, #3b82f6, #2563eb);
+		color: #fff;
+		border: none;
+		box-shadow:
+			6px 6px 14px rgba(37, 99, 235, 0.35),
+			-4px -4px 12px rgba(255, 255, 255, 0.9),
+			inset 0 1px 0 rgba(255, 255, 255, 0.25);
+	}
+	.hero--neumorphic .btn.primary:hover {
+		background: linear-gradient(145deg, #2563eb, #1d4ed8);
+		transform: translateY(-1px);
+		box-shadow:
+			8px 8px 18px rgba(37, 99, 235, 0.4),
+			-4px -4px 12px rgba(255, 255, 255, 0.9);
+	}
+	.hero--neumorphic .btn.primary:active {
+		transform: translateY(0);
+		box-shadow:
+			inset 4px 4px 10px rgba(29, 78, 216, 0.45),
+			inset -2px -2px 8px rgba(255, 255, 255, 0.15);
+	}
+	.hero--neumorphic .btn.ghost {
+		background: var(--neu-surface);
+		color: #4a5568;
+		border: none;
+		box-shadow:
+			6px 6px 14px var(--neu-shadow-dark),
+			-6px -6px 14px var(--neu-shadow-light);
+	}
+	.hero--neumorphic .btn.ghost:hover {
+		color: var(--accent);
+		box-shadow:
+			8px 8px 16px var(--neu-shadow-dark),
+			-8px -8px 16px var(--neu-shadow-light);
+	}
+	.hero--neumorphic .btn.ghost:active {
+		box-shadow:
+			inset 5px 5px 12px var(--neu-shadow-dark),
+			inset -5px -5px 12px var(--neu-shadow-light);
+	}
+
+	:global(:root.dark) .hero--neumorphic {
+		--neu-surface: #1e2433;
+		--neu-shadow-dark: #12161f;
+		--neu-shadow-light: #2a3347;
+		border-color: rgba(255, 255, 255, 0.06);
+	}
+	:global(:root.dark) .hero--neumorphic h1 {
+		color: #e8edf4;
+	}
+	:global(:root.dark) .hero--neumorphic .subtitle {
+		color: #9aa8be;
+	}
+	:global(:root.dark) .hero--neumorphic .eyebrow {
+		color: #6b7c93;
+	}
+	:global(:root.dark) .hero--neumorphic .btn.ghost {
+		color: #c5d0e0;
+	}
+
 	@media (max-width: 720px) {
 		.hero {
 			padding: 1.5rem;
 		}
+		.hero--neumorphic {
+			padding: 2.25rem 1.5rem;
+			border-radius: 1.5rem;
+		}
 	}
 </style>
-

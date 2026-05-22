@@ -1,0 +1,567 @@
+---
+import Hero from '../Hero.astro';
+import { SITE_AUTHOR, SITE_TITLE } from '../../consts';
+
+const quickRail = [
+	{ href: '/blog', label: 'Blog', icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z' },
+	{ href: '/playground', label: 'Playground', icon: 'M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z' },
+	{ href: '/apps', label: 'Apps', icon: 'M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z' },
+	{ href: '/gallery-firebase', label: 'Gallery', icon: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z' },
+];
+
+const appTiles = [
+	{ href: '/blog', label: 'Blog', color: '#4285F4', letter: 'B' },
+	{ href: '/idea', label: 'Idea', color: '#EA4335', letter: 'I' },
+	{ href: '/collection', label: 'Collection', color: '#FBBC04', letter: 'C' },
+	{ href: '/apps', label: 'Apps', color: '#34A853', letter: 'A' },
+	{ href: '/playground', label: 'Playground', color: '#9C27B0', letter: 'P' },
+	{ href: '/api-docs', label: 'API Docs', color: '#00BCD4', letter: 'D' },
+	{ href: '/md-browser', label: 'MD Browser', color: '#FF5722', letter: 'M' },
+	{ href: '/about', label: 'About', color: '#607D8B', letter: '?' },
+];
+---
+
+<div class="home-neu">
+	<div class="home-neu__orbs" aria-hidden="true">
+		<span class="orb orb--1"></span>
+		<span class="orb orb--2"></span>
+		<span class="orb orb--3"></span>
+	</div>
+
+	<div class="home-neu__watermark" aria-hidden="true">{SITE_TITLE}</div>
+
+	<aside class="home-neu__dock" aria-label="Quick actions">
+		<div class="home-neu__dock-dots" aria-hidden="true">
+			<span style="--c:#4285F4"></span>
+			<span style="--c:#EA4335"></span>
+			<span style="--c:#FBBC04"></span>
+			<span style="--c:#34A853"></span>
+		</div>
+		<a href="#explore" class="neu-pill neu-pill--icon" title="Explore">
+			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+		</a>
+		<a href="/about" class="neu-pill neu-pill--icon" title="About">
+			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+		</a>
+	</aside>
+
+	<div class="home-neu__layout">
+		<main class="home-neu__main">
+			<div class="home-neu__clock neu-inset">
+				<time id="home-clock" class="home-neu__clock-time">--:--</time>
+				<p id="home-date" class="home-neu__clock-date">—</p>
+			</div>
+
+			<Hero
+				variant="neumorphic"
+				align="left"
+				eyebrow="Developer journal"
+				title={`Hello, I'm ${SITE_AUTHOR}`}
+				subtitle="Frontend engineer, builder and someone who documents what I learn when building real products."
+				primaryCta={{ href: '/blog', label: 'Read blog' }}
+				secondaryCta={{ href: '/about', label: 'About me' }}
+			/>
+
+			<div id="explore" class="home-neu__search neu-raised">
+				<span class="home-neu__search-mark" aria-hidden="true">
+					<span class="g-dot" style="--c:#4285F4"></span>
+					<span class="g-dot" style="--c:#EA4335"></span>
+					<span class="g-dot" style="--c:#FBBC04"></span>
+					<span class="g-dot" style="--c:#34A853"></span>
+				</span>
+				<span class="home-neu__search-text">Explore blog, playgrounds, apps…</span>
+				<a href="/blog" class="neu-pill neu-pill--sm">Go</a>
+			</div>
+
+			<section class="home-neu__apps" aria-label="Quick links">
+				<button type="button" class="home-neu__apps-toggle neu-raised" id="apps-toggle" aria-expanded="false" aria-controls="apps-panel">
+					<span class="home-neu__apps-toggle-dots" aria-hidden="true">
+						<span style="--c:#4285F4"></span><span style="--c:#EA4335"></span>
+						<span style="--c:#FBBC04"></span><span style="--c:#34A853"></span>
+					</span>
+					<span>Shortcuts</span>
+				</button>
+				<div id="apps-panel" class="home-neu__apps-panel neu-raised" hidden>
+					{appTiles.map((tile) => (
+						<a href={tile.href} class="home-neu__app-tile neu-inset-sm">
+							<span class="home-neu__app-icon" style={`background:${tile.color}`}>{tile.letter}</span>
+							<span>{tile.label}</span>
+						</a>
+					))}
+				</div>
+			</section>
+		</main>
+
+		<nav class="home-neu__rail" aria-label="Sections">
+			{quickRail.map((item) => (
+				<a href={item.href} class="home-neu__rail-link neu-pill">
+					<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+						<path d={item.icon} />
+					</svg>
+					<span>{item.label}</span>
+				</a>
+			))}
+		</nav>
+	</div>
+
+	<div class="home-neu__widgets">
+		<div class="home-neu__widget neu-raised">
+			<span class="home-neu__widget-icon" aria-hidden="true">☀️</span>
+			<div>
+				<strong>Building</strong>
+				<span>Astro · Vue · TS</span>
+			</div>
+		</div>
+		<div class="home-neu__widget neu-raised">
+			<span class="home-neu__widget-icon" aria-hidden="true">📍</span>
+			<div>
+				<strong>Dev log</strong>
+				<span>Open source spirit</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function pad(n: number) {
+		return String(n).padStart(2, '0');
+	}
+	function tick() {
+		const now = new Date();
+		const clock = document.getElementById('home-clock');
+		const date = document.getElementById('home-date');
+		if (clock) {
+			clock.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+		}
+		if (date) {
+			date.textContent = now.toLocaleDateString('vi-VN', {
+				weekday: 'long',
+				day: 'numeric',
+				month: 'long',
+			});
+		}
+	}
+	tick();
+	setInterval(tick, 30_000);
+
+	const appsToggle = document.getElementById('apps-toggle');
+	const appsPanel = document.getElementById('apps-panel');
+	appsToggle?.addEventListener('click', () => {
+		const open = appsPanel?.hasAttribute('hidden');
+		if (open) {
+			appsPanel?.removeAttribute('hidden');
+			appsToggle?.setAttribute('aria-expanded', 'true');
+		} else {
+			appsPanel?.setAttribute('hidden', '');
+			appsToggle?.setAttribute('aria-expanded', 'false');
+		}
+	});
+</script>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+	.home-neu {
+		--neu-bg: #e4eaf3;
+		--neu-surface: #e8edf4;
+		--neu-dark: #b8c5d9;
+		--neu-light: #ffffff;
+		--neu-text: #2d3748;
+		--neu-muted: #6b7c93;
+		position: relative;
+		min-height: calc(100vh - 7rem);
+		padding: 2rem clamp(1rem, 4vw, 3rem) 5rem;
+		font-family: 'Inter', system-ui, sans-serif;
+		overflow: hidden;
+	}
+
+	:global(:root.dark) .home-neu {
+		--neu-bg: #141a24;
+		--neu-surface: #1a2230;
+		--neu-dark: #0c1018;
+		--neu-light: #243044;
+		--neu-text: #e8edf4;
+		--neu-muted: #9aa8be;
+	}
+
+	/* Shared neumorphic primitives */
+	.neu-raised {
+		background: var(--neu-surface);
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow:
+			8px 8px 18px var(--neu-dark),
+			-8px -8px 18px var(--neu-light);
+	}
+	.neu-inset {
+		background: var(--neu-surface);
+		border-radius: 1.25rem;
+		box-shadow:
+			inset 6px 6px 14px var(--neu-dark),
+			inset -6px -6px 14px var(--neu-light);
+	}
+	.neu-inset-sm {
+		background: var(--neu-surface);
+		border-radius: 1rem;
+		box-shadow:
+			inset 4px 4px 10px var(--neu-dark),
+			inset -4px -4px 10px var(--neu-light);
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+	.neu-inset-sm:hover {
+		transform: translateY(-2px);
+		box-shadow:
+			4px 4px 12px var(--neu-dark),
+			-4px -4px 12px var(--neu-light);
+	}
+	.neu-pill {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		padding: 0.65rem;
+		border-radius: 999px;
+		background: var(--neu-surface);
+		color: var(--neu-muted);
+		text-decoration: none;
+		border: none;
+		cursor: pointer;
+		box-shadow:
+			6px 6px 14px var(--neu-dark),
+			-6px -6px 14px var(--neu-light);
+		transition: transform 0.15s ease, color 0.15s ease;
+	}
+	.neu-pill:hover {
+		color: var(--accent);
+		transform: translateY(-1px);
+	}
+	.neu-pill:active {
+		box-shadow:
+			inset 4px 4px 10px var(--neu-dark),
+			inset -4px -4px 10px var(--neu-light);
+	}
+	.neu-pill--icon {
+		width: 2.75rem;
+		height: 2.75rem;
+		padding: 0;
+	}
+	.neu-pill--sm {
+		padding: 0.5rem 1.1rem;
+		font-weight: 600;
+		font-size: 0.85rem;
+		color: #fff;
+		background: linear-gradient(145deg, #3b82f6, #2563eb);
+		box-shadow:
+			4px 4px 10px rgba(37, 99, 235, 0.35),
+			-2px -2px 8px var(--neu-light);
+	}
+
+	/* Background */
+	.home-neu__orbs {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		overflow: hidden;
+	}
+	.orb {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(60px);
+		opacity: 0.45;
+	}
+	.orb--1 {
+		width: 320px;
+		height: 320px;
+		background: #93c5fd;
+		top: -80px;
+		right: 10%;
+	}
+	.orb--2 {
+		width: 280px;
+		height: 280px;
+		background: #c4b5fd;
+		bottom: 10%;
+		left: -60px;
+	}
+	.orb--3 {
+		width: 200px;
+		height: 200px;
+		background: #fda4af;
+		top: 40%;
+		right: -40px;
+		opacity: 0.3;
+	}
+
+	.home-neu__watermark {
+		position: absolute;
+		top: 42%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: clamp(4rem, 20vw, 12rem);
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		color: rgba(163, 177, 198, 0.18);
+		white-space: nowrap;
+		pointer-events: none;
+		user-select: none;
+		z-index: 0;
+	}
+	:global(:root.dark) .home-neu__watermark {
+		color: rgba(255, 255, 255, 0.03);
+	}
+
+	/* Left dock */
+	.home-neu__dock {
+		position: fixed;
+		left: clamp(0.75rem, 2vw, 1.5rem);
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 20;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.65rem;
+		padding: 0.85rem 0.55rem;
+		border-radius: 999px;
+		background: var(--neu-surface);
+		border: 1px solid rgba(255, 255, 255, 0.45);
+		box-shadow:
+			10px 10px 22px var(--neu-dark),
+			-10px -10px 22px var(--neu-light);
+	}
+	.home-neu__dock-dots {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 5px;
+		padding-bottom: 0.35rem;
+		border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+		margin-bottom: 0.15rem;
+	}
+	.home-neu__dock-dots span {
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: var(--c);
+	}
+
+	/* Layout */
+	.home-neu__layout {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: 2rem;
+		max-width: 1100px;
+		margin: 0 auto;
+		align-items: start;
+	}
+
+	.home-neu__main {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+		width: 100%;
+	}
+
+	/* Clock */
+	.home-neu__clock {
+		padding: 0.85rem 1.5rem;
+		text-align: center;
+		width: min(100%, 20rem);
+	}
+	.home-neu__clock-time {
+		display: block;
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		font-weight: 300;
+		letter-spacing: -0.03em;
+		color: var(--neu-text);
+		font-variant-numeric: tabular-nums;
+	}
+	.home-neu__clock-date {
+		margin: 0.15rem 0 0;
+		font-size: 0.95rem;
+		color: var(--neu-muted);
+		text-transform: capitalize;
+	}
+
+	/* Search bar */
+	.home-neu__search {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		width: min(100%, 36rem);
+		padding: 0.85rem 0.85rem 0.85rem 1.25rem;
+	}
+	.home-neu__search-mark {
+		display: flex;
+		gap: 3px;
+		flex-shrink: 0;
+	}
+	.g-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--c);
+	}
+	.home-neu__search-text {
+		flex: 1;
+		color: var(--neu-muted);
+		font-size: 1rem;
+	}
+
+	/* Apps drawer */
+	.home-neu__apps {
+		position: relative;
+		width: min(100%, 36rem);
+	}
+	.home-neu__apps-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		padding: 0.7rem 1.25rem;
+		font: inherit;
+		font-weight: 600;
+		color: var(--neu-text);
+		cursor: pointer;
+		border: none;
+	}
+	.home-neu__apps-toggle-dots {
+		display: flex;
+		gap: 4px;
+	}
+	.home-neu__apps-toggle-dots span {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--c);
+	}
+	.home-neu__apps-panel {
+		position: absolute;
+		top: calc(100% + 0.75rem);
+		left: 50%;
+		transform: translateX(-50%);
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 0.65rem;
+		padding: 1.25rem;
+		border-radius: 1.5rem;
+		width: min(100%, 22rem);
+		z-index: 10;
+	}
+	.home-neu__apps-panel[hidden] {
+		display: none;
+	}
+	.home-neu__app-tile {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.75rem 0.35rem;
+		text-decoration: none;
+		color: var(--neu-text);
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-align: center;
+	}
+	.home-neu__app-icon {
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		font-weight: 700;
+		font-size: 0.95rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+
+	/* Right rail */
+	.home-neu__rail {
+		display: flex;
+		flex-direction: column;
+		gap: 0.65rem;
+		padding-top: 4rem;
+	}
+	.home-neu__rail-link {
+		flex-direction: column;
+		padding: 0.75rem 0.55rem;
+		min-width: 4.5rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-align: center;
+	}
+	.home-neu__rail-link svg {
+		opacity: 0.75;
+	}
+
+	/* Bottom widgets */
+	.home-neu__widgets {
+		position: fixed;
+		left: clamp(1rem, 3vw, 2rem);
+		bottom: 2rem;
+		z-index: 15;
+		display: flex;
+		flex-direction: column;
+		gap: 0.65rem;
+	}
+	.home-neu__widget {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		padding: 0.65rem 1rem;
+		border-radius: 1rem;
+		font-size: 0.8rem;
+		color: var(--neu-muted);
+	}
+	.home-neu__widget strong {
+		display: block;
+		color: var(--neu-text);
+		font-size: 0.88rem;
+	}
+	.home-neu__widget span {
+		display: block;
+	}
+	.home-neu__widget-icon {
+		font-size: 1.25rem;
+	}
+
+	@media (max-width: 900px) {
+		.home-neu__rail {
+			display: none;
+		}
+		.home-neu__dock {
+			top: auto;
+			bottom: 5.5rem;
+			left: 50%;
+			transform: translateX(-50%);
+			flex-direction: row;
+			padding: 0.55rem 0.85rem;
+		}
+		.home-neu__dock-dots {
+			border-bottom: none;
+			border-right: 1px solid rgba(163, 177, 198, 0.25);
+			padding-bottom: 0;
+			padding-right: 0.5rem;
+			margin-bottom: 0;
+			margin-right: 0.15rem;
+		}
+		.home-neu__widgets {
+			flex-direction: row;
+			left: 50%;
+			transform: translateX(-50%);
+			bottom: 1rem;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.home-neu__widgets {
+			display: none;
+		}
+		.home-neu__apps-panel {
+			grid-template-columns: repeat(3, 1fr);
+			width: min(calc(100vw - 2rem), 18rem);
+		}
+	}
+</style>
