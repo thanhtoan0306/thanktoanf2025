@@ -77,9 +77,17 @@ const today = new Date();
 		margin-top: 1em;
 	}
 	.social-links a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 0;
 		text-decoration: none;
 		color: var(--text-secondary);
 		transition: color 0.3s ease;
+	}
+	.social-links a svg {
+		display: block;
+		flex-shrink: 0;
 	}
 	.social-links a:hover {
 		color: var(--text-primary);

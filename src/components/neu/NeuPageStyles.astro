@@ -132,14 +132,33 @@
 		padding-bottom: 2rem;
 	}
 
+	body:has(.neu-page) footer .social-links {
+		align-items: center;
+	}
+
 	body:has(.neu-page) footer .social-links a {
+		width: 3rem;
+		height: 3rem;
+		padding: 0;
 		border-radius: 50%;
-		padding: 0.5rem;
+		aspect-ratio: 1;
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 0;
 		background: #e8edf4;
 		box-shadow:
 			6px 6px 14px #b8c3d6,
 			-6px -6px 14px #ffffff;
 		transition: transform 0.15s ease;
+	}
+
+	body:has(.neu-page) footer .social-links a svg {
+		width: 1.35rem;
+		height: 1.35rem;
+		display: block;
+		flex-shrink: 0;
 	}
 
 	body:has(.neu-page) footer .social-links a:hover {
