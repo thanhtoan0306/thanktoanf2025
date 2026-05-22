@@ -1,0 +1,53 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const { title = `AI Bot | ${SITE_TITLE}`, description = SITE_DESCRIPTION } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<script>
+			(function () {
+				const theme = localStorage.getItem('theme') || 'light';
+				const root = document.documentElement;
+				if (theme === 'auto') {
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					root.classList.add(prefersDark ? 'dark' : 'light');
+					root.setAttribute('data-theme', 'auto');
+				} else {
+					root.classList.add(theme);
+					root.setAttribute('data-theme', theme);
+				}
+			})();
+		</script>
+	</head>
+	<body class="ai-bot-body">
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	.ai-bot-body {
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		height: 100dvh;
+		font-family: 'Google Sans Flex', 'Inter', system-ui, sans-serif;
+		background: #fff;
+		color: #1f1f1f;
+	}
+
+	:root.dark .ai-bot-body {
+		background: #131314;
+		color: #e3e3e3;
+	}
+</style>
