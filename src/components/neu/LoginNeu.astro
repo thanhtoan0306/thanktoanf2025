@@ -1,0 +1,405 @@
+---
+import { SITE_TITLE } from '../../consts';
+---
+
+<div class="neu-page login-neu">
+	<div class="login-neu__orbs" aria-hidden="true">
+		<span class="orb orb--1"></span>
+		<span class="orb orb--2"></span>
+	</div>
+	<div class="login-neu__watermark" aria-hidden="true">{SITE_TITLE}</div>
+
+	<div class="login-neu__inner">
+		<header class="login-neu__header neu-raised">
+			<p class="login-neu__eyebrow">Welcome back</p>
+			<h1>Login</h1>
+			<p class="login-neu__lead">Login with admin account to manage blog.</p>
+		</header>
+
+		<section class="login-neu__section">
+			<slot />
+		</section>
+	</div>
+</div>
+
+<style>
+	@import '../../styles/neu-tokens.css';
+
+	.login-neu {
+		position: relative;
+		min-height: calc(100vh - 7rem);
+		padding: 2.5rem clamp(1rem, 4vw, 2.5rem) 4rem;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.login-neu__orbs {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+	.orb {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(70px);
+		opacity: 0.4;
+	}
+	.orb--1 {
+		width: 280px;
+		height: 280px;
+		background: #a5b4fc;
+		top: 15%;
+		left: 20%;
+	}
+	.orb--2 {
+		width: 220px;
+		height: 220px;
+		background: #86efac;
+		bottom: 20%;
+		right: 15%;
+		opacity: 0.35;
+	}
+
+	.login-neu__watermark {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: clamp(3rem, 14vw, 9rem);
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		color: rgba(163, 177, 198, 0.14);
+		white-space: nowrap;
+		pointer-events: none;
+		user-select: none;
+	}
+	:global(:root.dark) .login-neu__watermark {
+		color: rgba(255, 255, 255, 0.03);
+	}
+
+	.login-neu__inner {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		max-width: 440px;
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.login-neu__header {
+		padding: 1.75rem 2rem;
+		text-align: center;
+	}
+
+	.login-neu__eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: var(--neu-muted);
+	}
+
+	.login-neu__header h1 {
+		margin: 0.35rem 0 0.5rem;
+		font-size: clamp(1.75rem, 4vw, 2.25rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: var(--neu-text);
+	}
+
+	.login-neu__lead {
+		margin: 0;
+		color: var(--neu-muted);
+		font-size: 0.95rem;
+		line-height: 1.55;
+	}
+
+	.login-neu__section {
+		display: flex;
+		justify-content: center;
+	}
+
+	/* Form & profile cards */
+	.login-neu :global(#admin-login-form),
+	.login-neu :global(#user-profile) {
+		width: 100%;
+		max-width: 400px;
+		padding: 2rem;
+		border-radius: 1.5rem;
+		background: var(--neu-surface);
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow:
+			12px 12px 26px var(--neu-dark),
+			-12px -12px 26px var(--neu-light);
+		display: grid;
+		gap: 1rem;
+	}
+
+	.login-neu :global(#admin-login-form[hidden]),
+	.login-neu :global(#user-profile[hidden]) {
+		display: none !important;
+		visibility: hidden !important;
+	}
+
+	.login-neu :global(#admin-login-form:not([hidden])),
+	.login-neu :global(#user-profile:not([hidden])) {
+		display: grid;
+	}
+
+	.login-neu :global(.field-group) {
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.login-neu :global(label) {
+		font-weight: 600;
+		font-size: 0.88rem;
+		color: var(--neu-muted);
+	}
+
+	.login-neu :global(input) {
+		padding: 0.75rem 1rem;
+		border-radius: 0.85rem;
+		border: none;
+		background: var(--neu-surface);
+		color: var(--neu-text);
+		font-size: 1rem;
+		font-family: inherit;
+		box-shadow:
+			inset 4px 4px 10px var(--neu-dark),
+			inset -4px -4px 10px var(--neu-light);
+		transition: box-shadow 0.15s ease;
+	}
+
+	.login-neu :global(input:focus-visible) {
+		outline: none;
+		box-shadow:
+			inset 5px 5px 12px var(--neu-dark),
+			inset -5px -5px 12px var(--neu-light),
+			0 0 0 2px rgba(37, 99, 235, 0.35);
+	}
+
+	.login-neu :global(.actions) {
+		display: flex;
+		width: 100%;
+	}
+
+	.login-neu :global(.primary-btn) {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.65rem;
+		padding: 0.9rem 1.5rem;
+		margin-top: 0.5rem;
+		border-radius: 999px;
+		border: none;
+		background: linear-gradient(145deg, #3b82f6, #2563eb);
+		color: #fff;
+		font-weight: 600;
+		font-size: 1rem;
+		font-family: inherit;
+		cursor: pointer;
+		box-shadow:
+			6px 6px 14px rgba(37, 99, 235, 0.35),
+			-4px -4px 12px var(--neu-light);
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.login-neu :global(.primary-btn:hover) {
+		transform: translateY(-1px);
+		box-shadow:
+			8px 8px 18px rgba(37, 99, 235, 0.4),
+			-4px -4px 12px var(--neu-light);
+	}
+
+	.login-neu :global(.primary-btn:active) {
+		transform: translateY(0);
+		box-shadow:
+			inset 4px 4px 10px rgba(29, 78, 216, 0.5),
+			inset -2px -2px 8px rgba(255, 255, 255, 0.15);
+	}
+
+	.login-neu :global(.primary-btn .btn-text) {
+		color: #fff;
+	}
+
+	.login-neu :global(.primary-btn:hover .btn-icon) {
+		transform: translateX(3px);
+	}
+
+	.login-neu :global(.divider) {
+		display: flex;
+		align-items: center;
+		margin: 0.5rem 0;
+	}
+
+	.login-neu :global(.divider::before),
+	.login-neu :global(.divider::after) {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, var(--neu-dark), transparent);
+	}
+
+	.login-neu :global(.divider span) {
+		padding: 0 1rem;
+		font-size: 0.85rem;
+		color: var(--neu-muted);
+		font-weight: 500;
+	}
+
+	.login-neu :global(#google-signin-button) {
+		display: flex;
+		justify-content: center;
+	}
+
+	.login-neu :global(.message) {
+		min-height: 1.4rem;
+		font-size: 0.88rem;
+		margin: 0;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.65rem;
+		text-align: center;
+	}
+
+	.login-neu :global(.message[hidden]) {
+		display: none;
+	}
+
+	.login-neu :global(.message.error) {
+		color: #dc2626;
+		background: rgba(220, 38, 38, 0.08);
+		box-shadow: inset 2px 2px 6px rgba(220, 38, 38, 0.1);
+	}
+
+	.login-neu :global(.message.success) {
+		color: #16a34a;
+		background: rgba(22, 163, 74, 0.08);
+	}
+
+	/* User profile */
+	.login-neu :global(.user-header) {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		padding-bottom: 1.25rem;
+		border-bottom: none;
+		box-shadow:
+			inset 0 -2px 8px var(--neu-dark);
+		margin-bottom: 0.25rem;
+	}
+
+	.login-neu :global(.user-avatar) {
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		overflow: hidden;
+		flex-shrink: 0;
+		padding: 4px;
+		background: var(--neu-surface);
+		box-shadow:
+			inset 4px 4px 10px var(--neu-dark),
+			inset -4px -4px 10px var(--neu-light);
+		border: none;
+	}
+
+	.login-neu :global(.user-avatar img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 50%;
+	}
+
+	.login-neu :global(.avatar-placeholder) {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--neu-muted);
+	}
+
+	.login-neu :global(.user-name) {
+		margin: 0 0 0.2rem;
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: var(--neu-text);
+	}
+
+	.login-neu :global(.user-email) {
+		margin: 0 0 0.5rem;
+		font-size: 0.9rem;
+		color: var(--neu-muted);
+	}
+
+	.login-neu :global(.login-method-badge) {
+		display: inline-block;
+		padding: 0.3rem 0.75rem;
+		border-radius: 999px;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		box-shadow:
+			inset 2px 2px 6px var(--neu-dark),
+			inset -2px -2px 6px var(--neu-light);
+	}
+
+	.login-neu :global(.login-method-badge.google-badge) {
+		color: #4285f4;
+	}
+
+	.login-neu :global(.login-method-badge.admin-badge) {
+		color: var(--accent);
+	}
+
+	.login-neu :global(.logout-btn) {
+		width: 100%;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.85rem 1.5rem;
+		border-radius: 999px;
+		border: none;
+		background: var(--neu-surface);
+		color: var(--neu-text);
+		font-weight: 600;
+		font-size: 0.95rem;
+		font-family: inherit;
+		cursor: pointer;
+		box-shadow:
+			6px 6px 14px var(--neu-dark),
+			-6px -6px 14px var(--neu-light);
+		transition: transform 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.login-neu :global(.logout-btn:hover) {
+		color: #dc2626;
+		transform: translateY(-1px);
+		box-shadow:
+			8px 8px 16px var(--neu-dark),
+			-8px -8px 16px var(--neu-light);
+	}
+
+	.login-neu :global(.logout-btn:active) {
+		box-shadow:
+			inset 4px 4px 10px var(--neu-dark),
+			inset -4px -4px 10px var(--neu-light);
+	}
+
+	@media (max-width: 480px) {
+		.login-neu :global(#admin-login-form),
+		.login-neu :global(#user-profile) {
+			padding: 1.5rem;
+		}
+		.login-neu :global(.user-header) {
+			flex-direction: column;
+			text-align: center;
+		}
+	}
+</style>

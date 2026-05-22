@@ -1,19 +1,14 @@
 ---
+import LoginNeu from '../components/neu/LoginNeu.astro';
+import NeuPageStyles from '../components/neu/NeuPageStyles.astro';
 import PageLayout from '../layouts/PageLayout.astro';
 ---
 
 <PageLayout title="Login">
-	<section class="page-header">
-		<div>
-			<p class="eyebrow">Welcome back</p>
-			<h1>Login</h1>
-			<p class="lead">Login with admin account to manage blog.</p>
-		</div>
-	</section>
-
-	<section class="login-section">
+	<NeuPageStyles />
+	<LoginNeu>
 		<!-- Login Form (hidden when logged in) -->
-		<form id="admin-login-form" class="card">
+		<form id="admin-login-form">
 			<div class="field-group">
 				<label for="username">Username</label>
 				<input
@@ -52,7 +47,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 		</form>
 
 		<!-- User Profile (shown when logged in) -->
-		<div id="user-profile" class="card user-card" hidden>
+		<div id="user-profile" hidden>
 			<div class="user-header">
 				<div class="user-avatar">
 					<img id="user-avatar-img" src="" alt="User avatar" hidden />
@@ -80,7 +75,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 				</button>
 			</div>
 		</div>
-	</section>
+	</LoginNeu>
 
 	<script>
 		// Type definitions for Google Identity Services
@@ -390,276 +385,5 @@ import PageLayout from '../layouts/PageLayout.astro';
 			}
 		});
 	</script>
-
-	<style>
-		.page-header {
-			display: grid;
-			gap: 0.5rem;
-			margin-bottom: 2rem;
-			text-align: center;
-		}
-		.eyebrow {
-			margin: 0;
-			text-transform: uppercase;
-			font-size: 0.9rem;
-			letter-spacing: 0.15em;
-			color: rgb(var(--gray));
-		}
-		.lead {
-			margin: 0;
-			color: rgb(var(--gray));
-			max-width: 640px;
-			margin-left: auto;
-			margin-right: auto;
-		}
-		.login-section {
-			display: flex;
-			justify-content: center;
-			align-items: flex-start;
-		}
-		#admin-login-form[hidden],
-		#user-profile[hidden] {
-			display: none !important;
-			visibility: hidden !important;
-		}
-		#admin-login-form:not([hidden]),
-		#user-profile:not([hidden]) {
-			display: block;
-		}
-		.card {
-			display: grid;
-			gap: 1rem;
-			width: 100%;
-			max-width: 400px;
-			padding: 2rem;
-			border-radius: 1rem;
-			border: 1px solid var(--border-color);
-			box-shadow: 0 10px 25px rgba(var(--black), 0.04);
-			background: var(--bg-primary);
-			transition: background-color 0.3s ease, border-color 0.3s ease;
-		}
-		.actions {
-			display: flex;
-			gap: 0.5rem;
-			align-items: stretch;
-			width: 100%;
-		}
-		.primary-btn {
-			width: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.75rem;
-			padding: 0.875rem 1.75rem;
-			border-radius: 0.75rem;
-			border: 1px solid var(--border-color);
-			background: var(--bg-primary);
-			color: var(--text-primary);
-			font-weight: 600;
-			font-size: 1rem;
-			cursor: pointer;
-			transition: all 0.2s ease;
-			margin-top: 1rem;
-		}
-		.primary-btn:hover {
-			background: var(--bg-secondary);
-			border-color: rgb(var(--gray));
-		}
-		.primary-btn:active {
-			background: var(--bg-primary);
-		}
-		.primary-btn .btn-text {
-			color: var(--text-primary);
-		}
-		.primary-btn .btn-icon {
-			transition: transform 0.2s ease;
-			flex-shrink: 0;
-		}
-		.primary-btn:hover .btn-icon {
-			transform: translateX(2px);
-		}
-		.field-group {
-			display: grid;
-			gap: 0.25rem;
-		}
-		label {
-			font-weight: 500;
-			font-size: 0.95rem;
-		}
-		input {
-			padding: 0.6rem 0.75rem;
-			border-radius: 0.6rem;
-			border: 1px solid var(--border-color);
-			background: var(--bg-primary);
-			color: var(--text-primary);
-			font-size: 1rem;
-			transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-		}
-		input:focus-visible {
-			outline: 2px solid rgb(var(--accent));
-			outline-offset: 1px;
-		}
-		.secondary-btn {
-			margin-top: 0.25rem;
-			padding: 0.6rem 0.9rem;
-			border-radius: 999px;
-			border: 1px solid var(--border-color);
-			background: var(--bg-primary);
-			color: var(--text-primary);
-			font-weight: 500;
-			cursor: pointer;
-			transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-		}
-		.secondary-btn:hover {
-			background: var(--bg-secondary);
-		}
-		.message {
-			min-height: 1.4rem;
-			font-size: 0.9rem;
-			margin-top: 0.5rem;
-		}
-		.message[hidden] {
-			display: none;
-		}
-		.message.error {
-			color: #dc2626;
-		}
-		.message.success {
-			color: #16a34a;
-		}
-		.divider {
-			display: flex;
-			align-items: center;
-			text-align: center;
-			margin: 1rem 0;
-		}
-		.divider::before,
-		.divider::after {
-			content: '';
-			flex: 1;
-			border-bottom: 1px solid var(--border-color);
-		}
-		.divider span {
-			padding: 0 1rem;
-			color: rgb(var(--gray));
-			font-size: 0.9rem;
-		}
-		#google-signin-button {
-			display: flex;
-			justify-content: center;
-		}
-
-		/* User Profile Styles */
-		.user-card {
-			max-width: 500px;
-		}
-		.user-header {
-			display: flex;
-			align-items: center;
-			gap: 1.25rem;
-			padding-bottom: 1.5rem;
-			border-bottom: 1px solid var(--border-color);
-		}
-		.user-avatar {
-			flex-shrink: 0;
-			width: 80px;
-			height: 80px;
-			border-radius: 50%;
-			overflow: hidden;
-			background: var(--bg-secondary);
-			border: 3px solid var(--border-color);
-		}
-		.user-avatar img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-		.avatar-placeholder {
-			width: 100%;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: rgb(var(--gray));
-			background: var(--bg-secondary);
-		}
-		.user-info {
-			flex: 1;
-			min-width: 0;
-		}
-		.user-name {
-			margin: 0 0 0.25rem 0;
-			font-size: 1.5rem;
-			font-weight: 700;
-			color: var(--text-primary);
-		}
-		.user-email {
-			margin: 0 0 0.5rem 0;
-			font-size: 0.95rem;
-			color: rgb(var(--gray));
-		}
-		.login-method-badge {
-			display: inline-block;
-			padding: 0.25rem 0.75rem;
-			border-radius: 999px;
-			font-size: 0.8rem;
-			font-weight: 600;
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
-		}
-		.login-method-badge.google-badge {
-			background: rgba(66, 133, 244, 0.1);
-			color: #4285f4;
-		}
-		.login-method-badge.admin-badge {
-			background: rgba(var(--accent-rgb), 0.1);
-			color: rgb(var(--accent));
-		}
-		.user-actions {
-			margin-top: 1.5rem;
-		}
-		.logout-btn {
-			width: 100%;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.5rem;
-			padding: 0.75rem 1.5rem;
-			border-radius: 999px;
-			border: 1px solid var(--border-color);
-			background: var(--bg-primary);
-			color: var(--text-primary);
-			font-weight: 600;
-			font-size: 1rem;
-			cursor: pointer;
-			transition: all 0.2s ease;
-		}
-		.logout-btn:hover {
-			background: var(--bg-secondary);
-			border-color: #dc2626;
-			color: #dc2626;
-			transform: translateY(-1px);
-		}
-		.logout-btn:active {
-			transform: translateY(0);
-		}
-		
-		@media (max-width: 640px) {
-			.card {
-				padding: 1.5rem;
-			}
-			.page-header {
-				margin-bottom: 1.5rem;
-			}
-			.user-header {
-				flex-direction: column;
-				text-align: center;
-			}
-			.user-avatar {
-				width: 100px;
-				height: 100px;
-			}
-		}
-	</style>
 </PageLayout>
 
