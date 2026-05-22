@@ -1,0 +1,80 @@
+/* Neumorphic design tokens — use inside .neu-page scopes */
+.neu-page {
+	--neu-bg: #e4eaf3;
+	--neu-surface: #e8edf4;
+	--neu-dark: #b8c5d9;
+	--neu-light: #ffffff;
+	--neu-text: #2d3748;
+	--neu-muted: #6b7c93;
+}
+
+:root.dark .neu-page {
+	--neu-bg: #141a24;
+	--neu-surface: #1a2230;
+	--neu-dark: #0c1018;
+	--neu-light: #243044;
+	--neu-text: #e8edf4;
+	--neu-muted: #9aa8be;
+}
+
+.neu-raised {
+	background: var(--neu-surface);
+	border-radius: 1.25rem;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	box-shadow:
+		10px 10px 22px var(--neu-dark),
+		-10px -10px 22px var(--neu-light);
+}
+
+.neu-inset {
+	background: var(--neu-surface);
+	border-radius: 1.25rem;
+	box-shadow:
+		inset 6px 6px 14px var(--neu-dark),
+		inset -6px -6px 14px var(--neu-light);
+}
+
+.neu-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35rem;
+	padding: 0.65rem 1.1rem;
+	border-radius: 999px;
+	background: var(--neu-surface);
+	color: var(--neu-muted);
+	text-decoration: none;
+	border: none;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 600;
+	font-size: 0.9rem;
+	box-shadow:
+		6px 6px 14px var(--neu-dark),
+		-6px -6px 14px var(--neu-light);
+	transition: transform 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.neu-pill:hover {
+	color: var(--accent);
+	transform: translateY(-1px);
+}
+
+.neu-pill:active {
+	box-shadow:
+		inset 4px 4px 10px var(--neu-dark),
+		inset -4px -4px 10px var(--neu-light);
+}
+
+.neu-pill--primary {
+	color: #fff;
+	background: linear-gradient(145deg, #3b82f6, #2563eb);
+	box-shadow:
+		6px 6px 14px rgba(37, 99, 235, 0.35),
+		-4px -4px 12px var(--neu-light);
+}
+
+.neu-pill--primary:hover {
+	color: #fff;
+	background: linear-gradient(145deg, #2563eb, #1d4ed8);
+}
