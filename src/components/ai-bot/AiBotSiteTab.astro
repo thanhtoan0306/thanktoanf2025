@@ -1,0 +1,61 @@
+---
+import { SITE_TAB_LABEL } from '../../lib/ai-bot-site';
+
+interface Props {
+	target: 'page' | 'widget';
+}
+
+const { target } = Astro.props;
+---
+
+<div class="aibot-tabs" role="tablist" aria-label="Suggested prompts">
+	<button
+		type="button"
+		role="tab"
+		class="aibot-tabs__chip"
+		data-aibot-site-tab
+		data-aibot-target={target}
+	>
+		{SITE_TAB_LABEL}
+	</button>
+</div>
+
+<style>
+	.aibot-tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		justify-content: center;
+		padding: 0 0 0.5rem;
+		max-width: 720px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	.aibot-tabs__chip {
+		padding: 0.5rem 1rem;
+		border: 1px solid #dadce0;
+		border-radius: 999px;
+		background: #fff;
+		color: #3c4043;
+		font: inherit;
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+	.aibot-tabs__chip:hover {
+		background: #f0f4f9;
+		border-color: #4285f4;
+		box-shadow: 0 1px 4px rgba(66, 133, 244, 0.15);
+	}
+	:global(:root.dark) .aibot-tabs__chip {
+		background: #282a2c;
+		border-color: #3c4043;
+		color: #e3e3e3;
+	}
+	:global(:root.dark) .aibot-tabs__chip:hover {
+		background: #333537;
+		border-color: #8ab4f8;
+	}
+</style>

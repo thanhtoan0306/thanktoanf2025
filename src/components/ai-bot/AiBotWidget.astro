@@ -1,5 +1,6 @@
 ---
-/** Floating AI Bot launcher + corner chat popup (UI demo). */
+import AiBotChatInit from './AiBotChatInit.astro';
+import AiBotSiteTab from './AiBotSiteTab.astro';
 ---
 
 <div class="aibot-widget" id="aibot-widget">
@@ -27,6 +28,10 @@
 
 		<div class="aibot-widget__messages" id="aibot-widget-messages">
 			<p class="aibot-widget__welcome">Hi! Ask me anything — UI demo only.</p>
+		</div>
+
+		<div class="aibot-widget__tabs-wrap">
+			<AiBotSiteTab target="widget" />
 		</div>
 
 		<form class="aibot-widget__form" id="aibot-widget-form">
@@ -117,6 +122,8 @@
 		if (input) input.value = '';
 	});
 </script>
+
+<AiBotChatInit />
 
 <style>
 	.aibot-widget {
@@ -298,6 +305,22 @@
 	}
 	:global(:root.dark .aibot-widget__msg--bot) {
 		color: #e3e3e3;
+	}
+
+	.aibot-widget__tabs-wrap {
+		flex-shrink: 0;
+		padding: 0.5rem 0.75rem 0;
+		border-top: 1px solid #e8eaed;
+		background: #fff;
+	}
+	.aibot-widget__tabs-wrap :global(.aibot-tabs) {
+		padding: 0;
+		max-width: none;
+		justify-content: flex-start;
+	}
+	:global(:root.dark) .aibot-widget__tabs-wrap {
+		background: #1e1f20;
+		border-top-color: #3c4043;
 	}
 
 	.aibot-widget__form {

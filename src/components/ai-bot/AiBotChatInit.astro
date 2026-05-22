@@ -1,0 +1,64 @@
+---
+import { buildSiteBotAnswer, SITE_TAB_USER_MESSAGE } from '../../lib/ai-bot-site';
+import { SITE_AUTHOR, SITE_TITLE } from '../../consts';
+
+const siteBotAnswer = buildSiteBotAnswer({
+	title: SITE_TITLE,
+	author: SITE_AUTHOR,
+});
+---
+
+<script define:vars={{ siteUserMsg: SITE_TAB_USER_MESSAGE, siteBotAnswer }}>
+	function appendPageExchange(userText, botText) {
+		const home = document.getElementById('aibot-home');
+		const chat = document.getElementById('aibot-chat');
+		const scroll = document.getElementById('aibot-scroll');
+		if (!chat) return;
+
+		if (home) home.hidden = true;
+		chat.hidden = false;
+
+		const user = document.createElement('p');
+		user.className = 'aibot-msg aibot-msg--user';
+		user.textContent = userText;
+		chat.appendChild(user);
+
+		const bot = document.createElement('p');
+		bot.className = 'aibot-msg aibot-msg--bot';
+		bot.textContent = botText;
+		chat.appendChild(bot);
+
+		scroll?.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' });
+	}
+
+	function appendWidgetExchange(userText, botText) {
+		const messages = document.getElementById('aibot-widget-messages');
+		if (!messages) return;
+
+		const welcome = messages.querySelector('.aibot-widget__welcome');
+		if (welcome) welcome.remove();
+
+		const user = document.createElement('p');
+		user.className = 'aibot-widget__msg aibot-widget__msg--user';
+		user.textContent = userText;
+		messages.appendChild(user);
+
+		const bot = document.createElement('p');
+		bot.className = 'aibot-widget__msg aibot-widget__msg--bot';
+		bot.textContent = botText;
+		messages.appendChild(bot);
+
+		messages.scrollTop = messages.scrollHeight;
+	}
+
+	document.querySelectorAll('[data-aibot-site-tab]').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const target = btn.getAttribute('data-aibot-target');
+			if (target === 'page') {
+				appendPageExchange(siteUserMsg, siteBotAnswer);
+			} else if (target === 'widget') {
+				appendWidgetExchange(siteUserMsg, siteBotAnswer);
+			}
+		});
+	});
+</script>
