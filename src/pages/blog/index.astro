@@ -1,5 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import BlogNeu from '../../components/neu/BlogNeu.astro';
+import NeuPageStyles from '../../components/neu/NeuPageStyles.astro';
 import PostCard from '../../components/PostCard.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import PageLayout from '../../layouts/PageLayout.astro';
@@ -32,7 +34,6 @@ function toTitleFromSlug(slug: string): string {
 }
 
 async function getHtmlBlogCards(): Promise<HtmlBlogCard[]> {
-	// Run at build/dev time on Node. `public/` files are served as static assets.
 	const publicDir = new URL('../../../public/', import.meta.url);
 	const htmlBlogDir = new URL('./htmlblog/', publicDir);
 
@@ -65,7 +66,7 @@ async function getHtmlBlogCards(): Promise<HtmlBlogCard[]> {
 						/<meta\s+content=["']([^"']+)["']\s+name=["']description["'][^>]*>/i,
 					);
 			} catch {
-				// If we can't read/parse, still show a fallback card.
+				// fallback card
 			}
 
 			return {
@@ -84,17 +85,8 @@ const htmlCards = await getHtmlBlogCards();
 ---
 
 <PageLayout title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
-	<section class="page-header">
-		<div>
-			<p class="eyebrow">Blog</p>
-			<h1>Blog của Thanktoanf</h1>
-		</div>
-		<button id="add-blog-button" class="add-blog-button" hidden>
-			+ Add blog
-		</button>
-	</section>
-
-	<section>
+	<NeuPageStyles />
+	<BlogNeu postCount={posts.length} htmlCount={htmlCards.length}>
 		<div class="post-grid">
 			{posts.map((post) => (
 				<PostCard post={post} />
@@ -115,7 +107,7 @@ const htmlCards = await getHtmlBlogCards();
 				</article>
 			))}
 		</div>
-	</section>
+	</BlogNeu>
 
 	<script>
 		const STORAGE_KEY = 'adminLoggedIn';
@@ -126,112 +118,7 @@ const htmlCards = await getHtmlBlogCards();
 		}
 
 		addBtn?.addEventListener('click', () => {
-			// Tạm thời chỉ alert, sau này có thể chuyển sang trang tạo bài mới
 			alert('TODO: Trang tạo blog mới (chưa implement).');
 		});
 	</script>
 </PageLayout>
-
-<style>
-	.page-header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-	}
-	.eyebrow {
-		margin: 0;
-		text-transform: uppercase;
-		font-size: 0.9rem;
-		letter-spacing: 0.15em;
-		color: rgb(var(--gray));
-	}
-	.lead {
-		margin: 0;
-		color: rgb(var(--gray));
-		max-width: 640px;
-	}
-	.post-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 1.4rem;
-	}
-
-	/* Keep HTML cards visually consistent with `PostCard` */
-	.card {
-		background: var(--bg-primary);
-		border-radius: 14px;
-		box-shadow: 0 12px 30px rgba(var(--gray), 12%);
-		transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.3s ease;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		height: 400px;
-	}
-	.card__link {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		color: inherit;
-		text-decoration: none;
-	}
-	.card__image {
-		display: block;
-		width: 100%;
-		height: 200px;
-		flex-shrink: 0;
-		object-fit: cover;
-	}
-	.card__body {
-		padding: 1.25rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.35rem;
-		flex: 1;
-		min-height: 0;
-		overflow: hidden;
-	}
-	.card__date {
-		margin: 0;
-		color: rgb(var(--gray));
-		font-size: 0.95rem;
-	}
-	.card__title {
-		margin: 0;
-		line-height: 1.25;
-		font-size: 1.2rem;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-	.card__description {
-		margin: 0;
-		color: rgb(var(--gray));
-		font-size: 1rem;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-	.card:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 16px 40px rgba(var(--gray), 18%);
-	}
-
-	.add-blog-button {
-		align-self: flex-start;
-		padding: 0.5rem 0.9rem;
-		border-radius: 999px;
-		border: none;
-		background: #f97316; /* cam */
-		color: white;
-		font-weight: 600;
-		cursor: pointer;
-		white-space: nowrap;
-	}
-	.add-blog-button:hover {
-		filter: brightness(0.95);
-	}
-</style>
