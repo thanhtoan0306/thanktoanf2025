@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Desktop Build Navigator</title>
-    <meta name="description" content="Giải pháp đóng gói ứng dụng Go & HTML thành phần mềm Desktop — so sánh Wails, Fyne, Lorca và trắc nghiệm tư vấn.">
+    <meta name="description" content="Packaging Go & HTML apps as desktop software — compare Wails, Lorca, webview_go, Tauri, Electron, and an advisory quiz.">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Mermaid.js CDN -->
@@ -41,7 +41,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        /* Tùy chỉnh thanh cuộn */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -71,13 +71,13 @@
                     <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                         Desktop Build Navigator <span class="text-xs bg-goblue-500/10 text-goblue-400 px-2 py-0.5 rounded-full border border-goblue-500/30">V1.0</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Giải pháp đóng gói ứng dụng Go & HTML thành phần mềm Desktop</p>
+                    <p class="text-xs text-slate-400">Packaging Go & HTML web apps as desktop software</p>
                 </div>
             </div>
             
             <div class="flex items-center space-x-4">
                 <a href="#quiz" class="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-slate-950 bg-goblue-400 hover:bg-goblue-300 transition-all duration-200 shadow-md shadow-goblue-500/10">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Trắc nghiệm tư vấn
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Advisory quiz
                 </a>
             </div>
         </div>
@@ -85,43 +85,43 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Giới thiệu ngắn -->
+        <!-- Intro -->
         <div class="mb-12 text-center max-w-3xl mx-auto">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
-                Làm sao để đưa <span class="text-transparent bg-clip-text bg-gradient-to-r from-goblue-400 to-cyan-300">Go HTML/SSR</span> lên máy tính người dùng?
+                How do you ship <span class="text-transparent bg-clip-text bg-gradient-to-r from-goblue-400 to-cyan-300">Go HTML/SSR</span> to end users?
             </h2>
             <p class="text-slate-400 text-base sm:text-lg">
-                Việc chọn công cụ đóng gói phù hợp phụ thuộc vào loại giao diện bạn dùng (SSR hay SPA), dung lượng phần mềm mong muốn và độ phức tạp của các chức năng can thiệp hệ thống.
+                The right packaging tool depends on your UI type (SSR vs SPA), target app size, and how much system-level functionality you need.
             </p>
         </div>
 
-        <!-- Hệ thống điều hướng Tab -->
+        <!-- Tab navigation -->
         <div class="border-b border-slate-800 mb-8 overflow-x-auto">
             <nav class="flex space-x-8 min-w-[500px]" aria-label="Tabs">
                 <button onclick="switchTab('tab-flowchart')" id="btn-tab-flowchart" class="tab-btn border-goblue-500 text-goblue-400 flex items-center py-4 px-1 border-b-2 font-medium text-sm gap-2 transition-all">
-                    <i class="fa-solid fa-diagram-project text-base"></i> Sơ đồ Quyết định (Mermaid)
+                    <i class="fa-solid fa-diagram-project text-base"></i> Decision Flowchart (Mermaid)
                 </button>
                 <button onclick="switchTab('tab-architecture')" id="btn-tab-architecture" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 flex items-center py-4 px-1 border-b-2 font-medium text-sm gap-2 transition-all">
-                    <i class="fa-solid fa-server text-base"></i> Sơ đồ Kiến trúc WebView
+                    <i class="fa-solid fa-server text-base"></i> WebView Architecture
                 </button>
                 <button onclick="switchTab('tab-comparison')" id="btn-tab-comparison" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 flex items-center py-4 px-1 border-b-2 font-medium text-sm gap-2 transition-all">
-                    <i class="fa-solid fa-table-list text-base"></i> Bảng So sánh Chi tiết
+                    <i class="fa-solid fa-table-list text-base"></i> Detailed Comparison
                 </button>
                 <button onclick="switchTab('tab-code')" id="btn-tab-code" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 flex items-center py-4 px-1 border-b-2 font-medium text-sm gap-2 transition-all">
-                    <i class="fa-solid fa-code text-base"></i> Mã nguồn Boilerplate nhanh
+                    <i class="fa-solid fa-code text-base"></i> Quick Boilerplate Code
                 </button>
             </nav>
         </div>
 
-        <!-- NỘI DUNG TABS -->
+        <!-- TAB CONTENT -->
         
-        <!-- Tab 1: Sơ đồ Quyết định -->
+        <!-- Tab 1: Decision flowchart -->
         <div id="tab-flowchart" class="tab-content block">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-goblue-500"></span> Luồng Quyết định Công nghệ
+                            <span class="w-2 h-2 rounded-full bg-goblue-500"></span> Technology Decision Flow
                         </h3>
                         <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">Mermaid Live Flowchart</span>
                     </div>
@@ -129,18 +129,18 @@
                     <!-- Mermaid Renderer -->
                     <div class="mermaid bg-slate-950 p-4 sm:p-6 rounded-xl border border-slate-800/80 flex justify-center overflow-x-auto min-h-[400px]">
                         graph TD
-                            Start([Bắt đầu chọn Công nghệ]) --> Q1{Giao diện của bạn?}
+                            Start([Start choosing a stack]) --> Q1{What is your UI?}
                             
-                            Q1 -- "Đã có Go SSR / HTML Template" --> Q2{Yêu cầu của bạn?}
-                            Q1 -- "Viết mới hoàn toàn (React/Vue/Svelte)" --> Q3{Bạn thạo ngôn ngữ nào?}
+                            Q1 -- "Already have Go SSR / HTML Template" --> Q2{What do you need?}
+                            Q1 -- "Greenfield (React/Vue/Svelte)" --> Q3{What language do you know best?}
 
-                            Q2 -- "Siêu nhẹ (<20MB), Tối giản" --> Webview[webview_go]
-                            Q2 -- "Ổn định cao, giao diện đồng nhất" --> Lorca[Lorca / Chrome App]
-                            Q2 -- "Cần nhiều tính năng Native xịn" --> WailsSSR[Wails v2/v3 (SSR mode)]
+                            Q2 -- "Ultra-light (&lt;20MB), minimal" --> Webview[webview_go]
+                            Q2 -- "High stability, consistent UI" --> Lorca[Lorca / Chrome App]
+                            Q2 -- "Rich native features" --> WailsSSR[Wails v2/v3 SSR mode]
 
-                            Q3 -- "Muốn dùng Go (Backend)" --> Wails[Wails v2/v3]
-                            Q3 -- "Muốn dùng Rust (Backend)" --> Tauri[Tauri]
-                            Q3 -- "Chỉ biết Javascript/Typescript" --> Electron[Electron]
+                            Q3 -- "Want Go backend" --> Wails[Wails v2/v3]
+                            Q3 -- "Want Rust backend" --> Tauri[Tauri]
+                            Q3 -- "Only JS/TypeScript" --> Electron[Electron]
 
                             %% Styling Nodes
                             style Start fill:#1e293b,stroke:#475569,stroke-width:2px,color:#fff
@@ -157,22 +157,22 @@
                     </div>
                 </div>
 
-                <!-- Cột thông tin nhanh cho Tab 1 -->
+                <!-- Quick tips sidebar -->
                 <div class="space-y-6">
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Mẹo chọn nhanh</h4>
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Quick picks</h4>
                         <div class="space-y-4">
                             <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-goblue-500">
-                                <h5 class="text-sm font-bold text-white mb-1">Dùng Go Webview (webview_go) khi:</h5>
-                                <p class="text-xs text-slate-400">Bạn đã có sẵn dự án web viết bằng Go (Gin, Fiber, Echo) chạy SSR và muốn đóng gói siêu tốc, file cài chỉ cần 10-15MB.</p>
+                                <h5 class="text-sm font-bold text-white mb-1">Use Go Webview (webview_go) when:</h5>
+                                <p class="text-xs text-slate-400">You already have a Go web project (Gin, Fiber, Echo) running SSR and want a fast package with a 10–15 MB installer.</p>
                             </div>
                             <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-red-500">
-                                <h5 class="text-sm font-bold text-white mb-1">Dùng Wails khi:</h5>
-                                <p class="text-xs text-slate-400">Bạn muốn làm một ứng dụng Desktop chuyên nghiệp, viết mới giao diện bằng React/Vue/Vite và muốn Go xử lý logic ở tầng hệ thống mượt mà.</p>
+                                <h5 class="text-sm font-bold text-white mb-1">Use Wails when:</h5>
+                                <p class="text-xs text-slate-400">You want a polished desktop app with a new React/Vue/Vite UI and smooth Go system-level logic.</p>
                             </div>
                             <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-amber-500">
-                                <h5 class="text-sm font-bold text-white mb-1">Dùng Lorca khi:</h5>
-                                <p class="text-xs text-slate-400">Bạn ngại sự bất ổn định của hệ thống WebView trên Windows cũ và muốn mượn sức mạnh đồng nhất của Google Chrome có sẵn trên máy người dùng.</p>
+                                <h5 class="text-sm font-bold text-white mb-1">Use Lorca when:</h5>
+                                <p class="text-xs text-slate-400">You want to avoid WebView quirks on older Windows and lean on the user’s installed Chrome for consistent rendering.</p>
                             </div>
                         </div>
                     </div>
@@ -180,35 +180,35 @@
             </div>
         </div>
 
-        <!-- Tab 2: Sơ đồ kiến trúc -->
+        <!-- Tab 2: Architecture diagram -->
         <div id="tab-architecture" class="tab-content hidden">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl mb-8">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-server text-goblue-500"></i> Cơ chế Hoạt động của Go SSR Desktop App
+                        <i class="fa-solid fa-server text-goblue-500"></i> How a Go SSR Desktop App Works
                     </h3>
                 </div>
                 
                 <div class="mermaid bg-slate-950 p-6 rounded-xl border border-slate-800/80 flex justify-center overflow-x-auto">
                     graph LR
-                        subgraph DesktopOS [Môi trường Hệ điều hành]
-                            subgraph APP [App Bundle]
-                                GoServer[Backend: Server Go chạy ngầm]
+                        subgraph DesktopOS [Operating system]
+                            subgraph APP [App bundle]
+                                GoServer[Backend: Go server in background]
                                 Embedded[Assets: HTML/CSS/JS]
                             end
                             
-                            subgraph GUI [Khung hiển thị giao diện]
+                            subgraph GUI [UI shell]
                                 WV[Native WebView]
                             end
                             
-                            BrowserEngine[Lõi Browser Hệ thống: WebView2 / Safari]
+                            BrowserEngine[System browser: WebView2 / Safari]
                         end
 
-                        Embedded -- Embed bằng //go:embed --> GoServer
-                        GoServer -- 1. Khởi động Web Server tại 127.0.0.1:PORT --> GoServer
-                        GoServer -- 2. Kích hoạt & Điều hướng WebView trỏ tới Local Port --> WV
-                        WV -- 3. Đọc dữ liệu từ lõi trình duyệt của OS --> BrowserEngine
-                        BrowserEngine -- 4. Render HTML/CSS/JS mượt mà ra màn hình --> GUI
+                        Embedded -- Embedded via //go:embed --> GoServer
+                        GoServer -- 1. Start web server at 127.0.0.1:PORT --> GoServer
+                        GoServer -- 2. Point WebView at local port --> WV
+                        WV -- 3. Load pages via OS browser engine --> BrowserEngine
+                        BrowserEngine -- 4. Render HTML/CSS/JS to screen --> GUI
 
                         style APP fill:#0f172a,stroke:#334155,stroke-width:2px,color:#fff
                         style GUI fill:#0f172a,stroke:#334155,stroke-width:2px,color:#fff
@@ -218,29 +218,29 @@
                         style BrowserEngine fill:#1e293b,stroke:#475569,stroke-width:1px,color:#fff
                 </div>
                 <div class="mt-4 text-sm text-slate-400 max-w-3xl">
-                    <p class="font-semibold text-white mb-2"><i class="fa-solid fa-circle-info text-goblue-400 mr-2"></i>Điểm cốt lõi:</p>
-                    <p>Ứng dụng thực chất chạy một Web Server siêu nhỏ bên trong máy người dùng một cách an toàn (chỉ mở kết nối nội bộ Loopback <code>127.0.0.1</code>). WebView đóng vai trò như một chiếc "gương" giúp loại bỏ thanh địa chỉ của trình duyệt, tạo cảm giác đó là một phần mềm Native Desktop hoàn chỉnh.</p>
+                    <p class="font-semibold text-white mb-2"><i class="fa-solid fa-circle-info text-goblue-400 mr-2"></i>Core idea:</p>
+                    <p>The app runs a tiny web server on the user’s machine (loopback only at <code>127.0.0.1</code>). WebView acts like a mirror without a browser address bar, so it feels like a native desktop app.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Tab 3: Bảng So sánh -->
+        <!-- Tab 3: Comparison table -->
         <div id="tab-comparison" class="tab-content hidden">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-                    <h3 class="text-lg font-bold text-white">Bảng Ma Trận So Sánh Các Giải Pháp</h3>
-                    <p class="text-xs text-slate-400 mt-1">Các chỉ số được đo lường dựa trên việc đóng gói ứng dụng Go kết hợp UI Web</p>
+                    <h3 class="text-lg font-bold text-white">Solution Comparison Matrix</h3>
+                    <p class="text-xs text-slate-400 mt-1">Metrics based on packaging a Go app with a web UI</p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-950/80 border-b border-slate-800 text-slate-300 text-xs font-semibold uppercase tracking-wider">
-                                <th class="p-4 sm:p-5">Giải pháp</th>
-                                <th class="p-4 sm:p-5">Dung lượng File (.exe/.app)</th>
-                                <th class="p-4 sm:p-5">Mức tiêu thụ RAM</th>
-                                <th class="p-4 sm:p-5">Độ đồng nhất UI trên các OS</th>
-                                <th class="p-4 sm:p-5">Mức độ can thiệp Hệ thống (Native API)</th>
-                                <th class="p-4 sm:p-5">Phù hợp nhất cho</th>
+                                <th class="p-4 sm:p-5">Solution</th>
+                                <th class="p-4 sm:p-5">Binary size (.exe/.app)</th>
+                                <th class="p-4 sm:p-5">RAM usage</th>
+                                <th class="p-4 sm:p-5">UI consistency across OS</th>
+                                <th class="p-4 sm:p-5">System access (native APIs)</th>
+                                <th class="p-4 sm:p-5">Best for</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 text-sm">
@@ -251,10 +251,10 @@
                                     </div>
                                 </td>
                                 <td class="p-4 sm:p-5 text-goblue-400 font-medium">~ 10 MB - 15 MB</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Rất thấp (~ 30-50MB)</td>
-                                <td class="p-4 sm:p-5 text-amber-400">Trung bình (Phụ thuộc OS)</td>
-                                <td class="p-4 sm:p-5 text-slate-400">Thấp (Cần tự viết CGO)</td>
-                                <td class="p-4 sm:p-5 text-slate-300">Tool nội bộ, Server SSR có sẵn cần giao diện nhanh.</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Very low (~ 30-50MB)</td>
+                                <td class="p-4 sm:p-5 text-amber-400">Medium (OS-dependent)</td>
+                                <td class="p-4 sm:p-5 text-slate-400">Low (CGO yourself)</td>
+                                <td class="p-4 sm:p-5 text-slate-300">Internal tools, existing SSR servers that need a quick UI shell.</td>
                             </tr>
                             <tr class="hover:bg-slate-800/30 transition-colors">
                                 <td class="p-4 sm:p-5 font-semibold text-white">
@@ -263,10 +263,10 @@
                                     </div>
                                 </td>
                                 <td class="p-4 sm:p-5 text-goblue-400 font-medium">~ 15 MB - 25 MB</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Thấp (~ 50-80MB)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Khá tốt (Đã tối ưu sâu)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Rất mạnh (Có sẵn Bridge Go-JS)</td>
-                                <td class="p-4 sm:p-5 text-slate-300">Phần mềm thương mại hiện đại sử dụng React/Vue/Vite.</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Low (~ 50-80MB)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Good (well optimized)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Strong (Go–JS bridge built in)</td>
+                                <td class="p-4 sm:p-5 text-slate-300">Modern commercial apps with React/Vue/Vite.</td>
                             </tr>
                             <tr class="hover:bg-slate-800/30 transition-colors">
                                 <td class="p-4 sm:p-5 font-semibold text-white">
@@ -275,10 +275,10 @@
                                     </div>
                                 </td>
                                 <td class="p-4 sm:p-5 text-goblue-400 font-medium">~ 8 MB - 12 MB</td>
-                                <td class="p-4 sm:p-5 text-slate-400">Trung bình (Dựa trên Chrome)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Tuyệt đối (Chạy lõi Chrome)</td>
-                                <td class="p-4 sm:p-5 text-slate-400">Thấp</td>
-                                <td class="p-4 sm:p-5 text-slate-300">App nội bộ, yêu cầu giao diện phức tạp nhưng đồng nhất.</td>
+                                <td class="p-4 sm:p-5 text-slate-400">Medium (Chrome-based)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Excellent (Chrome engine)</td>
+                                <td class="p-4 sm:p-5 text-slate-400">Low</td>
+                                <td class="p-4 sm:p-5 text-slate-300">Internal apps that need rich, consistent UI.</td>
                             </tr>
                             <tr class="hover:bg-slate-800/30 transition-colors">
                                 <td class="p-4 sm:p-5 font-semibold text-white/70">
@@ -287,10 +287,10 @@
                                     </div>
                                 </td>
                                 <td class="p-4 sm:p-5 text-goblue-400/70">~ 10 MB - 20 MB</td>
-                                <td class="p-4 sm:p-5 text-emerald-400/80">Rất thấp (~ 40-70MB)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400/80">Rất tốt</td>
-                                <td class="p-4 sm:p-5 text-emerald-400/80">Rất mạnh</td>
-                                <td class="p-4 sm:p-5 text-slate-400">Thay thế Electron nếu bạn thạo thêm Rust ở Backend.</td>
+                                <td class="p-4 sm:p-5 text-emerald-400/80">Very low (~ 40-70MB)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400/80">Very good</td>
+                                <td class="p-4 sm:p-5 text-emerald-400/80">Very strong</td>
+                                <td class="p-4 sm:p-5 text-slate-400">Electron alternative if your team knows Rust on the backend.</td>
                             </tr>
                             <tr class="hover:bg-slate-800/30 transition-colors">
                                 <td class="p-4 sm:p-5 font-semibold text-white/70">
@@ -299,10 +299,10 @@
                                     </div>
                                 </td>
                                 <td class="p-4 sm:p-5 text-red-400 font-medium">> 120 MB</td>
-                                <td class="p-4 sm:p-5 text-red-500">Rất cao (> 150MB - 300MB)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Tuyệt đối (Bao gồm Chromium)</td>
-                                <td class="p-4 sm:p-5 text-emerald-400">Toàn diện nhất</td>
-                                <td class="p-4 sm:p-5 text-slate-400">App doanh nghiệp lớn như VS Code, Slack, Discord.</td>
+                                <td class="p-4 sm:p-5 text-red-500">Very high (> 150MB - 300MB)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Excellent (bundled Chromium)</td>
+                                <td class="p-4 sm:p-5 text-emerald-400">Most comprehensive</td>
+                                <td class="p-4 sm:p-5 text-slate-400">Large products like VS Code, Slack, Discord.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -310,15 +310,15 @@
             </div>
         </div>
 
-        <!-- Tab 4: Code Boilerplate -->
+        <!-- Tab 4: Boilerplate code -->
         <div id="tab-code" class="tab-content hidden">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Code webview_go -->
+                <!-- webview_go code -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-full">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-xs bg-goblue-500/10 text-goblue-400 px-3 py-1 rounded-full border border-goblue-500/20 font-semibold uppercase">webview_go (SSR tối giản)</span>
+                        <span class="text-xs bg-goblue-500/10 text-goblue-400 px-3 py-1 rounded-full border border-goblue-500/20 font-semibold uppercase">webview_go (minimal SSR)</span>
                         <button onclick="copyCode('code-webview')" class="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1">
-                            <i class="fa-regular fa-copy"></i> Sao chép
+                            <i class="fa-regular fa-copy"></i> Copy
                         </button>
                     </div>
                     <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto text-xs text-slate-300 font-mono leading-relaxed flex-grow">
@@ -336,24 +336,24 @@ import (
 var templatesFS embed.FS
 
 func main() {
-	// 1. Tự động lấy một Port trống ngẫu nhiên
+	// 1. Pick a random free port
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		panic(err)
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
 
-	// 2. Chạy Server SSR (Gin, Fiber hoặc Standard HTTP)
+	// 2. Run SSR server (Gin, Fiber, or std HTTP)
 	tmpl := template.Must(template.ParseFS(templatesFS, "templates/*.html"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "index.html", map[string]interface{}{
-			"Title": "Chào mừng bạn tới Go SSR Desktop!",
+			"Title": "Welcome to Go SSR Desktop!",
 		})
 	})
 
 	go http.Serve(listener, nil)
 
-	// 3. Khởi động WebView hiển thị Server đó lên Desktop
+	// 3. Open WebView pointed at the local server
 	w := webview.New(false)
 	defer w.Destroy()
 	w.SetTitle("Go SSR Desktop App")
@@ -363,18 +363,18 @@ func main() {
 }</code></pre>
                 </div>
 
-                <!-- Code Wails v2 -->
+                <!-- Wails v2 code -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-full">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-xs bg-red-500/10 text-red-400 px-3 py-1 rounded-full border border-red-500/20 font-semibold uppercase">Wails v2/v3 (Khuyên Dùng)</span>
+                        <span class="text-xs bg-red-500/10 text-red-400 px-3 py-1 rounded-full border border-red-500/20 font-semibold uppercase">Wails v2/v3 (recommended)</span>
                         <button onclick="copyCode('code-wails')" class="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1">
-                            <i class="fa-regular fa-copy"></i> Sao chép
+                            <i class="fa-regular fa-copy"></i> Copy
                         </button>
                     </div>
                     <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto text-xs text-slate-300 font-mono leading-relaxed flex-grow">
-<code id="code-wails">// Cài đặt công cụ wails:
+<code id="code-wails">// Install Wails CLI:
 // go install github.com/wailsapp/wails/v2/cmd/wails@latest
-// Khởi tạo: wails init -n my-app -t svelte
+// Init: wails init -n my-app -t svelte
 
 package main
 
@@ -389,17 +389,17 @@ import (
 var assets embed.FS
 
 func main() {
-	app := NewApp() // Tạo struct App chứa logic xử lý
+	app := NewApp() // App struct with your logic
 
 	err := wails.Run(&options.App{
-		Title:  "Ứng dụng Wails Pro",
+		Title:  "Wails Pro App",
 		Width:  1024,
 		Height: 768,
 		AssetServer: &assetserver.Options{
-			Assets: assets, // Wails quản lý asset tuyệt đối không cần server ngầm
+			Assets: assets, // Wails serves assets; no hidden HTTP server needed
 		},
 		Bind: []interface{}{
-			app, // Bind các hàm Go cho Javascript gọi trực tiếp
+			app, // Expose Go methods to JavaScript
 		},
 	})
 
@@ -411,7 +411,7 @@ func main() {
             </div>
         </div>
 
-        <!-- PHẦN TRẮC NGHIỆM TƯ VẤN (QUIZ) -->
+        <!-- ADVISORY QUIZ -->
         <section id="quiz" class="mt-16 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
             <!-- Background glow -->
             <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-goblue-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -423,80 +423,80 @@ func main() {
                         <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
                     </span>
                     <div>
-                        <h3 class="text-xl font-bold text-white">Bạn không chắc chọn công cụ nào?</h3>
-                        <p class="text-xs text-slate-400">Trả lời 3 câu hỏi nhanh dưới đây để tìm giải pháp chuẩn nhất cho dự án của bạn.</p>
+                        <h3 class="text-xl font-bold text-white">Not sure which tool to pick?</h3>
+                        <p class="text-xs text-slate-400">Answer 3 quick questions to find the best fit for your project.</p>
                     </div>
                 </div>
 
-                <!-- Các Câu Hỏi -->
+                <!-- Questions -->
                 <div class="space-y-6 mt-8" id="quiz-container">
-                    <!-- Câu 1 -->
+                    <!-- Question 1 -->
                     <div class="quiz-step" data-step="1">
-                        <p class="text-sm font-semibold text-slate-300 mb-3">Câu 1: Dự án Web/Giao diện hiện tại của bạn đang nằm ở trạng thái nào?</p>
+                        <p class="text-sm font-semibold text-slate-300 mb-3">Question 1: What is the state of your web/UI project today?</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <button onclick="selectOption(1, 'A')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
-                                <span class="font-bold text-goblue-400 block mb-1">Phương án A</span>
-                                <span class="text-xs text-slate-300">Đã có code web SSR (HTML Template, Gin, Fiber, Go standard HTTP,...) cần đưa lên desktop.</span>
+                                <span class="font-bold text-goblue-400 block mb-1">Option A</span>
+                                <span class="text-xs text-slate-300">Existing SSR web (HTML templates, Gin, Fiber, Go std HTTP, …) that needs a desktop shell.</span>
                             </button>
                             <button onclick="selectOption(1, 'B')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
-                                <span class="font-bold text-purple-400 block mb-1">Phương án B</span>
-                                <span class="text-xs text-slate-300">Viết mới từ đầu, muốn dùng các Single Page App hiện đại (React, Vue, Svelte, Vite,...).</span>
+                                <span class="font-bold text-purple-400 block mb-1">Option B</span>
+                                <span class="text-xs text-slate-300">Greenfield project using a modern SPA (React, Vue, Svelte, Vite, …).</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Câu 2 -->
+                    <!-- Question 2 -->
                     <div class="quiz-step hidden" data-step="2">
-                        <p class="text-sm font-semibold text-slate-300 mb-3">Câu 2: Bạn ưu tiên yếu tố nào nhất đối với File ứng dụng đầu ra?</p>
+                        <p class="text-sm font-semibold text-slate-300 mb-3">Question 2: What matters most for the shipped binary?</p>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button onclick="selectOption(2, 'A')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
-                                <span class="font-bold text-emerald-400 block mb-1">Siêu nhẹ & Tiết kiệm</span>
-                                <span class="text-xs text-slate-400">Dung lượng cài phải nhỏ nhất có thể (&lt;20MB), ngốn cực ít RAM.</span>
+                                <span class="font-bold text-emerald-400 block mb-1">Ultra-light & efficient</span>
+                                <span class="text-xs text-slate-400">Smallest installer possible (&lt;20MB) and minimal RAM.</span>
                             </button>
                             <button onclick="selectOption(2, 'B')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
-                                <span class="font-bold text-goblue-400 block mb-1">Native API & Trải nghiệm</span>
-                                <span class="text-xs text-slate-400">Dung lượng vừa phải (dưới 40MB), nhưng có khả năng tương tác hệ thống mạnh mẽ.</span>
+                                <span class="font-bold text-goblue-400 block mb-1">Native APIs & UX</span>
+                                <span class="text-xs text-slate-400">Moderate size (under ~40MB) with strong system integration.</span>
                             </button>
                             <button onclick="selectOption(2, 'C')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
-                                <span class="font-bold text-amber-400 block mb-1">Độ ổn định tuyệt đối</span>
-                                <span class="text-xs text-slate-400">Chấp nhận app nặng (100MB+) để đảm bảo giao diện hiển thị y hệt nhau trên mọi loại máy.</span>
+                                <span class="font-bold text-amber-400 block mb-1">Maximum stability</span>
+                                <span class="text-xs text-slate-400">Accept a heavy app (100MB+) for identical UI on every machine.</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Câu 3 -->
+                    <!-- Question 3 -->
                     <div class="quiz-step hidden" data-step="3">
-                        <p class="text-sm font-semibold text-slate-300 mb-3">Câu 3: Đội ngũ phát triển của bạn thành thạo nhất ngôn ngữ nào để viết tầng Backend/Hệ thống?</p>
+                        <p class="text-sm font-semibold text-slate-300 mb-3">Question 3: What does your team know best for backend/system code?</p>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button onclick="selectOption(3, 'A')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
                                 <span class="font-bold text-goblue-400 block mb-1">Golang (Go)</span>
-                                <span class="text-xs text-slate-400">Chỉ muốn dùng Go để viết logic hệ thống (tương tác file, gọi lệnh native, DB...).</span>
+                                <span class="text-xs text-slate-400">Go only for system logic (files, native commands, DB, …).</span>
                             </button>
                             <button onclick="selectOption(3, 'B')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
                                 <span class="font-bold text-orange-400 block mb-1">Rust</span>
-                                <span class="text-xs text-slate-400">Yêu thích sự an toàn của Rust và muốn thử sức với hệ sinh thái Tauri mới.</span>
+                                <span class="text-xs text-slate-400">Prefer Rust safety and the Tauri ecosystem.</span>
                             </button>
                             <button onclick="selectOption(3, 'C')" class="option-btn p-4 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-goblue-500/50 hover:bg-slate-900/80 transition-all">
                                 <span class="font-bold text-yellow-400 block mb-1">JavaScript/TypeScript</span>
-                                <span class="text-xs text-slate-400">Không muốn sờ vào Go/Rust, thích code full Node.js trên máy tính.</span>
+                                <span class="text-xs text-slate-400">Avoid Go/Rust; full Node.js on the desktop.</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Kết quả hiển thị động -->
+                    <!-- Dynamic result -->
                     <div id="quiz-result" class="hidden p-6 bg-slate-900 rounded-2xl border border-goblue-500/30 text-center space-y-4">
                         <div class="inline-flex items-center justify-center p-4 bg-goblue-500 text-slate-950 rounded-2xl text-2xl font-black mb-2" id="result-badge">
                             GO
                         </div>
-                        <h4 class="text-xl font-bold text-white">Lựa chọn khuyên dùng: <span id="result-title" class="text-goblue-400">Wails v2/v3</span></h4>
-                        <p id="result-desc" class="text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">Mô tả kết quả phù hợp nhất sẽ hiển thị tại đây.</p>
+                        <h4 class="text-xl font-bold text-white">Recommended: <span id="result-title" class="text-goblue-400">Wails v2/v3</span></h4>
+                        <p id="result-desc" class="text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">Your best-fit description will appear here.</p>
                         
                         <div class="pt-4 flex justify-center gap-3">
                             <button onclick="resetQuiz()" class="px-4 py-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white rounded-lg text-xs transition-all">
-                                Làm lại trắc nghiệm
+                                Retake quiz
                             </button>
                             <button onclick="switchTab('tab-code')" class="px-4 py-2 bg-goblue-500 hover:bg-goblue-400 text-slate-950 font-bold rounded-lg text-xs transition-all">
-                                Xem code mẫu tương ứng
+                                View matching sample code
                             </button>
                         </div>
                     </div>
@@ -509,14 +509,14 @@ func main() {
     <!-- Footer -->
     <footer class="border-t border-slate-900 bg-slate-950 py-8 mt-16 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4">
-            <p class="mb-2">Go Desktop Build Navigator - Phát triển và Biên soạn chuyên sâu cho cộng đồng Go Việt Nam</p>
-            <p>Sử dụng các công nghệ mã nguồn mở: Mermaid.js, Tailwind CSS và Webview APIs.</p>
+            <p class="mb-2">Go Desktop Build Navigator — a practical guide for shipping Go web UIs on the desktop</p>
+            <p>Built with open source: Mermaid.js, Tailwind CSS, and WebView APIs.</p>
         </div>
     </footer>
 
-    <!-- JS Logic cho Trang Web -->
+    <!-- Page scripts -->
     <script>
-        // Khởi tạo Mermaid.js
+        // Initialize Mermaid.js
         mermaid.initialize({
             startOnLoad: true,
             theme: 'dark',
@@ -527,21 +527,18 @@ func main() {
             }
         });
 
-        // Đổi tab mượt mà
+        // Tab switching
         function switchTab(tabId) {
-            // Ẩn tất cả tab
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(el => el.classList.add('hidden'));
             contents.forEach(el => el.classList.remove('block'));
 
-            // Hiển thị tab được chọn
             const target = document.getElementById(tabId);
             if (target) {
                 target.classList.remove('hidden');
                 target.classList.add('block');
             }
 
-            // Thay đổi class active trên button tab
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('border-goblue-500', 'text-goblue-400');
@@ -555,13 +552,12 @@ func main() {
             }
         }
 
-        // Logic Trắc nghiệm
+        // Quiz logic
         let quizAnswers = {};
 
         function selectOption(step, value) {
             quizAnswers[step] = value;
             
-            // Tìm bước tiếp theo
             const currentStepEl = document.querySelector(`.quiz-step[data-step="${step}"]`);
             if (currentStepEl) {
                 currentStepEl.classList.add('hidden');
@@ -571,15 +567,14 @@ func main() {
             if (nextStepEl) {
                 nextStepEl.classList.remove('hidden');
             } else {
-                // Đã hoàn thành tất cả câu hỏi, tính toán kết quả
                 calculateQuizResult();
             }
         }
 
         function calculateQuizResult() {
-            const r1 = quizAnswers[1]; // Giao diện
-            const r2 = quizAnswers[2]; // Ưu tiên dung lượng
-            const r3 = quizAnswers[3]; // Thành thạo Backend
+            const r1 = quizAnswers[1]; // UI type
+            const r2 = quizAnswers[2]; // Size priority
+            const r3 = quizAnswers[3]; // Backend skill
 
             let resultTitle = "";
             let resultDesc = "";
@@ -588,42 +583,41 @@ func main() {
 
             if (r3 === 'B') {
                 resultTitle = "Tauri (Rust + Web)";
-                resultDesc = "Do bạn thành thạo Rust và muốn tối ưu hóa hiệu năng, Tauri là giải pháp hoàn hảo để xây dựng ứng dụng Desktop vừa siêu nhẹ (chỉ khoảng 15MB) vừa mượt mà. Đóng gói SPA bằng Tauri sẽ mang lại trải nghiệm chuẩn Native nhất.";
+                resultDesc = "With Rust skills and a performance focus, Tauri is ideal: ~15MB bundles and smooth native feel. Great for packaging SPAs with a Rust backend.";
                 badgeBg = "bg-emerald-500";
                 badgeText = "RUST";
             } else if (r3 === 'C') {
                 resultTitle = "Electron (JavaScript)";
-                resultDesc = "Nếu team của bạn thuần thục JavaScript/TypeScript và muốn có sự ổn định tuyệt đối, bất chấp việc tốn RAM và dung lượng file nặng (120MB+), Electron là con quái vật được bảo chứng bởi các ông lớn như Microsoft, Slack.";
+                resultDesc = "If your team lives in JavaScript/TypeScript and wants maximum stability regardless of RAM and size (120MB+), Electron is proven by Microsoft, Slack, and others.";
                 badgeBg = "bg-slate-500";
                 badgeText = "JS";
             } else {
-                // Trực hệ xử lý cho Golang (r3 === 'A')
-                if (r1 === 'A') { // SSR / HTML Template sẵn có
+                // Go backend path (r3 === 'A')
+                if (r1 === 'A') { // Existing SSR
                     if (r2 === 'A') {
                         resultTitle = "webview_go (Golang WebView)";
-                        resultDesc = "Sự kết hợp hoàn hảo cho dự án Go SSR hiện tại của bạn. webview_go sẽ tận dụng engine có sẵn của hệ điều hành, giúp build ứng dụng gọn gàng trong tầm 10-15MB, tốc độ tải tức thì và ăn cực ít bộ nhớ RAM.";
+                        resultDesc = "A strong match for your current Go SSR project. webview_go uses the OS engine for ~10–15MB builds, fast startup, and low RAM.";
                         badgeBg = "bg-goblue-500";
                         badgeText = "WEBVIEW";
                     } else if (r2 === 'B') {
-                        resultTitle = "Wails v2/v3 (Chế độ SSR Server)";
-                        resultDesc = "Wails cung cấp bộ khung (Frame) tuyệt vời cho Go. Mặc dù tối ưu nhất cho SPA, bạn hoàn toàn có thể cấu hình Wails làm một cửa sổ Desktop trỏ thẳng vào Server SSR ngầm của bạn để tận hưởng các API hệ thống cao cấp từ Wails.";
+                        resultTitle = "Wails v2/v3 (SSR server mode)";
+                        resultDesc = "Wails gives Go a polished desktop frame. Though SPA-first, you can point Wails at a hidden SSR server for advanced system APIs.";
                         badgeBg = "bg-red-500";
                         badgeText = "WAILS";
                     } else {
-                        resultTitle = "Lorca (Tận dụng Chrome)";
-                        resultDesc = "Để loại bỏ tình trạng 'vỡ giao diện' do sự khác biệt giữa Edge WebView2 trên Windows và WebKit trên macOS, Lorca mượn lõi Chrome có sẵn của máy người dùng. Đây là cách rất an toàn cho dự án Go HTML thuần của bạn.";
+                        resultTitle = "Lorca (Chrome-based)";
+                        resultDesc = "To avoid UI drift between WebView2 on Windows and WebKit on macOS, Lorca uses the user’s Chrome. A safe choice for plain Go HTML apps.";
                         badgeBg = "bg-amber-500";
                         badgeText = "LORCA";
                     }
-                } else { // Viết mới bằng SPA (React, Vue, Svelte...)
+                } else { // Greenfield SPA
                     resultTitle = "Wails (v2/v3)";
-                    resultDesc = "Đây là framework đỉnh nhất hệ sinh thái Go để xây dựng desktop app hiện đại. Wails hỗ trợ liên kết chặt chẽ (binding) các hàm Go trực tiếp vào JS giúp bạn gọi chức năng Backend mà không cần khởi tạo Server HTTP chạy ngầm.";
+                    resultDesc = "The top Go framework for modern desktop apps. Wails binds Go functions to JS so you can call backend logic without a hidden HTTP server.";
                     badgeBg = "bg-red-500";
                     badgeText = "WAILS";
                 }
             }
 
-            // Hiển thị kết quả
             const badge = document.getElementById('result-badge');
             badge.className = `inline-flex items-center justify-center p-4 text-slate-950 rounded-2xl text-lg font-black mb-2 ${badgeBg}`;
             badge.innerText = badgeText;
@@ -636,7 +630,6 @@ func main() {
 
         function resetQuiz() {
             quizAnswers = {};
-            // Reset các bước hiển thị
             document.querySelectorAll('.quiz-step').forEach((el, index) => {
                 if (index === 0) el.classList.remove('hidden');
                 else el.classList.add('hidden');
@@ -644,11 +637,10 @@ func main() {
             document.getElementById('quiz-result').classList.add('hidden');
         }
 
-        // Sao chép code mẫu vào Clipboard
+        // Copy sample code to clipboard
         function copyCode(elementId) {
             const codeText = document.getElementById(elementId).innerText;
             
-            // Sử dụng cơ chế sao chép dự phòng tương thích môi trường iFrame
             const el = document.createElement('textarea');
             el.value = codeText;
             document.body.appendChild(el);
@@ -656,10 +648,9 @@ func main() {
             document.execCommand('copy');
             document.body.removeChild(el);
 
-            // Hiển thị Toast thông báo thành công đơn giản
             const toast = document.createElement('div');
             toast.className = 'fixed bottom-5 right-5 bg-goblue-500 text-slate-950 px-4 py-2 rounded-lg font-bold shadow-lg transition-all text-xs z-50';
-            toast.innerText = 'Đã sao chép code vào bộ nhớ đệm!';
+            toast.innerText = 'Code copied to clipboard!';
             document.body.appendChild(toast);
             
             setTimeout(() => {
